@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Relations - Voxivium</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="apple-touch-icon" sizes="180x180" href="favicon2/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon2/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon2/favicon-16x16.png">
+	<link rel="manifest" href="favicon2/site.webmanifest">    
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo Text -->
+            <a href="index.html" class="flex items-center">
+                <img src="images/V-logo.png" alt="Voxivium Logo" class="h-10 sm:h-12 md:h-16 max-w-xs object-contain">
+            </a>
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-gray-600 hover:text-vox-blue transition-colors">Home</a>
+                <a href="#" class="text-gray-600 hover:text-vox-blue transition-colors font-semibold text-vox-blue">Investors</a>
+                <a href="index.html#about" class="text-gray-600 hover:text-vox-blue transition-colors">About</a>
+            </nav>
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="menu-button" class="text-gray-600 hover:text-vox-blue focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Slide-out Menu -->
+    <div id="menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 menu-hidden md:hidden">
+        <div class="flex justify-end p-4">
+            <button id="close-menu-button" class="text-gray-600 hover:text-vox-blue focus:outline-none">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <nav class="flex flex-col p-4 space-y-4">
+            <a href="index.html" class="text-gray-600 hover:text-vox-blue transition-colors">Home</a>
+            <a href="#" class="text-gray-600 hover:text-vox-blue transition-colors">Investors</a>
+            <a href="index.html#about" class="text-gray-600 hover:text-vox-blue transition-colors">About</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <section class="hero-gradient py-16 sm:py-24">
+            <div class="container mx-auto px-6">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold text-vox-blue tracking-tight">Investing in the Future of Governance</h1>
+                    <p class="mt-6 text-lg text-gray-600">Voxivium is a Public Benefit Corporation committed to creating a more transparent and accountable government. We are seeking partners who share our vision of empowering citizens and strengthening the democratic process through technology.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-vox-blue">A Unique Opportunity</h2>
+                        <p class="mt-4 text-lg text-gray-600">
+                            The relationship between citizens and their government is ready for a fundamental shift. Traditional methods of communication are outdated, and there is a growing demand for greater transparency and accountability. Voxivium is positioned to lead this change.
+                        </p>
+                        <p class="mt-4 text-lg text-gray-600">
+                            As a Public Benefit Corporation, our mission is legally protected, ensuring our long-term focus remains on creating a positive social impact alongside financial returns. We believe this model builds trust and creates a sustainable, mission-driven enterprise.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                         <div class="flex items-center justify-center h-16 w-16 rounded-full bg-vox-blue text-white mx-auto mb-6">
+                           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-center text-gray-800">Contact Us</h3>
+                        <p class="text-center text-gray-500 mt-2 mb-6">For inquiries about investment opportunities, please reach out to our investor relations team.</p>
+                        <div class="text-center text-lg text-vox-blue font-semibold" id="investor-email-link">
+                            <!-- Email will be inserted here by investor.js -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p>&copy; 2025 Voxivium, PBC. All Rights Reserved.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-vox-blue-light transition-colors">For Investors</a>
+                    <a href="privacy.html" class="hover:text-vox-blue-light transition-colors">Privacy Policy</a>
+                    <a href="tos.html" class="hover:text-vox-blue-light transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+    <script src="investor.js"></script>
+</body>
+</html>

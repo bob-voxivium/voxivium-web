@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="description" content="Voxivium is a political accountability and transparency platform. We empower citizens to hold elected officials accountable by providing a direct, transparent, and data-driven way to track politicians' actions against constituent values.">
+	<meta name="keywords" content="Voxivium, political accountability, political transparency, civic engagement, elected officials, politicians, voter report card, constituent data, public benefit corporation, non-partisan, democracy, voter engagement, political platform, election tool">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxivium</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="apple-touch-icon" sizes="180x180" href="favicon2/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon2/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon2/favicon-16x16.png">
+	<link rel="manifest" href="favicon2/site.webmanifest">    
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo Image -->
+            <a href="index.html" class="flex items-center">
+                <img src="images/V-logo.png" alt="Voxivium Logo" class="h-10 sm:h-12 md:h-16 max-w-xs object-contain">
+            </a>
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-gray-600 hover:text-vox-blue transition-colors font-semibold text-vox-blue">Home</a>
+                <a href="investors.html" class="text-gray-600 hover:text-vox-blue transition-colors">Investors</a>
+                <a href="#about" class="text-gray-600 hover:text-vox-blue transition-colors">About</a>
+            </nav>
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="menu-button" class="text-gray-600 hover:text-vox-blue focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Slide-out Menu -->
+    <div id="menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 menu-hidden md:hidden">
+        <div class="flex justify-end p-4">
+            <button id="close-menu-button" class="text-gray-600 hover:text-vox-blue focus:outline-none">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <nav class="flex flex-col p-4 space-y-4">
+            <a href="#" class="text-gray-600 hover:text-vox-blue transition-colors">Home</a>
+            <a href="investors.html" class="text-gray-600 hover:text-vox-blue transition-colors">Investors</a>
+            <a href="#about" class="text-gray-600 hover:text-vox-blue transition-colors">About</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section with Sign-up Form -->
+        <section class="hero-gradient py-16 sm:py-24">
+            <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+                <!-- Left Column: Headline -->
+                <div class="text-center md:text-left">
+                    <h1 class="text-4xl md:text-5xl font-bold text-vox-blue tracking-tight">A Government for the People, by the People.</h1>
+                    <p class="mt-6 text-lg text-gray-600">Voxivium is building a revolutionary platform to improve the relationship between citizens and their elected officials and to provide an unprecedented level of transparency and accountability in government. Our mission is to ensure your opinions matter and that your government is truly accountable to you.</p>
+                </div>
+                <!-- Right Column: Sign-up Form -->
+                <div id="form-container-top">
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                        <h2 class="text-2xl font-semibold text-center text-gray-800">Be the First to Know</h2>
+                        <p class="text-center text-gray-500 mt-2 mb-6">The Voxivium app is coming soon. Sign up for updates and be part of the change.</p>
+                        <form id="signup-form-top" class="space-y-4" novalidate>
+                            <div>
+                                <label for="firstName-top" class="block text-sm font-medium text-gray-700">First Name</label>
+                                <input type="text" id="firstName-top" name="firstName" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-vox-blue-light focus:border-vox-blue-light form-input" required>
+                                <p class="text-red-500 text-xs mt-1 hidden" data-validation-for="firstName"></p>
+                            </div>
+                            <div>
+                                <label for="email-top" class="block text-sm font-medium text-gray-700">Email Address</label>
+                                <input type="email" id="email-top" name="email" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-vox-blue-light focus:border-vox-blue-light form-input" required>
+                                <p class="text-red-500 text-xs mt-1 hidden" data-validation-for="email"></p>
+                            </div>
+                            <div>
+                                <label for="state-top" class="block text-sm font-medium text-gray-700">State</label>
+                                <select id="state-top" name="state" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-vox-blue-light focus:border-vox-blue-light form-input" required>
+                                    <option value="" disabled selected>Select your state</option>
+                                    <!-- States will be populated by JavaScript -->
+                                </select>
+                                <p class="text-red-500 text-xs mt-1 hidden" data-validation-for="state"></p>
+                            </div>
+                            <button type="submit" class="w-full bg-vox-blue hover:bg-vox-blue-light text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-vox-blue-light transition-all duration-300">Notify Me</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold text-vox-blue">What is Voxivium?</h2>
+                    <p class="mt-4 text-lg text-gray-600">
+                        The name <span class="font-semibold text-vox-blue">Voxivium</span> was inspired by the Latin words "Vox Civium," which translates to "The Voice of the Citizens." This name embodies our core mission: to build a government that is truly "of the people, by the people, and for the people."
+                    </p>
+                </div>
+
+                <div class="mt-16 grid md:grid-cols-3 gap-10">
+                    <!-- Feature 1 -->
+                    <div class="text-center">
+                        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-vox-blue text-white mx-auto">
+                           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="mt-5 text-xl font-semibold text-gray-900">Empower Your Voice</h3>
+                        <p class="mt-2 text-gray-600">Voxivium provides a direct, transparent, and data-driven line of communication to your elected officials, ensuring they know where you stand on the issues that matter most.</p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="text-center">
+                        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-vox-blue text-white mx-auto">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <h3 class="mt-5 text-xl font-semibold text-gray-900">Demand Accountability</h3>
+                        <p class="mt-2 text-gray-600">Effortlessly create a "Personal Report Card" for any politician, tracking their votes against your own stance on key issues. Hold them accountable with a personalized score.</p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="text-center">
+                        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-vox-blue text-white mx-auto">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <h3 class="mt-5 text-xl font-semibold text-gray-900">Bridge Partisan Divides</h3>
+                        <p class="mt-2 text-gray-600">Discover surprising areas of common ground. Voxivium reveals where citizens unite across party lines, empowering unified advocacy for the policies you mutually support.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our PBC Commitment Section -->
+        <section class="py-16 sm:py-24 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-vox-blue text-white mx-auto mb-6">
+                       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 20.417l5.5-5.5a1 1 0 011.414 0l5.5 5.5a12.02 12.02 0 005.618-14.477z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-bold text-vox-blue">Our Commitment as a Public Benefit Corporation</h2>
+                    <p class="mt-4 text-lg text-gray-600">
+                        Voxivium is incorporated as a Public Benefit Corporation (PBC), which legally binds us to our mission. This isn't just a promise; it's our corporate charter. Being a PBC means our success is measured not only by financial returns, but by how effectively we empower citizens and foster a more accountable government. This structure ensures that our core purpose—serving the public good—will always guide our decisions.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Sign-up Section -->
+        <section class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                 <div class="max-w-2xl mx-auto">
+                    <div id="form-container-bottom">
+                         <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                            <h2 class="text-2xl font-semibold text-center text-gray-800">Ready to Make a Difference?</h2>
+                            <p class="text-center text-gray-500 mt-2 mb-6">Join the waitlist and be the first to use Voxivium to hold your representatives accountable.</p>
+                            <form id="signup-form-bottom" class="space-y-4" novalidate>
+                                <div>
+                                    <label for="firstName-bottom" class="block text-sm font-medium text-gray-700">First Name</label>
+                                    <input type="text" id="firstName-bottom" name="firstName" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-vox-blue-light focus:border-vox-blue-light form-input" required>
+                                    <p class="text-red-500 text-xs mt-1 hidden" data-validation-for="firstName"></p>
+                                </div>
+                                <div>
+                                    <label for="email-bottom" class="block text-sm font-medium text-gray-700">Email Address</label>
+                                    <input type="email" id="email-bottom" name="email" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-vox-blue-light focus:border-vox-blue-light form-input" required>
+                                    <p class="text-red-500 text-xs mt-1 hidden" data-validation-for="email"></p>
+                                </div>
+                                <div>
+                                    <label for="state-bottom" class="block text-sm font-medium text-gray-700">State</label>
+                                    <select id="state-bottom" name="state" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:ring-vox-blue-light focus:border-vox-blue-light form-input" required>
+                                        <option value="" disabled selected>Select your state</option>
+                                        <!-- States will be populated by JavaScript -->
+                                    </select>
+                                    <p class="text-red-500 text-xs mt-1 hidden" data-validation-for="state"></p>
+                                </div>
+                                <button type="submit" class="w-full bg-vox-blue hover:bg-vox-blue-light text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-vox-blue-light transition-all duration-300">Count Me In!</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p>&copy; 2025 Voxivium, PBC. All Rights Reserved.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="investors.html" class="hover:text-vox-blue-light transition-colors">For Investors</a>
+                    <a href="privacy.html" class="hover:text-vox-blue-light transition-colors">Privacy Policy</a>
+                    <a href="tos.html" class="hover:text-vox-blue-light transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
