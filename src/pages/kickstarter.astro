@@ -1,0 +1,271 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import FeatureCard from '@components/ui/FeatureCard.astro'
+import VoterForm from '@components/forms/VoterForm.astro'
+
+const kickstarterUrl = import.meta.env.PUBLIC_KICKSTARTER_URL || ''
+const campaignLive = kickstarterUrl !== '' && kickstarterUrl !== '#'
+---
+
+<BaseLayout
+  title="Back Voxivium on Kickstarter"
+  description="Voxivium's Kickstarter campaign funds the launch of a non-partisan political accountability platform for U.S. voters. Sign up to be notified when the campaign goes live."
+>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Kickstarter</p>
+      <h1>{campaignLive ? "We're live on Kickstarter." : "We're going to Kickstarter."}</h1>
+      <p class="lead">
+        Voxivium is funded by community backers and paid accounts for politicians, media, and AI
+        labs—not advertisers, not data brokers. Help us launch a platform that's truly accountable
+        to the people who use it.
+      </p>
+
+      {
+        campaignLive ? (
+          <div class="cta-row">
+            <a class="primary" href={kickstarterUrl} rel="noopener" target="_blank">
+              Back on Kickstarter
+            </a>
+            <a class="secondary" href="/#voters">
+              Or sign up for general updates
+            </a>
+          </div>
+        ) : (
+          <div class="cta-row">
+            <span class="badge">Campaign launching soon</span>
+            <a class="secondary" href="#signup">
+              Get notified when it goes live
+            </a>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="why">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Where the funding goes</p>
+        <h2>What backers help build.</h2>
+      </header>
+
+      <p class="stakes">
+        Backers don't just fund a launch. They fund the foundation of a platform where the
+        verified, weighted voice of millions of Americans can finally reach the people elected to
+        represent them. Voxivium starts at the federal level. With your support, it grows from
+        there.
+      </p>
+
+      <div class="grid">
+        <FeatureCard title="Identity verification at scale">
+          <p>
+            Each Voxivium voter is a verified, registered U.S. citizen. Verification costs roughly
+            $1 per voter, one-time. Kickstarter funds the first wave so the platform launches with
+            real, attributable signal.
+          </p>
+        </FeatureCard>
+
+        <FeatureCard title="A complete federal vote ledger">
+          <p>
+            Every roll-call, every public statement, structured and tied to the issues real voters
+            care about. The ledger is open and auditable from day one.
+          </p>
+        </FeatureCard>
+
+        <FeatureCard title="Privacy-preserving aggregation">
+          <p>
+            We're building the aggregation pipeline before we open the platform—so the moment a user
+            states a position, we already know how to report it without ever exposing them.
+          </p>
+        </FeatureCard>
+
+        <FeatureCard title="iOS and Android launch">
+          <p>
+            The Voxivium app on both major mobile platforms, free for voters, ready on day one of
+            the public launch.
+          </p>
+        </FeatureCard>
+      </div>
+    </div>
+  </section>
+
+  {
+    !campaignLive && (
+      <section class="signup" id="signup">
+        <div class="container">
+          <div class="card">
+            <h2>Be first when the campaign goes live.</h2>
+            <p>
+              Drop your email and we'll notify you the moment the Kickstarter is open—and again when
+              the app launches.
+            </p>
+            <VoterForm />
+          </div>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<script>
+  import '@lib/forms/client'
+</script>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 3rem;
+  }
+
+  .container {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text2);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    max-width: 36rem;
+  }
+
+  .cta-row {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .primary,
+  .secondary {
+    padding: 0.875rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      opacity 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .primary {
+    background: var(--color-brand-primary);
+    color: white;
+  }
+
+  .primary:hover {
+    opacity: 0.9;
+  }
+
+  .secondary {
+    color: var(--color-brand-primary);
+    border: 1px solid var(--color-brand-el2);
+  }
+
+  .secondary:hover {
+    background: var(--color-brand-surface);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.5rem 0.875rem;
+    border-radius: 999px;
+    background: var(--color-brand-surface);
+    color: var(--color-brand-text2);
+    border: 1px solid var(--color-brand-el2);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .why {
+    padding: clamp(3rem, 8vh, 5rem) 1.5rem;
+    background: var(--color-brand-surface);
+    border-block: 1px solid var(--color-brand-el1);
+  }
+
+  .why .container {
+    max-width: 64rem;
+  }
+
+  .why header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .stakes {
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    max-width: 44rem;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .why h2 {
+    margin-top: 0.5rem;
+  }
+
+  .grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .signup {
+    padding: clamp(3rem, 8vh, 5rem) 1.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .signup .card {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+    padding: 2rem;
+  }
+
+  .signup h2 {
+    margin-bottom: 0.75rem;
+  }
+
+  .signup p {
+    color: var(--color-brand-text2);
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+  }
+</style>

@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+@config "../../tailwind.config.mjs";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+
+    --color-brand-primary: #0b5996;
+    --color-brand-bg: #f0f6fa;
+    --color-brand-surface: #ddeaf4;
+    --color-brand-el1: #c9ddf0;
+    --color-brand-el2: #b5d1eb;
+    --color-brand-el3: #a2c4e5;
+    --color-brand-text1: #040707;
+    --color-brand-text2: #19252e;
+    --color-brand-text3: #334552;
+    --color-brand-text4: #4d6171;
+  }
+
+  html.dark {
+    --color-brand-primary: #6bb6e8;
+    --color-brand-bg: #0a1117;
+    --color-brand-surface: #121e29;
+    --color-brand-el1: #1a2a38;
+    --color-brand-el2: #223647;
+    --color-brand-el3: #2a4257;
+    --color-brand-text1: #f0f6fa;
+    --color-brand-text2: #ddeaf4;
+    --color-brand-text3: #b5d1eb;
+    --color-brand-text4: #9cb8d1;
+  }
+
+  html {
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-text1);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-family: 'Inter Variable', Inter, system-ui, sans-serif;
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.2;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

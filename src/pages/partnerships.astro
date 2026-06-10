@@ -1,0 +1,548 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import FeatureCard from '@components/ui/FeatureCard.astro'
+import PoliticianForm from '@components/forms/PoliticianForm.astro'
+import MediaForm from '@components/forms/MediaForm.astro'
+import AiLabForm from '@components/forms/AiLabForm.astro'
+import PartnershipForm from '@components/forms/PartnershipForm.astro'
+---
+
+<BaseLayout
+  title="Partner with Voxivium — Funding, early access, and the path to launch"
+  description="Voxivium is a pre-launch Public Benefit Corporation. We're working with media, research, AI alignment partners, and the politicians ready to be on the platform from day one."
+>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Partnerships</p>
+      <h1>Help us build the data layer democracy is missing.</h1>
+      <p class="lead">
+        Voxivium is a pre-launch Public Benefit Corporation. We're raising early support from media
+        and research organizations, AI labs, civic-tech funders, and the federal officeholders and
+        candidates ready to be on the platform from day one. If that's you, we'd like to talk.
+      </p>
+
+      <nav class="toc" aria-label="On this page">
+        <span class="toc-label">On this page</span>
+        <a href="#why">Why partner now</a>
+        <a href="#founding-partners">Founding partners</a>
+        <a href="#for-politicians">For politicians</a>
+        <a href="#other-partnerships">Other partnerships</a>
+        <a href="#commitments">Our commitments</a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="why" id="why">
+    <div class="container">
+      <h2>Why partner now</h2>
+      <p>
+        The dataset Voxivium is building doesn't exist anywhere else: verified, anonymized,
+        constituent-level positions across dozens of beliefs, mapped against the votes their
+        elected officials actually cast. No commercial pollster has the privacy guarantees. No
+        academic project has the scale. No partisan think tank has the credibility.
+      </p>
+      <p>
+        Early partners shape what gets measured, how the methodology is documented, and who gets
+        access first. We're a Public Benefit Corporation by design, with internal commitments
+        codified in our bylaws. The partners who join us early are not buying a product — they're
+        helping decide what the product becomes.
+      </p>
+    </div>
+  </section>
+
+  <section class="founding" id="founding-partners">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Founding partners</p>
+        <h2>Be first in line for the data.</h2>
+        <p class="lead">
+          We're working with a small group of media organizations, academic researchers, and AI
+          alignment teams ahead of launch. Founding partners get early API access, methodology
+          input, and named attribution — in exchange for the funding that gets us to launch.
+        </p>
+      </header>
+
+      <div class="grid">
+        <FeatureCard title="Early API access">
+          <p>
+            Founding partners get programmatic access to aggregated voter sentiment and politician
+            alignment data as soon as the platform has meaningful coverage — ahead of the general
+            availability of the commercial license.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="Methodology input">
+          <p>
+            How issues are categorized, how alignment is scored, how partisan balance is reported —
+            these decisions get made early and stick for a long time. Founding partners are at the
+            table when we make them.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="Named attribution">
+          <p>
+            We list founding partners publicly (with your consent) as the organizations that helped
+            make the platform possible. Case studies, co-marketing, and citation rights come with
+            the territory.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="Locked-in terms">
+          <p>
+            Pricing isn't published yet because the commercial platform hasn't launched. Partners
+            who join before launch lock in preferred terms that won't be available once the rate
+            card goes out.
+          </p>
+        </FeatureCard>
+      </div>
+
+      <div class="two-up">
+        <details class="disclosure">
+          <summary>
+            <span class="disclosure-label">Reach out as a media or research partner</span>
+            <span class="disclosure-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="disclosure-body">
+            <p class="form-note">
+              For news organizations, academic researchers, and think tanks. Tell us what you'd
+              publish, who you'd reach, and what data scope matters most.
+            </p>
+            <MediaForm />
+          </div>
+        </details>
+
+        <details class="disclosure">
+          <summary>
+            <span class="disclosure-label">Reach out as an AI lab</span>
+            <span class="disclosure-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="disclosure-body">
+            <p class="form-note">
+              For alignment teams, safety researchers, and ethical-AI initiatives evaluating model
+              behavior against verified human values.
+            </p>
+            <AiLabForm />
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="politicians" id="for-politicians">
+    <div class="container">
+      <header>
+        <p class="eyebrow">For politicians</p>
+        <h2>Be on the platform on day one.</h2>
+        <p class="lead">
+          Voxivium launches with federal coverage — President, Senate, and House of
+          Representatives — and expands to state and local offices in subsequent releases. If you
+          serve at the federal level or expect to be a candidate at any level, the form below puts
+          you in the first cohort.
+        </p>
+      </header>
+
+      <div class="politicians-body">
+        <p>
+          For most representatives, the path of least resistance is to govern from incomplete
+          signals: donor calls, primary turnout, the loudest voices in the room. The politicians
+          on Voxivium can do something different. They govern from the actual, weighted will of
+          every verified constituent in their district, and build a public record those
+          constituents can see. The platform turns "is my representative actually voting the way
+          I'd vote?" from a guess into a number — for them, and for everyone they represent.
+        </p>
+
+        <h3 class="subhead">The Voxivium Commitment</h3>
+        <p>
+          The Voxivium Commitment is a public commitment we're building <em>inside the app</em>: a
+          politician with a verified Voxivium account can pledge to publish their positions, review
+          their constituent report card on a regular cadence, and respond publicly when they vote
+          against the majority of their verified constituents on an issue marked important. Politicians 
+          who have made the commitment will have a badge displayed on their public profile.
+        </p>
+        <p>
+          The commitment lives in the app — not on this marketing site — because it depends on identity
+          verification we don't perform here. Anyone can fill out a form claiming to be a senator;
+          a Politician account is verified before it goes live. Once the in-app commitment is active
+          and participation is balanced across parties, we'll publish aggregate counts on this page.
+        </p>
+      </div>
+
+      <details class="disclosure disclosure--primary">
+        <summary>
+          <span class="disclosure-label">Apply for early access as a federal officeholder or candidate</span>
+          <span class="disclosure-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="disclosure-body">
+          <p class="form-note">
+            We'll be in touch when verification opens for federal officeholders and candidates.
+          </p>
+          <PoliticianForm />
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="other" id="other-partnerships">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Other partnerships</p>
+        <h2>Open to grants and aligned partners.</h2>
+      </header>
+
+      <p class="other-body">
+        We're also open to philanthropic grants from foundations funding civic engagement,
+        democracy infrastructure, AI alignment, and public-interest technology — and to
+        partnerships with identity-verification vendors, voter-registration nonprofits, and
+        civic-tech organizations whose missions overlap with ours. If you're working in this space
+        and think there's something to talk about, the form below is the fastest way to start a
+        conversation.
+      </p>
+
+      <details class="disclosure">
+        <summary>
+          <span class="disclosure-label">Reach out about a partnership</span>
+          <span class="disclosure-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="disclosure-body">
+          <p class="form-note">
+            Tell us about your organization and what an early conversation would look like. We'll
+            follow up with materials suited to your review process.
+          </p>
+          <PartnershipForm />
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="never" id="commitments">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Our commitments</p>
+        <h2>What we will never do.</h2>
+        <p class="lead">
+          The point of partnering with Voxivium is the trust the platform represents. These
+          commitments make Voxivium safe to partner with. They are not aspirations.
+        </p>
+      </header>
+
+      <div class="grid">
+        <FeatureCard title="No individual data for sale">
+          <p>
+            We will not sell, rent, or share individual voter records. Every commercial product is
+            built on aggregated, anonymized data. This is in our bylaws.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="No partisan funding strings">
+          <p>
+            We will not accept funding contingent on partisan outcomes, candidate endorsements, or
+            methodology choices that favor one party. Funders may not direct what gets measured.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="No campaign targeting">
+          <p>
+            Our data will not be used to micro-target voters for partisan campaign messaging.
+            Licensing terms make this an explicit, enforceable restriction.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="No donor influence on methodology">
+          <p>
+            How issues are framed, how alignment is scored, how the data is sampled — these are
+            documented publicly. Donors and partners see the same methodology everyone else does.
+          </p>
+        </FeatureCard>
+      </div>
+    </div>
+  </section>
+
+  <script
+    is:inline
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer></script>
+
+  <script>
+    import '@lib/forms/client'
+  </script>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.01em;
+    margin: 0 0 1.25rem;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-brand-text1);
+    margin: 0 0 0.5rem;
+  }
+
+  .page-hero .lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text2);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    max-width: 40rem;
+  }
+
+  .toc {
+    margin: 2rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .toc-label {
+    color: var(--color-brand-text3);
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+
+  .toc a {
+    color: var(--color-brand-primary);
+    text-decoration: none;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-brand-el1);
+    background: var(--color-brand-bg);
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .toc a:hover {
+    background: var(--color-brand-surface);
+    border-color: var(--color-brand-el2);
+  }
+
+  .toc a:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+  }
+
+  .why,
+  .politicians,
+  .other {
+    padding: clamp(2.5rem, 6vh, 4rem) 1.5rem;
+  }
+
+  .why p,
+  .other .other-body,
+  .politicians .politicians-body p {
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    margin: 0 0 1.25rem;
+  }
+
+  .why p:last-child,
+  .politicians .politicians-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .founding,
+  .never {
+    padding: clamp(3rem, 8vh, 5rem) 1.5rem;
+    background: var(--color-brand-surface);
+    border-block: 1px solid var(--color-brand-el1);
+  }
+
+  .founding .container,
+  .politicians .container,
+  .other .container,
+  .never .container {
+    max-width: 64rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    max-width: 44rem;
+    margin-inline: auto;
+  }
+
+  .lead {
+    margin: 1rem auto 0;
+    color: var(--color-brand-text3);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .subhead {
+    font-size: 1.25rem;
+    margin: 1.75rem 0 0.75rem;
+    color: var(--color-brand-text1);
+  }
+
+  .politicians-body {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .two-up {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    margin-top: 2rem;
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .two-up {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ----- Disclosure form-cards ------------------------------------------- */
+  /* Each form sits inside a <details> so the page reads as marketing copy
+     by default and the form only appears when the visitor self-selects.
+     Works without JS via native <details>; styled as a button. */
+  .disclosure {
+    background: var(--color-brand-bg);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+    margin-top: 2rem;
+    overflow: hidden;
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .two-up .disclosure {
+    margin-top: 0;
+  }
+
+  .disclosure[open] {
+    border-color: var(--color-brand-el2);
+    box-shadow: 0 8px 24px -16px rgba(0, 0, 0, 0.25);
+  }
+
+  .disclosure summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-brand-text1);
+    transition: background-color 150ms ease;
+  }
+
+  .disclosure summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .disclosure summary:hover {
+    background: var(--color-brand-surface);
+  }
+
+  .disclosure summary:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: -2px;
+  }
+
+  .disclosure-label {
+    text-wrap: balance;
+  }
+
+  .disclosure-icon {
+    color: var(--color-brand-primary);
+    font-weight: 700;
+    font-size: 1.4rem;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: transform 200ms ease;
+  }
+
+  .disclosure[open] .disclosure-icon {
+    transform: rotate(45deg);
+  }
+
+  .disclosure-body {
+    padding: 1.25rem 1.4rem 1.5rem;
+    border-top: 1px solid var(--color-brand-el1);
+  }
+
+  .disclosure-body .form-note {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    margin: 0 0 1.25rem;
+    line-height: 1.5;
+  }
+
+  /* Louder treatment for the politician CTA — it's the highest-value lead
+     on the page and should out-rank the other disclosure buttons visually. */
+  .disclosure--primary summary {
+    background: var(--color-brand-primary);
+    color: white;
+  }
+
+  .disclosure--primary summary:hover {
+    background: color-mix(in oklab, var(--color-brand-primary), black 10%);
+  }
+
+  .disclosure--primary .disclosure-icon {
+    color: white;
+  }
+
+  .disclosure--primary .disclosure-body {
+    border-top-color: var(--color-brand-el2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .disclosure,
+    .disclosure-icon,
+    .disclosure summary {
+      transition: none;
+    }
+  }
+</style>

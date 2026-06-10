@@ -1,0 +1,93 @@
+---
+const kickstarterUrl = import.meta.env.PUBLIC_KICKSTARTER_URL || '/kickstarter'
+---
+
+<section class="cta" aria-labelledby="cta-heading">
+  <div class="container">
+    <h2 id="cta-heading">Help us build a government that listens.</h2>
+    <p>
+      Voxivium runs on community trust, not advertiser budgets. Back the Kickstarter to fund the
+      launch and put accountability in the hands of every voter who needs it.
+    </p>
+    <div class="actions">
+      <a href={kickstarterUrl} class="primary">Back the Kickstarter</a>
+      <a href="/about" class="secondary">Read our commitments</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem;
+    background:
+      radial-gradient(
+        ellipse at center,
+        color-mix(in oklab, var(--color-brand-primary), transparent 75%) 0%,
+        transparent 70%
+      ),
+      var(--color-brand-bg);
+  }
+
+  .container {
+    max-width: 48rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: clamp(1.875rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 1.25rem auto 0;
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    max-width: 36rem;
+    text-wrap: balance;
+  }
+
+  .actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .primary,
+  .secondary {
+    padding: 0.875rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      opacity 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .primary {
+    background: var(--color-brand-primary);
+    color: white;
+  }
+
+  .primary:hover {
+    opacity: 0.9;
+  }
+
+  .secondary {
+    background: var(--color-brand-surface);
+    color: var(--color-brand-text2);
+    border: 1px solid var(--color-brand-el2);
+  }
+
+  .secondary:hover {
+    background: var(--color-brand-el1);
+  }
+</style>

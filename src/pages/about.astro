@@ -1,0 +1,225 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import FeatureCard from '@components/ui/FeatureCard.astro'
+---
+
+<BaseLayout
+  title="About Voxivium — A Public Benefit Corporation for civic accountability"
+  description="Voxivium is a Public Benefit Corporation building a non-partisan platform for political accountability and transparency. Read about our mission and internal commitments."
+>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">About Voxivium</p>
+      <h1>A government of the people, by the people, for the people...</h1>
+      <p class="lead">
+        Voxivium exists to repair the broken connection between citizens and the people elected to
+        serve them. We're a Public Benefit Corporation building a non-partisan platform for
+        political accountability, transparency, and informed civic engagement.
+      </p>
+    </div>
+  </section>
+
+  <section class="why">
+    <div class="container">
+      <p class="eyebrow">Why we're building this</p>
+      <h2>Two broken connections, one platform.</h2>
+      <p>
+        Politics today runs on a paradox. Voters feel unheard, worn down by a media diet of outrage
+        and a political class that seems to answer first to donors and primary extremists.
+        Politicians, even well-intentioned ones, govern from incomplete signals: short polls, the
+        loudest inbox, and the assumption that the party platform reflects the district. Both sides
+        are working in the dark.
+      </p>
+      <p>
+        Voxivium turns the lights on. When the verified positions of millions of voters are
+        aggregated and weighted by what they care about, voters discover they aren't alone, and
+        politicians get a mandate they can actually govern by. Most Americans agree on more than
+        they think. We're building the data layer that lets them prove it.
+      </p>
+    </div>
+  </section>
+
+  <section class="mission">
+    <div class="container">
+      <h2>Our mission</h2>
+      <p>
+        Modern democracies have a quiet failure: the gap between what constituents want and what
+        elected officials do. Donor influence, partisan rhetoric, biased polls, and toxic digital
+        discourse have all conspired to make accountability feel impossible. Voxivium closes the gap
+        with a single, honest measurement: how often does your representative vote the way you'd
+        vote?
+      </p>
+      <p>
+        Our mission isn't a marketing line. It's encoded in our corporate charter, which legally
+        requires us to balance financial returns with public benefit. The structure means our
+        success has to be measured both in revenue and in outcomes for democracy.
+      </p>
+    </div>
+  </section>
+
+  <section class="why-pbc">
+    <div class="container">
+      <h2>Why a Public Benefit Corporation?</h2>
+      <p>
+        A traditional C-corp has one duty: maximize shareholder value. That duty conflicts—often
+        quietly, sometimes loudly—with the public interest a civic platform needs to serve. As a
+        Public Benefit Corporation, our directors have a legal obligation to consider the impact of
+        decisions on the citizens we serve, not only on shareholders.
+      </p>
+      <p>
+        We chose this structure because the work demands it. A platform built to hold power
+        accountable cannot answer first to investors who want growth at any cost. Voxivium answers
+        first to the people whose voices it carries.
+      </p>
+    </div>
+  </section>
+
+  <section class="commitments">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Internal commitments</p>
+        <h2>What we hold ourselves to.</h2>
+        <p class="lead">
+          To demand better government, we hold ourselves to a higher standard of corporate
+          governance. These commitments are codified in our bylaws.
+        </p>
+      </header>
+
+      <div class="grid">
+        <FeatureCard title="5:1 pay ratio">
+          <p>
+            Total compensation between our highest-paid executive and our lowest-paid employee is
+            capped at 5:1. The number is in our bylaws, not just our values deck.
+          </p>
+        </FeatureCard>
+
+        <FeatureCard title="Living wage">
+          <p>
+            Every Voxivium employee, contractor, and intern earns a locality-adjusted living wage—no
+            exceptions, no roles excluded.
+          </p>
+        </FeatureCard>
+
+        <FeatureCard title="Profit sharing">
+          <p>
+            After necessary operational reserves, profits are shared with employees. The people
+            building the platform share in its upside.
+          </p>
+        </FeatureCard>
+
+        <FeatureCard title="Privacy by design">
+          <p>
+            Individual user data is never for sale. Every paid product is built on aggregated,
+            anonymized signal—and the bylaws bind us to keep it that way.
+          </p>
+        </FeatureCard>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.01em;
+    margin: 0 0 1.25rem;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .page-hero .lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text2);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    max-width: 36rem;
+  }
+
+  .why,
+  .mission,
+  .why-pbc {
+    padding: 2rem 1.5rem;
+  }
+
+  .why p,
+  .mission p,
+  .why-pbc p {
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    margin: 0 0 1.25rem;
+  }
+
+  .why p:last-child,
+  .mission p:last-child,
+  .why-pbc p:last-child {
+    margin-bottom: 0;
+  }
+
+  .commitments {
+    padding: clamp(3rem, 8vh, 5rem) 1.5rem;
+    background: var(--color-brand-surface);
+    border-block: 1px solid var(--color-brand-el1);
+    margin-top: 2rem;
+  }
+
+  .commitments .container {
+    max-width: 64rem;
+  }
+
+  .commitments header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    max-width: 40rem;
+    margin-inline: auto;
+  }
+
+  .commitments .lead {
+    margin: 1rem auto 0;
+    color: var(--color-brand-text3);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,447 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+
+const lastUpdated = 'May 7, 2026'
+---
+
+<BaseLayout
+  title="Privacy Policy — Voxivium"
+  description="How Voxivium collects, uses, shares, and protects your information across our website and the Voxivium app."
+>
+  <article class="legal">
+    <header class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Legal</p>
+        <h1>Privacy Policy</h1>
+        <p class="meta">Last updated: {lastUpdated}</p>
+        <p class="lead">
+          Voxivium is built on the principle that civic engagement and personal privacy must
+          coexist. This policy explains what information we collect, how we use it, and the
+          choices you have. We've written it in plain English.
+        </p>
+      </div>
+    </header>
+
+    <section class="prose">
+      <div class="container">
+        <h2>Scope</h2>
+        <p>
+          This policy covers <strong>voxivium.com</strong> (the website you're reading) and the
+          <strong>Voxivium app</strong> (currently in development, planned for U.S. launch). When
+          we say "Voxivium," "we," "us," or "our," we mean Voxivium, PBC, a Delaware Public Benefit
+          Corporation. When we say "you," we mean a visitor to our website or a user of our app.
+        </p>
+        <p>
+          Voxivium is currently available only to users in the United States. We do not knowingly
+          accept signups from outside the U.S.
+        </p>
+
+        <h2>The information we collect</h2>
+
+        <h3>From visitors to voxivium.com</h3>
+        <p>
+          The marketing site collects only what you give us. If you fill out one of our interest
+          forms (voter signup, politician inquiry, media or research inquiry, AI lab inquiry), we
+          collect the fields you submit—typically your name, email address, and a small set of
+          context fields specific to your audience, such as your organization, jurisdiction, or
+          intended use case.
+        </p>
+        <p>
+          Beyond that, we use Cloudflare Web Analytics for basic, privacy-respecting traffic
+          measurement. Cloudflare Web Analytics does not use cookies and does not fingerprint
+          visitors. We do not run Google Analytics, the Meta pixel, or any third-party advertising
+          trackers on this site.
+        </p>
+        <p>
+          The site also stores your color-theme preference (light or dark) in your browser's
+          <code>localStorage</code>. That preference never leaves your device.
+        </p>
+
+        <h3>From users of the Voxivium app</h3>
+        <p>
+          Once the app is live, creating a Voxivium voter account involves these categories of
+          information:
+        </p>
+        <ul>
+          <li>
+            <strong>Account information.</strong> Your email address and password. Passwords are
+            stored as a one-way cryptographic hash—we never see your plaintext password.
+          </li>
+          <li>
+            <strong>Identity verification data.</strong> When you complete identity verification,
+            we forward the personal details required by our third-party identity-verification
+            provider (such as your full legal name, date of birth, and address) to that provider
+            for the sole purpose of confirming who you are. Voxivium does not collect or store
+            your government-issued identity documents. We retain only the verification result and
+            the facts we need to operate the service (see profile data, below).
+          </li>
+          <li>
+            <strong>Voter registration verification.</strong> We use a third-party
+            voter-registration verification service to confirm that you are a U.S. registered
+            voter. From that check, we store only your <strong>registration status</strong> and
+            your <strong>assigned voter districts</strong> (federal, state, and local). We do not
+            collect or store your voting history.
+          </li>
+          <li>
+            <strong>Profile data.</strong> Your real first name and last name, residential
+            address, date of birth, political party affiliation, gender, voter districts, and—only
+            if you choose to provide it—your race or ethnicity.
+          </li>
+          <li>
+            <strong>Civic input.</strong> Your stated stances and importance ratings on beliefs,
+            your responses to polls, and your stances on specific pieces of legislation, executive
+            orders, and court rulings.
+          </li>
+          <li>
+            <strong>Payment information.</strong> If you subscribe to a premium tier, payment
+            details are processed by our third-party payment processor. Voxivium does not store
+            full payment-card numbers; we receive only the limited transaction metadata required
+            to manage your subscription.
+          </li>
+          <li>
+            <strong>Technical data.</strong> Device type, operating system, app version, IP
+            address, and similar diagnostic information used to deliver the service securely.
+          </li>
+          <li>
+            <strong>Notification preferences.</strong> Your settings for push, email, and in-app
+            notifications.
+          </li>
+        </ul>
+
+        <h2>How we use your information</h2>
+        <ul>
+          <li>
+            <strong>To run the service.</strong> Generating your personal report cards, candidate
+            comparisons, polling experiences, and notifications all require the data above.
+          </li>
+          <li>
+            <strong>To keep your records current.</strong> We periodically re-check your voter
+            registration status (typically quarterly) so that your assigned representatives and
+            districts stay accurate, and to detect changes such as a move or a registration lapse.
+          </li>
+          <li>
+            <strong>To produce aggregated, anonymized insights.</strong> The civic data you
+            provide is the foundation of the aggregated, anonymized statistics we share with paid
+            customers (politicians, media, researchers, AI labs)—described below.
+          </li>
+          <li>
+            <strong>To communicate with you.</strong> Service announcements, security alerts, and
+            notifications you've opted into.
+          </li>
+          <li>
+            <strong>To improve and secure the service.</strong> Diagnostic data, abuse detection,
+            and standard product analytics.
+          </li>
+          <li>
+            <strong>To comply with the law.</strong> Where we are legally required to retain or
+            disclose information.
+          </li>
+        </ul>
+
+        <h2>How we share your information</h2>
+
+        <h3>What we will never sell or share</h3>
+        <p>
+          Voxivium will <strong
+            >never sell or share your personally identifiable information</strong
+          >, including your name, residential address, date of birth, email address, or phone
+          number. That commitment is part of the platform's design and is reflected in our
+          corporate bylaws.
+        </p>
+
+        <h3>What we may share, only as aggregated and anonymized data</h3>
+        <p>
+          The whole purpose of Voxivium is to translate civic input into a clear collective
+          signal. To paid customers (politicians, media organizations, academic researchers, and
+          AI labs), we may share <strong>aggregated, anonymized</strong> data derived from the
+          following categories:
+        </p>
+        <ul>
+          <li>Political party affiliation</li>
+          <li>Gender</li>
+          <li>Race or ethnicity (only where you have voluntarily provided it)</li>
+          <li>Belief stances and importance ratings</li>
+          <li>Polling responses</li>
+          <li>Stances on specific issues, legislation, court rulings, and executive orders</li>
+        </ul>
+        <p>
+          "Aggregated and anonymized" means these data are reported only as group statistics
+          scoped to a geographic area or demographic segment—never as individual records and never
+          tied to your identity. We apply minimum-group-size thresholds and other safeguards to
+          prevent re-identification.
+        </p>
+
+        <h3>Service providers</h3>
+        <p>
+          We rely on a small set of vetted third parties to operate the service. Each is bound by
+          contract to use your data only as we direct:
+        </p>
+        <ul>
+          <li><strong>Identity verification:</strong> [IDV PROVIDER]</li>
+          <li><strong>Voter registration verification:</strong> [VRV PROVIDER]</li>
+          <li><strong>Hosting and content delivery:</strong> Cloudflare</li>
+          <li><strong>Web analytics:</strong> Cloudflare Web Analytics</li>
+          <li><strong>Payments:</strong> [PAYMENT PROCESSOR]</li>
+          <li><strong>Email delivery:</strong> our transactional email provider</li>
+        </ul>
+
+        <h3>Legal disclosures</h3>
+        <p>
+          We may disclose information when we are legally required to do so—for example, in
+          response to a valid subpoena, court order, or other lawful government request. We will
+          challenge requests we believe to be overbroad or unlawful, and where we are not legally
+          prohibited from doing so, we will notify the affected user before complying.
+        </p>
+
+        <h2>Cookies and similar technologies</h2>
+        <p>
+          The marketing site does not set tracking cookies. Cloudflare Web Analytics, our
+          analytics provider, is cookie-free by design. We use your browser's <code
+            >localStorage</code
+          > only to remember your color-theme preference, which is not a tracking technology.
+        </p>
+        <p>
+          The Voxivium app uses standard, essential session technologies to keep you signed in.
+          These are not used for cross-context advertising or third-party tracking.
+        </p>
+
+        <h2>Your choices and rights</h2>
+        <ul>
+          <li>
+            <strong>Access and correction.</strong> You can view and update your profile data from
+            within your account.
+          </li>
+          <li>
+            <strong>Deletion.</strong> You can delete your Voxivium account, and the data
+            associated with it, at any time from within the app. Deletion timelines are described
+            under "Data retention," below.
+          </li>
+          <li>
+            <strong>Communication preferences.</strong> You can change which notifications you
+            receive at any time. Transactional messages required to operate your account
+            (security alerts, billing notices) cannot be disabled while your account remains
+            active.
+          </li>
+          <li>
+            <strong>California residents.</strong> California law gives you specific rights to
+            know, access, correct, delete, and limit the use of your personal information, and
+            the right not to be discriminated against for exercising those rights. To exercise any
+            of these rights, contact <a href="mailto:privacy@voxivium.com"
+              >privacy@voxivium.com</a
+            >.
+          </li>
+          <li>
+            <strong>Other U.S. state residents.</strong> Several states grant similar rights. We
+            extend the substance of those rights to all U.S. users on request. Contact <a
+              href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
+            >.
+          </li>
+        </ul>
+
+        <h2>Data retention</h2>
+        <p>
+          We retain your account data for as long as your account is active. When you delete your
+          account—or when we delete it for one of the reasons described below—your data is
+          removed from our production systems within <strong>30 days</strong> and is purged from
+          encrypted backups within <strong>90 days</strong>. After deletion, only the
+          aggregated, anonymized signal you contributed remains; that signal cannot be
+          reconstructed back to you.
+        </p>
+        <p>We may delete an account, with or without notice, in the following cases:</p>
+        <ul>
+          <li>
+            The user signs up but does not complete identity verification within a reasonable
+            window.
+          </li>
+          <li>
+            The user completes identity verification and is determined to be under 18 years of
+            age.
+          </li>
+          <li>
+            The account is dormant or inactive for an extended period, as described in our Terms.
+          </li>
+          <li>The account is found to be fraudulent or in material breach of our Terms.</li>
+        </ul>
+        <p>
+          We may retain limited information for longer where required by law (for example, tax,
+          accounting, or fraud-prevention obligations).
+        </p>
+
+        <h2>Security</h2>
+        <p>
+          We protect your information with industry-standard safeguards: encryption in transit
+          (TLS) and at rest, scoped access controls, audit logging, and regular security reviews.
+          No system is perfectly secure, and we will not promise otherwise—but we will treat your
+          data with the care that civic trust requires.
+        </p>
+
+        <h2>Children</h2>
+        <p>
+          Voxivium is intended for U.S. registered voters and is not directed to anyone under 18.
+          We do not knowingly collect personal information from children under 13. If you believe
+          a child has provided us with personal information, contact <a
+            href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
+          > and we will promptly delete it.
+        </p>
+
+        <h2>International users</h2>
+        <p>
+          Voxivium currently operates only in the United States. Our servers and service
+          providers are located in the United States. If you are located outside the U.S., please
+          do not use the Voxivium app.
+        </p>
+
+        <h2>Changes to this policy</h2>
+        <p>
+          We may update this policy from time to time. When we do, we will revise the "Last
+          updated" date above and, for material changes, give you advance notice through the
+          service or by email. Your continued use of Voxivium after a change takes effect means
+          you accept the updated policy.
+        </p>
+
+        <h2>Contact us</h2>
+        <p>
+          For privacy questions, requests to exercise your rights, or any other privacy-related
+          inquiries:
+        </p>
+        <p class="contact">
+          <strong>Email:</strong>
+          <a href="mailto:privacy@voxivium.com">privacy@voxivium.com</a><br />
+          <strong>Mail:</strong><br />
+          Voxivium, PBC<br />
+          921 Pleasant Valley Ave #561<br />
+          Mount Laurel, NJ 08054
+        </p>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .meta {
+    margin: 1rem 0 0;
+    color: var(--color-brand-text4);
+    font-size: 0.9375rem;
+  }
+
+  .lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    max-width: 36rem;
+  }
+
+  .prose {
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .prose h2 {
+    font-size: clamp(1.375rem, 2.5vw, 1.625rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.01em;
+    margin: 2.5rem 0 1rem;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .prose h2:first-child {
+    margin-top: 0;
+  }
+
+  .prose h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-brand-text1);
+    margin: 1.75rem 0 0.625rem;
+    line-height: 1.3;
+  }
+
+  .prose p,
+  .prose li {
+    color: var(--color-brand-text2);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .prose p {
+    margin: 0 0 1rem;
+  }
+
+  .prose ul,
+  .prose ol {
+    margin: 0 0 1.25rem;
+    padding-left: 1.25rem;
+  }
+
+  .prose li {
+    margin-bottom: 0.5rem;
+  }
+
+  .prose li::marker {
+    color: var(--color-brand-text4);
+  }
+
+  .prose a {
+    color: var(--color-brand-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .prose a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .prose code {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.9em;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
+  }
+
+  .prose strong {
+    color: var(--color-brand-text1);
+    font-weight: 600;
+  }
+
+  .contact {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    line-height: 1.7;
+  }
+</style>

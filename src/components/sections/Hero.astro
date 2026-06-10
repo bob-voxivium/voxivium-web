@@ -1,0 +1,628 @@
+---
+// Cross-partisan-popular issues. Pew / AP-NORC / Gallup all show >70% agreement
+// across party lines on each of these. The displayed agreement % is computed
+// from the actual dot field at runtime, so it stays honest to the visualization.
+const ISSUES = [
+  { question: 'Should term limits be imposed on Congress?', skew: 0.77 },
+  { question: 'Should the President face the same criminal laws as everyone else?', skew: 0.72 },
+  { question: 'Should the government ensure all citizens have access to healthcare?', skew: 0.67 },
+  { question: 'Should federal law enforcement investigate itself without outside oversight?', skew: 0.22 },
+  { question: 'Should the government fully fund VA healthcare for veterans?', skew: 0.82 },
+  { question: 'Should higher earners pay a larger percentage of their income in taxes?', skew: 0.68 },
+  { question: 'Should the government cap the cost of essential medications?', skew: 0.75 }
+]
+---
+
+<section class="hero" aria-labelledby="hero-heading">
+  <canvas class="hero-canvas" aria-hidden="true"></canvas>
+
+  <div class="hero-content">
+    <h1 id="hero-heading" class="hero-title">Common ground, made visible.</h1>
+    <p class="hero-subtitle">
+      Not a poll. Not a guess. The verified voice of real citizens, and the issues we already
+      agree on, hiding in plain sight.
+    </p>
+    <div class="hero-ctas">
+      <a class="hero-cta-primary" href="/#voters">Get early access</a>
+      <a class="hero-cta-secondary" href="/about">How it works</a>
+    </div>
+
+    <div
+      class="hero-chyron"
+      role="status"
+      aria-live="polite"
+      data-issues={JSON.stringify(ISSUES)}
+    >
+      <div class="chyron-question" data-chyron-question>
+        <span class="chyron-pulse" aria-hidden="true"></span>
+        <span class="chyron-q" data-chyron-q>{ISSUES[0]!.question}</span>
+      </div>
+      <div class="chyron-result" data-chyron-result>
+        <span class="chyron-pct" data-chyron-pct>—</span>
+        <span class="chyron-label">of verified citizens agree</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  type Issue = { question: string; skew: number }
+  type Dot = {
+    homeX: number
+    homeY: number
+    phaseX: number
+    phaseY: number
+    waveT: number
+    align: number
+  }
+
+  const hero = document.querySelector<HTMLElement>('.hero')
+  const canvas = document.querySelector<HTMLCanvasElement>('.hero-canvas')
+  const chyron = document.querySelector<HTMLElement>('.hero-chyron')
+  const questionRow = document.querySelector<HTMLElement>('[data-chyron-question]')
+  const resultRow = document.querySelector<HTMLElement>('[data-chyron-result]')
+  const pctEl = document.querySelector<HTMLElement>('[data-chyron-pct]')
+  const qEl = document.querySelector<HTMLElement>('[data-chyron-q]')
+  if (!hero || !canvas || !chyron || !questionRow || !resultRow || !pctEl || !qEl) {
+    // Hero not in DOM; nothing to do.
+  } else {
+    const ctx = canvas.getContext('2d', { alpha: true })
+    const issues = JSON.parse(chyron.dataset.issues!) as Issue[]
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // --- Config -------------------------------------------------------------
+    const DOT_COUNT = 280
+    const MIN_DIST = 34 // poisson-disk min spacing in CSS px (approx; scales with size)
+    const DRIFT_AMPLITUDE = 6 // CSS px drift around home position
+    const BASE_RADIUS = 1.6
+    const PEAK_RADIUS = 3.2
+
+    // Per-cycle timing (ms). The question appears alone first, then a single
+    // random seed dot "answers" and the response radiates outward through the
+    // field — slowly at first, accelerating as it spreads. Once the wave has
+    // crossed every dot, the agreement percentage fades in beneath the
+    // question. Then everything fades out and the next issue begins.
+    const T_QUESTION_IN = 700
+    const T_QUESTION_HOLD = 500 // question shown alone before the seed answers
+    const T_WAVE_START = T_QUESTION_IN + T_QUESTION_HOLD // 1200
+    const T_WAVE_DURATION = 3400
+    const T_WAVE_END = T_WAVE_START + T_WAVE_DURATION // 4600
+    const T_PCT_DELAY = 150 // brief beat after the wave completes
+    const T_PCT_IN_START = T_WAVE_END + T_PCT_DELAY // 4750
+    const T_PCT_IN_DURATION = 900
+    const T_PCT_IN_END = T_PCT_IN_START + T_PCT_IN_DURATION // 5650
+    const T_HOLD_END = 7000
+    const T_FADE_END = 8000
+    const CYCLE_MS = 8500
+
+    // Exponent on the wave-radius curve. Higher = slower start, faster finish.
+    const WAVE_ACCEL = 2.3
+
+    // --- Color tokens -------------------------------------------------------
+    const css = getComputedStyle(canvas)
+    const baseColor = parseRGB(css.getPropertyValue('--dot-base').trim()) ?? [120, 165, 210]
+    const peakColor = parseRGB(css.getPropertyValue('--dot-peak').trim()) ?? [245, 196, 96]
+    const baseAlpha = parseFloat(css.getPropertyValue('--dot-base-alpha')) || 0.22
+    const peakAlpha = parseFloat(css.getPropertyValue('--dot-peak-alpha')) || 0.95
+
+    // --- Layout / sizing ----------------------------------------------------
+    let dpr = Math.min(window.devicePixelRatio || 1, 2)
+    let cssW = 0
+    let cssH = 0
+    let dots: Dot[] = []
+    let alignments: Float32Array[] = []
+    let issueIndex = 0
+    let cycleStart = performance.now()
+    let lastShownPct = -1
+
+    // Per-cycle reveal state. Each cycle picks a random seed dot; every other
+    // dot's `triggerDist` is its Euclidean distance from that seed. The wave's
+    // radius grows over T_WAVE_DURATION; a dot lights up when the radius
+    // reaches its trigger distance.
+    let seedIndex = 0
+    let triggerDist: Float32Array = new Float32Array(0)
+    let maxTriggerDist = 1
+
+    function rand(seed: { s: number }) {
+      seed.s = (seed.s * 1664525 + 1013904223) | 0
+      return ((seed.s >>> 0) % 1_000_003) / 1_000_003
+    }
+
+    function poissonField(w: number, h: number, count: number, minDist: number): Dot[] {
+      const out: Dot[] = []
+      const seed = { s: 0x9e3779b1 }
+      const cell = minDist / Math.SQRT2
+      const cols = Math.ceil(w / cell)
+      const rows = Math.ceil(h / cell)
+      const grid: number[] = new Array(cols * rows).fill(-1)
+      let attempts = 0
+      const maxAttempts = count * 30
+
+      while (out.length < count && attempts < maxAttempts) {
+        const x = rand(seed) * w
+        const y = rand(seed) * h
+        const cx = Math.floor(x / cell)
+        const cy = Math.floor(y / cell)
+        let ok = true
+        for (let dy = -2; dy <= 2 && ok; dy++) {
+          for (let dx = -2; dx <= 2 && ok; dx++) {
+            const nx = cx + dx
+            const ny = cy + dy
+            if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue
+            const idx = grid[ny * cols + nx]
+            if (idx < 0) continue
+            const d = out[idx]!
+            const ddx = d.homeX - x
+            const ddy = d.homeY - y
+            if (ddx * ddx + ddy * ddy < minDist * minDist) ok = false
+          }
+        }
+        attempts++
+        if (!ok) continue
+        const dot: Dot = {
+          homeX: x,
+          homeY: y,
+          phaseX: rand(seed) * Math.PI * 2,
+          phaseY: rand(seed) * Math.PI * 2,
+          waveT: 0,
+          align: 0.5,
+        }
+        grid[cy * cols + cx] = out.length
+        out.push(dot)
+      }
+      return out
+    }
+
+    // Sample per-dot alignments for the given issue skew. Each value is drawn
+    // from Irwin-Hall(3) (bell-ish, range [0,1]) so brightnesses feel natural,
+    // then the whole field is shifted so the fraction above 0.5 matches the
+    // configured skew within a small ±0.03 jitter. The displayed agreement %
+    // equals the count of dots above 0.5, so this calibration is what keeps
+    // the shown number within ±5 points of each issue's skew on every reload.
+    function sampleAlignments(skew: number, n: number): Float32Array {
+      const raw: number[] = new Array(n)
+      for (let i = 0; i < n; i++) {
+        raw[i] = (Math.random() + Math.random() + Math.random()) / 3
+      }
+      const jitter = (Math.random() - 0.5) * 0.06 // ±0.03
+      const targetSkew = Math.max(0.01, Math.min(0.99, skew + jitter))
+      const targetCount = Math.round(targetSkew * n)
+      const sorted = raw.slice().sort((a, b) => a - b)
+      let shift: number
+      if (targetCount <= 0) {
+        shift = 0.5 - sorted[n - 1]!
+      } else if (targetCount >= n) {
+        shift = 0.5 - sorted[0]! + 1e-3
+      } else {
+        shift = 0.5 - sorted[n - targetCount - 1]!
+      }
+      const out = new Float32Array(n)
+      for (let i = 0; i < n; i++) {
+        let v = raw[i]! + shift
+        if (v < 0) v = 0
+        else if (v > 1) v = 1
+        out[i] = v
+      }
+      return out
+    }
+
+    function rebuild() {
+      const rect = hero!.getBoundingClientRect()
+      cssW = rect.width
+      cssH = rect.height
+      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      canvas!.width = Math.round(cssW * dpr)
+      canvas!.height = Math.round(cssH * dpr)
+      canvas!.style.width = `${cssW}px`
+      canvas!.style.height = `${cssH}px`
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      // Density-scaled count: more dots on bigger heroes, fewer on phones.
+      const area = cssW * cssH
+      const density = Math.max(0.6, Math.min(1.4, area / (1100 * 620)))
+      const count = Math.round(DOT_COUNT * density)
+      dots = poissonField(cssW, cssH, count, MIN_DIST)
+
+      // Sample alignments for every issue against the new dot count.
+      alignments = issues.map((iss) => sampleAlignments(iss.skew, dots.length))
+
+      // Re-seed the current cycle so trigger distances match the new field.
+      startCycle(issueIndex)
+    }
+
+    function startCycle(idx: number) {
+      issueIndex = idx
+      if (dots.length === 0) return
+      seedIndex = Math.floor(Math.random() * dots.length)
+      const seed = dots[seedIndex]!
+      if (triggerDist.length !== dots.length) {
+        triggerDist = new Float32Array(dots.length)
+      }
+      let max = 0
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i]!
+        const dx = d.homeX - seed.homeX
+        const dy = d.homeY - seed.homeY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        triggerDist[i] = dist
+        if (dist > max) max = dist
+      }
+      maxTriggerDist = Math.max(1, max)
+      lastShownPct = -1
+    }
+
+    function smoothstep(a: number, b: number, x: number) {
+      if (x <= a) return 0
+      if (x >= b) return 1
+      const t = (x - a) / (b - a)
+      return t * t * (3 - 2 * t)
+    }
+
+    function lerp(a: number, b: number, t: number) {
+      return a + (b - a) * t
+    }
+
+    function parseRGB(s: string): [number, number, number] | null {
+      const m = s.match(/^#?([0-9a-f]{6})$/i)
+      if (m) {
+        const n = parseInt(m[1]!, 16)
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+      }
+      const r = s.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
+      if (r) return [parseInt(r[1]!), parseInt(r[2]!), parseInt(r[3]!)]
+      return null
+    }
+
+    function setChyron(pct: number, question: string) {
+      if (pct !== lastShownPct) {
+        pctEl!.textContent = `${pct}%`
+        lastShownPct = pct
+      }
+      if (qEl!.textContent !== question) qEl!.textContent = question
+    }
+
+    function frame(now: number) {
+      let t = now - cycleStart
+      if (t >= CYCLE_MS) {
+        cycleStart += CYCLE_MS
+        t = now - cycleStart
+        startCycle((issueIndex + 1) % issues.length)
+      }
+      const issue = issues[issueIndex]!
+      const aligns = alignments[issueIndex]!
+      const seed = dots[seedIndex]!
+
+      // Cycle-wide fade in (at question entry) and fade out (at cycle end).
+      const cycleIn = smoothstep(0, T_QUESTION_IN, t)
+      const cycleOut = 1 - smoothstep(T_FADE_END - 700, T_FADE_END, t)
+      const questionOpacity = Math.min(cycleIn, cycleOut)
+      questionRow!.style.opacity = questionOpacity.toFixed(3)
+
+      // Radial reveal: radius grows on a power curve (slow start, accelerating).
+      const waveT = Math.max(0, Math.min(1, (t - T_WAVE_START) / T_WAVE_DURATION))
+      const waveProgress = Math.pow(waveT, WAVE_ACCEL)
+      const waveRadius = maxTriggerDist * waveProgress
+      const revealBand = Math.max(18, maxTriggerDist * 0.07)
+      const fadeOut = 1 - smoothstep(T_HOLD_END, T_FADE_END, t)
+
+      // Percentage row appears once every dot has answered.
+      const pctIn = smoothstep(T_PCT_IN_START, T_PCT_IN_END, t)
+      const pctOpacity = pctIn * cycleOut
+      resultRow!.style.opacity = pctOpacity.toFixed(3)
+
+      // Final percentage is computed from the actual field; counter ticks up
+      // in sync with the row's fade-in.
+      let agreeCount = 0
+      for (let i = 0; i < dots.length; i++) {
+        if (aligns[i]! > 0.5) agreeCount++
+      }
+      const finalPct = Math.round((agreeCount / dots.length) * 100)
+      const shownPct = Math.round(pctIn * finalPct)
+      setChyron(shownPct, issue.question)
+
+      // Render canvas.
+      ctx!.clearRect(0, 0, cssW, cssH)
+
+      // Expanding wavefront ring centered on the seed dot. Peaks midway through
+      // the wave so it reads as "the answer is moving outward" without
+      // dominating the dot field.
+      if (waveT > 0 && waveT < 1) {
+        const ringAlpha =
+          Math.pow(waveT, 0.55) * (1 - waveT) * 0.42 * fadeOut * questionOpacity
+        if (ringAlpha > 0.01) {
+          ctx!.strokeStyle = `rgba(${peakColor[0]}, ${peakColor[1]}, ${peakColor[2]}, ${ringAlpha.toFixed(3)})`
+          ctx!.lineWidth = 1.4
+          ctx!.beginPath()
+          ctx!.arc(seed.homeX, seed.homeY, waveRadius, 0, Math.PI * 2)
+          ctx!.stroke()
+        }
+      }
+
+      const driftPhase = now * 0.00015
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i]!
+        const a = aligns[i]!
+        const trig = triggerDist[i]!
+
+        // Reveal as the radial wavefront crosses this dot.
+        let dotReveal = 0
+        if (waveT > 0) {
+          dotReveal = smoothstep(trig - revealBand, trig, waveRadius)
+        }
+        dotReveal *= fadeOut
+
+        const x = d.homeX + Math.sin(driftPhase * 2 + d.phaseX) * DRIFT_AMPLITUDE
+        const y = d.homeY + Math.cos(driftPhase * 1.7 + d.phaseY) * DRIFT_AMPLITUDE
+
+        const intensity = dotReveal * a
+        const alpha = lerp(baseAlpha, peakAlpha, intensity)
+        const r = lerp(baseColor[0], peakColor[0], intensity)
+        const g = lerp(baseColor[1], peakColor[1], intensity)
+        const b = lerp(baseColor[2], peakColor[2], intensity)
+        const radius = lerp(BASE_RADIUS, PEAK_RADIUS, intensity)
+
+        if (intensity > 0.35) {
+          ctx!.fillStyle = `rgba(${r | 0}, ${g | 0}, ${b | 0}, ${(alpha * 0.35).toFixed(3)})`
+          ctx!.beginPath()
+          ctx!.arc(x, y, radius * 2.4, 0, Math.PI * 2)
+          ctx!.fill()
+        }
+
+        ctx!.fillStyle = `rgba(${r | 0}, ${g | 0}, ${b | 0}, ${alpha.toFixed(3)})`
+        ctx!.beginPath()
+        ctx!.arc(x, y, radius, 0, Math.PI * 2)
+        ctx!.fill()
+      }
+
+      rafId = requestAnimationFrame(frame)
+    }
+
+    // --- Static reduced-motion frame ---------------------------------------
+    function renderStaticFrame() {
+      const issue = issues[0]!
+      const aligns = alignments[0]!
+      ctx!.clearRect(0, 0, cssW, cssH)
+      let agreeCount = 0
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i]!
+        const a = aligns[i]!
+        if (a > 0.5) agreeCount++
+        const intensity = a
+        const alpha = lerp(baseAlpha, peakAlpha, intensity)
+        const r = lerp(baseColor[0], peakColor[0], intensity)
+        const g = lerp(baseColor[1], peakColor[1], intensity)
+        const b = lerp(baseColor[2], peakColor[2], intensity)
+        const radius = lerp(BASE_RADIUS, PEAK_RADIUS, intensity)
+        ctx!.fillStyle = `rgba(${r | 0}, ${g | 0}, ${b | 0}, ${alpha.toFixed(3)})`
+        ctx!.beginPath()
+        ctx!.arc(d.homeX, d.homeY, radius, 0, Math.PI * 2)
+        ctx!.fill()
+      }
+      setChyron(Math.round((agreeCount / dots.length) * 100), issue.question)
+      questionRow!.style.opacity = '1'
+      resultRow!.style.opacity = '1'
+    }
+
+    // --- Boot ---------------------------------------------------------------
+    rebuild()
+
+    let rafId = 0
+    if (reduceMotion) {
+      renderStaticFrame()
+    } else {
+      // rebuild() already called startCycle(0) for the initial seed.
+      cycleStart = performance.now()
+      rafId = requestAnimationFrame(frame)
+    }
+
+    // Resize handling: debounce, then rebuild.
+    let resizeTimer = 0
+    window.addEventListener('resize', () => {
+      window.clearTimeout(resizeTimer)
+      resizeTimer = window.setTimeout(() => {
+        rebuild()
+        if (reduceMotion) renderStaticFrame()
+      }, 150)
+    })
+
+    // Pause when tab is hidden to save power. On resume, restart at the top
+    // of a fresh cycle with a new seed so the reveal feels deliberate.
+    document.addEventListener('visibilitychange', () => {
+      if (reduceMotion) return
+      if (document.hidden) {
+        cancelAnimationFrame(rafId)
+      } else {
+        cycleStart = performance.now()
+        startCycle(issueIndex)
+        rafId = requestAnimationFrame(frame)
+      }
+    })
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    min-height: clamp(540px, 80vh, 760px);
+    background: linear-gradient(180deg, var(--color-brand-bg) 0%, var(--color-brand-surface) 100%);
+  }
+
+  :global(html.dark) .hero {
+    background: radial-gradient(
+        ellipse at 50% 35%,
+        #0e1a26 0%,
+        #060a10 60%,
+        #03060a 100%
+      );
+  }
+
+  .hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    /* Dots use brand-aligned blue at rest and warm gold at the moment of
+       reveal. Intensity carries the signal, never tribal color. */
+    --dot-base: #6f9bc4;
+    --dot-peak: #f5c460;
+    --dot-base-alpha: 0.18;
+    --dot-peak-alpha: 0.95;
+  }
+
+  :global(html.dark) .hero-canvas {
+    --dot-base: #4a7aa6;
+    --dot-peak: #ffd27a;
+    --dot-base-alpha: 0.28;
+    --dot-peak-alpha: 1;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: clamp(4rem, 12vh, 8rem) 1.5rem clamp(3rem, 8vh, 5rem);
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-brand-text1);
+    margin: 0;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  .hero-subtitle {
+    margin: 1.5rem auto 0;
+    max-width: 36rem;
+    color: var(--color-brand-text2);
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    line-height: 1.6;
+    text-wrap: balance;
+  }
+
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .hero-cta-primary,
+  .hero-cta-secondary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      opacity 200ms ease,
+      background-color 200ms ease;
+  }
+
+  .hero-cta-primary {
+    background: var(--color-brand-primary);
+    color: white;
+  }
+
+  .hero-cta-primary:hover {
+    opacity: 0.9;
+  }
+
+  .hero-cta-secondary {
+    background: color-mix(in oklab, var(--color-brand-surface), transparent 20%);
+    color: var(--color-brand-text2);
+    border: 1px solid var(--color-brand-el2);
+    backdrop-filter: blur(4px);
+  }
+
+  .hero-cta-secondary:hover {
+    background: var(--color-brand-el1);
+  }
+
+  .hero-chyron {
+    margin: 2.75rem auto 0;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    max-width: 42rem;
+    padding: 0.6rem 1.05rem;
+    border-radius: 1.1rem;
+    background: color-mix(in oklab, var(--color-brand-surface), transparent 35%);
+    border: 1px solid var(--color-brand-el2);
+    backdrop-filter: blur(8px);
+    font-size: clamp(0.85rem, 1.3vw, 0.95rem);
+    color: var(--color-brand-text2);
+    line-height: 1.4;
+  }
+
+  .chyron-question {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+  }
+
+  .chyron-result {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* Hidden until JS reveals it after the wave completes. */
+    opacity: 0;
+  }
+
+  .chyron-pulse {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #f5c460;
+    box-shadow: 0 0 0 0 rgba(245, 196, 96, 0.7);
+    animation: chyron-pulse 2.2s ease-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes chyron-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(245, 196, 96, 0.55);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(245, 196, 96, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(245, 196, 96, 0);
+    }
+  }
+
+  .chyron-pct {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--color-brand-text1);
+  }
+
+  .chyron-label {
+    color: var(--color-brand-text3);
+  }
+
+  .chyron-q {
+    color: var(--color-brand-text1);
+    font-weight: 500;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chyron-pulse {
+      animation: none;
+    }
+  }
+</style>

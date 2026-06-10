@@ -1,0 +1,473 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import FeatureCard from '@components/ui/FeatureCard.astro'
+import CareersForm from '@components/forms/CareersForm.astro'
+---
+
+<BaseLayout
+  title="Careers at Voxivium — Roles we're starting to fill"
+  description="Voxivium is pre-launch and meeting candidates now so we know who to call when funding allows the next hire. Three roles, equity-only compensation, and a PBC structure that codifies internal commitments."
+>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Careers</p>
+      <h1>Help us build political accountability.</h1>
+      <p class="lead">
+        Voxivium is a pre-launch Public Benefit Corporation. We're meeting candidates now so that
+        when funding allows the next hire, we already know who to call.
+      </p>
+
+      <nav class="toc" aria-label="On this page">
+        <span class="toc-label">On this page</span>
+        <a href="#timing">A note on timing</a>
+        <a href="#culture">What we look for</a>
+        <a href="#compensation">Compensation</a>
+        <a href="#roles">Open roles</a>
+        <a href="#apply">Apply</a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="timing" id="timing">
+    <div class="container">
+      <h2>A note on timing</h2>
+      <p>
+        We're not actively filling any of the roles below today. Voxivium is pre-revenue and
+        pre-launch. We're collecting applications now because the platform is close to launch and
+        when funding allows the next hire, we'd rather already know who you are than start a search
+        from scratch.
+      </p>
+      <p>
+        If you submit, we'll reply when there's something concrete to discuss. That may be soon. It
+        may not be.  We'd rather not pretend otherwise.
+      </p>
+    </div>
+  </section>
+
+  <section class="culture" id="culture">
+    <div class="container">
+      <header>
+        <p class="eyebrow">What we look for</p>
+        <h2>Versatile, mission-aligned, comfortable building.</h2>
+      </header>
+
+      <div class="grid">
+        <FeatureCard title="Versatility over specialization">
+          <p>
+            The team is small. Every hire spans more than one discipline. The right candidate
+            shows up with one core strength and adjacent abilities they'll use weekly, not
+            quarterly.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="Mission alignment">
+          <p>
+            The work is civic infrastructure. You'll be making decisions about methodology,
+            partisan balance, privacy, and trust where the right answer rarely shows up in a
+            startup playbook. Caring about the mission is not a tiebreaker — it's the job.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="Comfort with ambiguity">
+          <p>
+            Pre-launch means decisions get made with incomplete information, often by the person
+            doing the work. We need people who can make a call, document it, and revisit it
+            without ego.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="Non-partisan rigor">
+          <p>
+            Voxivium's value depends on being trusted across the spectrum. Candidates who can hold
+            that line in their public footprint and their day-to-day reasoning have a meaningful
+            edge.
+          </p>
+        </FeatureCard>
+      </div>
+    </div>
+  </section>
+
+  <section class="compensation" id="compensation">
+    <div class="container">
+      <h2>Compensation</h2>
+      <p>
+        Voxivium is pre-revenue. Compensation is currently equity-only, with cash compensation to
+        follow funding. We won't pretend that's not a real ask. It is.
+      </p>
+      <p>
+        The equity comes with PBC governance you won't find at most startups, codified in our
+        corporate bylaws:
+      </p>
+      <ul class="commitments">
+        <li>
+          <strong>5:1 executive-to-employee pay ratio cap.</strong> Total compensation between the
+          highest-paid executive and the lowest-paid employee is capped at 5:1.
+        </li>
+        <li>
+          <strong>Locality-adjusted living wage for all staff.</strong> No exceptions, no roles
+          excluded.
+        </li>
+        <li>
+          <strong>Employee profit sharing.</strong> After necessary operational reserves, profits
+          are shared with the people who built the platform.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="roles" id="roles">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Open roles</p>
+        <h2>Three positions we're hiring next.</h2>
+        <p class="lead">
+          Each of these covers more ground than a typical job title implies. That's deliberate.
+        </p>
+      </header>
+
+      <article class="role">
+        <h3>Support, QA, and Deployment Engineer</h3>
+        <p class="role-summary">
+          The platform engineer who keeps users unblocked and the system shipping. You'll own the
+          loop from "user reports a problem" to "fix is live in production."
+        </p>
+        <h4>What you'd do</h4>
+        <ul>
+          <li>Handle user-reported issues end-to-end: reproduce, diagnose, fix or hand off, communicate back.</li>
+          <li>Own quality assurance: write and run the regression tests, build the smoke tests, catch what slips past automated checks.</li>
+          <li>Run deployments: ship code to production safely, roll back when needed, keep release notes honest.</li>
+          <li>Improve the engineering toolchain over time — CI, monitoring, alerting — when the gap is felt.</li>
+        </ul>
+        <h4>What we look for</h4>
+        <ul>
+          <li>Comfort across web stack, cloud infrastructure (AWS preferred), and shell.</li>
+          <li>Real experience handling production incidents and the patience to write good post-mortems.</li>
+          <li>QA instinct: the urge to break your own work before it ships.</li>
+          <li>Strong written communication.</li>
+        </ul>
+        <p class="role-note">Currently equity-only. Full-time, remote-first.</p>
+      </article>
+
+      <article class="role">
+        <h3>Marketing, Pricing, and Sales</h3>
+        <p class="role-summary">
+          The commercial lead who turns interest into revenue. You'll own pricing decisions, public
+          positioning, and the B2B sales motion for media, research, and AI partners.
+        </p>
+        <h4>What you'd do</h4>
+        <ul>
+          <li>Develop the pricing strategy across politician, media/research, and AI lab tiers. Test, adjust, document the why.</li>
+          <li>Represent the public face of Voxivium: press relationships, partner conversations, conference presence.</li>
+          <li>Run the sales pipeline for media organizations, academic researchers, and AI alignment teams.</li>
+          <li>Maintain the non-partisan brand integrity that makes the platform valuable. Every word ships through this filter.</li>
+        </ul>
+        <h4>What we look for</h4>
+        <ul>
+          <li>Track record selling complex B2B products — ideally data, API, or platform sales.</li>
+          <li>Strong instinct for pricing data businesses; comfortable with both subscription and tiered-access models.</li>
+          <li>Ability to write the way smart customers want to read. No jargon, no hype, no partisan tells.</li>
+          <li>Bonus: existing relationships in journalism, academia, civic tech, or AI safety.</li>
+        </ul>
+        <p class="role-note">Currently equity-only. Full-time, remote-first.</p>
+      </article>
+
+      <article class="role">
+        <h3>Policy &amp; Content Specialist</h3>
+        <p class="role-summary">
+          The editorial conscience of the platform. You'll review the plain-English summaries of
+          legislation, court rulings, and executive actions that voters read and that determine
+          whether they trust us.
+        </p>
+        <h4>What you'd do</h4>
+        <ul>
+          <li>Review neutral, accurate, plain-English summaries of bills, votes, court rulings, and executive orders at the federal level — and over time, state and local.</li>
+          <li>Define and refine the methodology for issue categorization, including how partisan framing is filtered out before it reaches users.</li>
+          <li>Review algorithmic position recommendations for bias and surface any drift to the team.</li>
+        </ul>
+        <h4>What we look for</h4>
+        <ul>
+          <li>Background in legislative journalism, policy research, legislative-aide work, or political science — anyone whose job has been reading bills and explaining them clearly.</li>
+          <li>Demonstrably non-partisan writing record. We'll read your work.</li>
+          <li>Fast, precise editing under tight deadlines.</li>
+          <li>Engineering literacy is a plus, not a requirement.</li>
+        </ul>
+        <p class="role-note">Currently equity-only. Full-time, remote-first.</p>
+      </article>
+
+      <p class="other-note">
+        Don't see a role that fits but think you'd add something? Select <em>Other</em> in the
+        application form below and tell us where you'd fit.
+      </p>
+    </div>
+  </section>
+
+  <section class="apply" id="apply">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Apply</p>
+        <h2>Send us your resume.</h2>
+        <p class="lead">
+          We extract a plain-text version of your PDF for review. The original file is not stored.
+          You'll receive a confirmation that we've received your application; we'll follow up when
+          there's something to discuss.
+        </p>
+      </header>
+
+      <div class="form-card">
+        <CareersForm />
+      </div>
+    </div>
+  </section>
+
+  <script
+    is:inline
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer></script>
+
+  <script>
+    import '@lib/forms/client'
+  </script>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.01em;
+    margin: 0 0 1.25rem;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-brand-text2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 1.25rem 0 0.5rem;
+  }
+
+  .page-hero .lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text2);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    max-width: 40rem;
+  }
+
+  .toc {
+    margin: 2rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .toc-label {
+    color: var(--color-brand-text3);
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+
+  .toc a {
+    color: var(--color-brand-primary);
+    text-decoration: none;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-brand-el1);
+    background: var(--color-brand-bg);
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .toc a:hover {
+    background: var(--color-brand-surface);
+    border-color: var(--color-brand-el2);
+  }
+
+  .toc a:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+  }
+
+  .timing,
+  .compensation,
+  .roles,
+  .apply {
+    padding: clamp(2.5rem, 6vh, 4rem) 1.5rem;
+  }
+
+  .culture {
+    padding: clamp(3rem, 8vh, 5rem) 1.5rem;
+    background: var(--color-brand-surface);
+    border-block: 1px solid var(--color-brand-el1);
+  }
+
+  .timing p,
+  .compensation p,
+  .compensation ul {
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    margin: 0 0 1.25rem;
+  }
+
+  .compensation ul.commitments {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .compensation ul.commitments li {
+    color: var(--color-brand-text2);
+    line-height: 1.6;
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .compensation ul.commitments li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--color-brand-primary);
+  }
+
+  .compensation strong {
+    color: var(--color-brand-text1);
+  }
+
+  .timing .container,
+  .culture .container,
+  .compensation .container,
+  .roles .container,
+  .apply .container {
+    max-width: 64rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    max-width: 44rem;
+    margin-inline: auto;
+  }
+
+  .lead {
+    margin: 1rem auto 0;
+    color: var(--color-brand-text3);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .role {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .role:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .role-summary {
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .role ul {
+    margin: 0 0 0.5rem;
+    padding-left: 1.25rem;
+    color: var(--color-brand-text2);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .role ul li {
+    margin-bottom: 0.375rem;
+  }
+
+  .role-note {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    font-style: italic;
+    margin: 1.25rem 0 0;
+  }
+
+  .other-note {
+    margin: 2rem auto 0;
+    color: var(--color-brand-text3);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    text-align: center;
+    max-width: 36rem;
+  }
+
+  .form-card {
+    background: var(--color-brand-bg);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+    padding: 1.75rem;
+    max-width: 36rem;
+    margin: 0 auto;
+  }
+</style>

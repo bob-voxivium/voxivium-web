@@ -1,0 +1,108 @@
+---
+import '@styles/forms.css'
+---
+
+<form data-voxivium-form="partnership" class="vox-form" novalidate>
+  <div class="form-field">
+    <label for="part-name">Name <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="part-name"
+      name="name"
+      type="text"
+      required
+      autocomplete="name"
+      maxlength="96"
+      aria-describedby="part-name-error"
+    />
+    <p id="part-name-error" class="form-error" data-error-for="name" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="part-email">Email <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="part-email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      aria-describedby="part-email-error"
+    />
+    <p id="part-email-error" class="form-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="part-organization"
+      >Organization <span class="req" aria-hidden="true">*</span></label
+    >
+    <input
+      id="part-organization"
+      name="organization"
+      type="text"
+      required
+      maxlength="120"
+      autocomplete="organization"
+      aria-describedby="part-organization-error"
+    />
+    <p id="part-organization-error" class="form-error" data-error-for="organization" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="part-role">Your role (optional)</label>
+    <input
+      id="part-role"
+      name="role"
+      type="text"
+      maxlength="120"
+      placeholder="e.g. Program officer, Executive director"
+      aria-describedby="part-role-error"
+    />
+    <p id="part-role-error" class="form-error" data-error-for="role" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="part-interest"
+      >What's the focus of your interest? <span class="req" aria-hidden="true">*</span></label
+    >
+    <textarea
+      id="part-interest"
+      name="interest"
+      required
+      maxlength="2000"
+      rows="3"
+      placeholder="Civic engagement, democracy infrastructure, AI safety, voter access, etc."
+      aria-describedby="part-interest-error"></textarea>
+    <p id="part-interest-error" class="form-error" data-error-for="interest" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="part-message">Anything else? (optional)</label>
+    <textarea
+      id="part-message"
+      name="message"
+      maxlength="2000"
+      rows="2"
+      aria-describedby="part-message-error"></textarea>
+    <p id="part-message-error" class="form-error" data-error-for="message" hidden></p>
+  </div>
+
+  <input
+    type="text"
+    name="hp"
+    tabindex="-1"
+    autocomplete="off"
+    class="honeypot"
+    aria-hidden="true"
+  />
+
+  <div
+    class="cf-turnstile"
+    data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+    data-theme="auto"
+  >
+  </div>
+  <p class="form-error" data-error-for="turnstile" hidden></p>
+
+  <button type="submit">Start a conversation</button>
+
+  <p class="form-status" data-form-status hidden></p>
+</form>

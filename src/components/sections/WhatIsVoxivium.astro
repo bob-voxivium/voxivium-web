@@ -1,0 +1,114 @@
+---
+import FeatureCard from '@components/ui/FeatureCard.astro'
+---
+
+<section class="what-is" id="what-is" aria-labelledby="what-is-heading">
+  <div class="container">
+    <header>
+      <p class="eyebrow">What Voxivium changes</p>
+      <h2 id="what-is-heading">
+        A non-partisan bridge between citizens and the people who represent them.
+      </h2>
+      <p class="lead">
+        When the verified positions of millions of voters are aggregated and weighted by what they
+        care about, two things become possible: voters discover common ground they never knew existed, 
+        and politicians get a mandate they can actually govern by.
+      </p>
+    </header>
+
+    <div class="grid">
+      <FeatureCard title="For voters: proof you're not alone">
+        <p>
+          State your positions on the issues that matter. See how often each representative supports
+          the issues you care about, and discover how much your district already agrees on issues 
+          you've been told are too divisive to discuss.
+        </p>
+      </FeatureCard>
+
+      <FeatureCard title="For politicians: a real mandate">
+        <p>
+          See what the verified citizens of your district actually want, weighted by what they care
+          about most. Govern from a measurable signal instead of donor pressure or primary noise.
+        </p>
+      </FeatureCard>
+
+      <FeatureCard title="Verified, never sold">
+        <p>
+          Every Voxivium user is a confirmed registered U.S. voter. Individual positions are never
+          tied to your name and never sold. The platform reports the aggregated voice of the
+          citizens, never the citizen.
+        </p>
+      </FeatureCard>
+
+      <FeatureCard title="A Public Benefit Corporation">
+        <p>
+          Our charter legally requires the mission to come first. Our bylaws codify a 5:1 executive
+          pay ratio, a living wage for every employee, and profit sharing across the company.
+        </p>
+      </FeatureCard>
+    </div>
+  </div>
+</section>
+
+<style>
+  .what-is {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem;
+  }
+
+  .container {
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+
+  header {
+    max-width: 48rem;
+    margin: 0 auto 3rem;
+    text-align: center;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h2 {
+    font-size: clamp(1.875rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-brand-text1);
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .lead {
+    margin: 1.25rem auto 0;
+    max-width: 40rem;
+    color: var(--color-brand-text3);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    text-wrap: balance;
+  }
+
+  .grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

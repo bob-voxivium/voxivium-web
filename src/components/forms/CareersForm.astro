@@ -1,0 +1,172 @@
+---
+import '@styles/forms.css'
+import { RESUME_MAX_BYTES, careersPositionSchema } from '@lib/forms/schemas'
+
+const positions = careersPositionSchema.options
+const maxMb = RESUME_MAX_BYTES / 1024 / 1024
+---
+
+<form data-voxivium-form="careers" class="vox-form" enctype="multipart/form-data" novalidate>
+  <div class="form-row">
+    <div class="form-field">
+      <label for="car-firstName">First name <span class="req" aria-hidden="true">*</span></label>
+      <input
+        id="car-firstName"
+        name="firstName"
+        type="text"
+        required
+        autocomplete="given-name"
+        maxlength="48"
+        aria-describedby="car-firstName-error"
+      />
+      <p id="car-firstName-error" class="form-error" data-error-for="firstName" hidden></p>
+    </div>
+    <div class="form-field">
+      <label for="car-lastName">Last name <span class="req" aria-hidden="true">*</span></label>
+      <input
+        id="car-lastName"
+        name="lastName"
+        type="text"
+        required
+        autocomplete="family-name"
+        maxlength="48"
+        aria-describedby="car-lastName-error"
+      />
+      <p id="car-lastName-error" class="form-error" data-error-for="lastName" hidden></p>
+    </div>
+  </div>
+
+  <div class="form-field">
+    <label for="car-email">Email <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="car-email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      aria-describedby="car-email-error"
+    />
+    <p id="car-email-error" class="form-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="car-phone">Phone (optional)</label>
+    <input
+      id="car-phone"
+      name="phone"
+      type="tel"
+      autocomplete="tel"
+      maxlength="40"
+      aria-describedby="car-phone-error"
+    />
+    <p id="car-phone-error" class="form-error" data-error-for="phone" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="car-position">
+      Which role are you interested in? <span class="req" aria-hidden="true">*</span>
+    </label>
+    <select
+      id="car-position"
+      name="position"
+      required
+      aria-describedby="car-position-error"
+    >
+      <option value="" disabled selected>Select a role</option>
+      {positions.map((p) => <option value={p}>{p}</option>)}
+    </select>
+    <p id="car-position-error" class="form-error" data-error-for="position" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="car-linkedin">LinkedIn or personal site (optional)</label>
+    <input
+      id="car-linkedin"
+      name="linkedin"
+      type="url"
+      maxlength="300"
+      placeholder="https://"
+      aria-describedby="car-linkedin-error"
+    />
+    <p id="car-linkedin-error" class="form-error" data-error-for="linkedin" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="car-resume">
+      Resume (PDF, {maxMb} MB max) <span class="req" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="car-resume"
+      name="resume"
+      type="file"
+      accept="application/pdf,.pdf"
+      required
+      aria-describedby="car-resume-help car-resume-error"
+    />
+    <p id="car-resume-help" class="form-help">
+      We extract a plain-text version of your resume for hiring review. The original PDF is not
+      stored.
+    </p>
+    <p id="car-resume-error" class="form-error" data-error-for="resume" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="car-message">Tell us why you're interested (optional)</label>
+    <textarea
+      id="car-message"
+      name="message"
+      maxlength="2000"
+      rows="4"
+      placeholder="If you chose Other, briefly describe the role you'd fit. Otherwise, anything you'd like us to know."
+      aria-describedby="car-message-error"></textarea>
+    <p id="car-message-error" class="form-error" data-error-for="message" hidden></p>
+  </div>
+
+  <input
+    type="text"
+    name="hp"
+    tabindex="-1"
+    autocomplete="off"
+    class="honeypot"
+    aria-hidden="true"
+  />
+
+  <div
+    class="cf-turnstile"
+    data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+    data-theme="auto"
+  >
+  </div>
+  <p class="form-error" data-error-for="turnstile" hidden></p>
+
+  <button type="submit">Submit application</button>
+
+  <p class="form-status" data-form-status hidden></p>
+</form>
+
+<style>
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-help {
+    color: var(--color-brand-text3);
+    font-size: 0.8125rem;
+    margin: 0.25rem 0 0;
+    line-height: 1.5;
+  }
+
+  input[type='file'] {
+    padding: 0.5rem;
+    background: var(--color-brand-bg);
+    color: var(--color-brand-text2);
+  }
+</style>

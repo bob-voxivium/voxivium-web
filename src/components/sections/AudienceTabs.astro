@@ -1,0 +1,368 @@
+---
+import VoterForm from '@components/forms/VoterForm.astro'
+import PoliticianForm from '@components/forms/PoliticianForm.astro'
+import MediaForm from '@components/forms/MediaForm.astro'
+import AiLabForm from '@components/forms/AiLabForm.astro'
+
+interface PanelDef {
+  id: string
+  label: string
+  heading: string
+  body: string
+  bullets: string[]
+  formHeading: string
+  formNote?: string
+}
+
+const panels: PanelDef[] = [
+  {
+    id: 'voters',
+    label: 'For voters',
+    heading: 'Your representatives shouldn’t be a guess.',
+    body: "State your positions on the issues that matter, and Voxivium turns them into a personal accountability score for every official who claims to speak for you. Then it shows you something most platforms hide: how often your neighbors actually agree with you, even across party lines. You're not a drop in the ocean. You're a measurable voice.",
+    bullets: [
+      'Free for life on every core feature',
+      'Personalized accountability score for each representative',
+      'Side-by-side candidate comparisons during elections',
+      'Anonymous and aggregate by design—your voice, never your identity',
+    ],
+    formHeading: 'Get notified when Voxivium launches',
+  },
+  {
+    id: 'politicians',
+    label: 'For politicians',
+    heading: 'Stop guessing what your constituents actually want.',
+    body: 'Most representatives govern from incomplete signals: donor calls, primary turnout, the loudest voices in the room. Voxivium gives you the actual weighted will of every verified constituent in your district, refreshed continuously and segmented by issue. Govern from a real mandate, build a public record voters can see, and let your work speak for itself at the next election.',
+    bullets: [
+      'Aggregated, weighted constituent sentiment by district and by issue',
+      'Every user is a verified registered voter (no bots, no foreign influence)',
+      'Public alignment score you can stand behind in your next campaign',
+      'Cross-tabulations to find where your district actually agrees',
+    ],
+    formHeading: 'Apply for early access',
+    formNote: 'Submissions open soon—we’ll notify you when verification opens.',
+  },
+  {
+    id: 'media',
+    label: 'For media & research',
+    heading: 'Replace polling noise with verified sentiment.',
+    body: 'Voxivium licenses aggregated insights to news organizations, academic institutions, and public-interest researchers covering federal, state, and local government. Granular data, transparent methodology, full attribution rights.',
+    bullets: [
+      'National, state, and local sentiment data',
+      'API access for newsroom integration',
+      'Cross-tabulations and trend analysis',
+      'Pre-built dashboards for race-level coverage',
+    ],
+    formHeading: 'Inquire about licensing',
+    formNote: 'Submissions open soon—we’ll be in touch with details.',
+  },
+  {
+    id: 'aiLab',
+    label: 'For AI labs',
+    heading: 'Train and evaluate against verified human values.',
+    body: 'The Voxivium "Ground Truth" license gives alignment teams a benchmark for what real, attributable citizens actually believe across the political spectrum—not internet noise, not paid contractors, not a single platform’s user base.',
+    bullets: [
+      'Verified, anonymized human stances across the issue spectrum',
+      'Cross-partisan ground truth, not skewed to a platform’s user base',
+      'Tiered API access scaled to evaluation needs',
+      'License terms designed for evaluation, not training',
+    ],
+    formHeading: 'Request access',
+    formNote: 'Submissions open soon—we’ll reach out with the program brief.',
+  },
+]
+---
+
+<section class="audiences" id="audiences" aria-labelledby="audiences-heading" data-audience-tabs>
+  <div class="container">
+    <header>
+      <p class="eyebrow">Built for everyone in the conversation</p>
+      <h2 id="audiences-heading">Four kinds of accounts. One platform.</h2>
+      <p class="lead">
+        Voxivium serves voters, the politicians they elect, the journalists who cover them, and the
+        AI labs working to keep models aligned with real human values. Pick the role that fits.
+      </p>
+    </header>
+
+    <div role="tablist" aria-label="Choose your audience" class="tablist">
+      {
+        panels.map((p, i) => (
+          <button
+            role="tab"
+            id={`tab-${p.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-controls={`panel-${p.id}`}
+            tabindex={i === 0 ? 0 : -1}
+            data-tab={p.id}
+            type="button"
+          >
+            {p.label}
+          </button>
+        ))
+      }
+    </div>
+
+    {
+      panels.map((p, i) => (
+        <div
+          role="tabpanel"
+          id={`panel-${p.id}`}
+          aria-labelledby={`tab-${p.id}`}
+          data-panel={p.id}
+          class="panel"
+          hidden={i !== 0}
+          tabindex="0"
+        >
+          <div class="copy">
+            <h3>{p.heading}</h3>
+            <p>{p.body}</p>
+            <ul>
+              {p.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          </div>
+          <div class="form-card">
+            <h4>{p.formHeading}</h4>
+            {p.formNote && <p class="form-note">{p.formNote}</p>}
+            {p.id === 'voters' && <VoterForm />}
+            {p.id === 'politicians' && <PoliticianForm />}
+            {p.id === 'media' && <MediaForm />}
+            {p.id === 'aiLab' && <AiLabForm />}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script is:inline>
+  ;(() => {
+    const validTabs = ['voters', 'politicians', 'media', 'aiLab']
+    document.querySelectorAll('[data-audience-tabs]').forEach((root) => {
+      const tabs = Array.from(root.querySelectorAll('[role="tab"]'))
+      const panels = Array.from(root.querySelectorAll('[role="tabpanel"]'))
+
+      function activate(tabId, opts) {
+        const focus = opts && opts.focus
+        const updateHash = !opts || opts.updateHash !== false
+        let didChange = false
+        tabs.forEach((t) => {
+          const active = t.dataset.tab === tabId
+          if (t.getAttribute('aria-selected') !== String(active)) didChange = true
+          t.setAttribute('aria-selected', String(active))
+          t.tabIndex = active ? 0 : -1
+          if (active && focus) t.focus()
+        })
+        panels.forEach((p) => {
+          const active = p.id === `panel-${tabId}`
+          p.hidden = !active
+        })
+        if (didChange && updateHash && history.replaceState) {
+          history.replaceState(null, '', `#${tabId}`)
+        }
+      }
+
+      tabs.forEach((tab, i) => {
+        tab.addEventListener('click', () => activate(tab.dataset.tab))
+        tab.addEventListener('keydown', (e) => {
+          let nextIndex = -1
+          if (e.key === 'ArrowRight') nextIndex = (i + 1) % tabs.length
+          else if (e.key === 'ArrowLeft') nextIndex = (i - 1 + tabs.length) % tabs.length
+          else if (e.key === 'Home') nextIndex = 0
+          else if (e.key === 'End') nextIndex = tabs.length - 1
+          if (nextIndex >= 0) {
+            e.preventDefault()
+            activate(tabs[nextIndex].dataset.tab, { focus: true })
+          }
+        })
+      })
+
+      const initialHash = window.location.hash.slice(1)
+      if (initialHash && validTabs.includes(initialHash)) {
+        activate(initialHash, { updateHash: false })
+      }
+
+      window.addEventListener('hashchange', () => {
+        const h = window.location.hash.slice(1)
+        if (validTabs.includes(h)) activate(h, { updateHash: false })
+      })
+    })
+  })()
+</script>
+
+<script
+  is:inline
+  src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+  async
+  defer></script>
+
+<script>
+  import '@lib/forms/client'
+</script>
+
+<style>
+  .audiences {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem;
+    background: var(--color-brand-surface);
+    border-block: 1px solid var(--color-brand-el1);
+  }
+
+  .container {
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+
+  header {
+    max-width: 48rem;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h2 {
+    font-size: clamp(1.875rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-brand-text1);
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .lead {
+    margin: 1.25rem auto 0;
+    max-width: 40rem;
+    color: var(--color-brand-text3);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    text-wrap: balance;
+  }
+
+  .tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding: 0.375rem;
+    background: var(--color-brand-bg);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 999px;
+    width: fit-content;
+    margin-inline: auto;
+    margin-bottom: 2.5rem;
+  }
+
+  [role='tab'] {
+    background: transparent;
+    border: 0;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    color: var(--color-brand-text3);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  [role='tab']:hover {
+    color: var(--color-brand-text1);
+  }
+
+  [role='tab'][aria-selected='true'] {
+    background: var(--color-brand-primary);
+    color: white;
+  }
+
+  .panel {
+    display: grid;
+    gap: 2.5rem;
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .panel {
+      grid-template-columns: 1fr 1fr;
+      gap: 3.5rem;
+    }
+  }
+
+  .panel:focus-visible {
+    outline: none;
+  }
+
+  .panel h3 {
+    font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.01em;
+    margin: 0 0 1rem;
+    line-height: 1.2;
+  }
+
+  .panel .copy > p {
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    margin: 0 0 1.25rem;
+  }
+
+  .panel ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .panel li {
+    color: var(--color-brand-text2);
+    line-height: 1.5;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .panel li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--color-brand-primary);
+  }
+
+  .form-card {
+    background: var(--color-brand-bg);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+    padding: 1.75rem;
+  }
+
+  .form-card h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-brand-text1);
+    margin: 0 0 0.5rem;
+  }
+
+  .form-card .form-note {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    margin: 0 0 1.25rem;
+  }
+</style>

@@ -1,0 +1,45 @@
+---
+interface Props {
+  title: string
+}
+
+const { title } = Astro.props
+---
+
+<article class="feature-card">
+  <h3>{title}</h3>
+  <div class="body">
+    <slot />
+  </div>
+</article>
+
+<style>
+  .feature-card {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+  }
+
+  .feature-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-brand-text1);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-card .body {
+    color: var(--color-brand-text3);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .feature-card .body :global(p) {
+    margin: 0;
+  }
+</style>

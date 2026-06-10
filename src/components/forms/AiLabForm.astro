@@ -1,0 +1,94 @@
+---
+import '@styles/forms.css'
+---
+
+<form data-voxivium-form="aiLab" class="vox-form" novalidate>
+  <div class="form-field">
+    <label for="ai-name">Name <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="ai-name"
+      name="name"
+      type="text"
+      required
+      autocomplete="name"
+      maxlength="96"
+      aria-describedby="ai-name-error"
+    />
+    <p id="ai-name-error" class="form-error" data-error-for="name" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="ai-email">Email <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="ai-email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      aria-describedby="ai-email-error"
+    />
+    <p id="ai-email-error" class="form-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="ai-organization">Organization <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="ai-organization"
+      name="organization"
+      type="text"
+      required
+      maxlength="120"
+      autocomplete="organization"
+      aria-describedby="ai-organization-error"
+    />
+    <p id="ai-organization-error" class="form-error" data-error-for="organization" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="ai-useCase">Use case <span class="req" aria-hidden="true">*</span></label>
+    <textarea
+      id="ai-useCase"
+      name="useCase"
+      required
+      maxlength="2000"
+      rows="3"
+      placeholder="What you're evaluating, and how Ground Truth fits in."
+      aria-describedby="ai-useCase-error"></textarea>
+    <p id="ai-useCase-error" class="form-error" data-error-for="useCase" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="ai-scale">Scale <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="ai-scale"
+      name="scale"
+      type="text"
+      required
+      maxlength="120"
+      placeholder="Rough number of queries or users per month."
+      aria-describedby="ai-scale-error"
+    />
+    <p id="ai-scale-error" class="form-error" data-error-for="scale" hidden></p>
+  </div>
+
+  <input
+    type="text"
+    name="hp"
+    tabindex="-1"
+    autocomplete="off"
+    class="honeypot"
+    aria-hidden="true"
+  />
+
+  <div
+    class="cf-turnstile"
+    data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+    data-theme="auto"
+  >
+  </div>
+  <p class="form-error" data-error-for="turnstile" hidden></p>
+
+  <button type="submit">Request access</button>
+
+  <p class="form-status" data-form-status hidden></p>
+</form>

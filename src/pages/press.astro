@@ -1,0 +1,668 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import FeatureCard from '@components/ui/FeatureCard.astro'
+---
+
+<BaseLayout
+  title="Press — Voxivium"
+  description="Press resources for journalists, researchers, and editors covering Voxivium: boilerplate copy, fast facts, founder bio, brand assets, and prepared quotes."
+>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Press</p>
+      <h1>Resources for journalists, researchers, and editors.</h1>
+      <p class="lead">
+        Everything you need to write about Voxivium accurately is on this page. If something is
+        missing or you have a question we haven't anticipated, the press contact below is the
+        fastest way to reach us.
+      </p>
+
+      <nav class="toc" aria-label="On this page">
+        <span class="toc-label">On this page</span>
+        <a href="#press-contact">Press contact</a>
+        <a href="#about">About Voxivium</a>
+        <a href="#fast-facts">Fast facts</a>
+        <a href="#founder">Founder</a>
+        <a href="#brand-assets">Brand assets</a>
+        <a href="#quotes">Prepared quotes</a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="contact" id="press-contact">
+    <div class="container">
+      <h2>Press contact</h2>
+      <p>
+        For interviews, source verification, image requests, or other media inquiries, email
+        <a
+          href="#"
+          class="mail-obfuscated"
+          data-u="press"
+          data-d="voxivium.com"
+          aria-label="Press email address (revealed when JavaScript is enabled)"
+          >press [at] voxivium [dot] com</a
+        >. We aim to respond within one business day.
+      </p>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="container">
+      <header>
+        <p class="eyebrow">About Voxivium</p>
+        <h2>Boilerplate copy.</h2>
+        <p class="lead">
+          Two versions of our standard description. Either may be quoted or paraphrased.
+        </p>
+      </header>
+
+      <div class="boilerplate">
+        <h3>Short (≈ 50 words)</h3>
+        <blockquote>
+          Voxivium is a pre-launch Public Benefit Corporation building a non-partisan platform for
+          political accountability. Voters state their values and positions on key issues; the
+          platform compares those against their elected officials' votes to generate a
+          personalized accountability score. Politicians receive an aggregated constituent score
+          that reveals where their voters align. Individual data is never for sale.
+        </blockquote>
+
+        <h3>Long (≈ 150 words)</h3>
+        <blockquote>
+          Voxivium (Latin for "the voice of the citizens") is a Public Benefit Corporation
+          building a political accountability and transparency platform. Voters state their values
+          and positions on key issues; Voxivium compares those positions against the votes and
+          public statements of their elected officials and generates an ongoing, personalized
+          accountability score for every politician who represents them. Politicians, in turn,
+          receive an aggregated constituent score that shows how their voting record aligns with
+          the people they serve, and reveals where voters across party lines actually agree.
+          <br /><br />
+          Unlike polls or social-media sentiment trackers, Voxivium operates on verified, anonymized
+          data: every user is a confirmed registered voter, and individual data is never sold,
+          shared, or used to target political messaging. Revenue comes from optional services for
+          politicians, media organizations, academic researchers, and AI alignment teams — not from
+          the voters whose voice the platform carries. As a Public Benefit Corporation, Voxivium's
+          bylaws codify a 5:1 executive-to-employee pay ratio cap, a living-wage commitment for all
+          staff, and employee profit sharing.
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="facts" id="fast-facts">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Fast facts</p>
+        <h2>Quick reference.</h2>
+      </header>
+
+      <dl class="facts-list">
+        <div>
+          <dt>Founded by</dt>
+          <dd>Bob Seamon</dd>
+        </div>
+        <div>
+          <dt>Corporate structure</dt>
+          <dd>Public Benefit Corporation (C-Corp)</dd>
+        </div>
+        <div>
+          <dt>Launch coverage</dt>
+          <dd>Federal officials at launch; state and local in subsequent releases</dd>
+        </div>
+        <div>
+          <dt>Trademark</dt>
+          <dd>
+            Allowed by the United States Patent and Trademark Office; Statement of Use to be filed
+            upon entering commerce.
+          </dd>
+        </div>
+        <div>
+          <dt>Domain</dt>
+          <dd>voxivium.com</dd>
+        </div>
+        <div>
+          <dt>Revenue model</dt>
+          <dd>
+            Freemium. Core features free for voters; paid services for politicians, media and
+            research, and AI alignment teams.
+          </dd>
+        </div>
+        <div>
+          <dt>Privacy</dt>
+          <dd>Individual user data is never for sale. All commercial products use aggregated,
+            anonymized signal.
+          </dd>
+        </div>
+        <div>
+          <dt>Internal commitments (codified in bylaws)</dt>
+          <dd>
+            5:1 executive-to-employee pay ratio cap; locality-adjusted living wage for all staff;
+            employee profit sharing after operational reserves.
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="founder" id="founder">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Founder</p>
+        <h2>Bob Seamon.</h2>
+      </header>
+
+      <div class="founder-card">
+        <img
+          src="/press/bob_corporate.png"
+          alt="Bob Seamon"
+          width="280"
+          height="307"
+          loading="lazy"
+          decoding="async"
+          class="headshot"
+        />
+
+        <div class="founder-body">
+          <h3>Short bio (≈ 40 words)</h3>
+          <blockquote>
+            Bob Seamon is the founder of Voxivium. He spent more than a decade as a software
+            architect and engineering leader, with roles at Comcast and Warner Bros. Discovery
+            building high-scale systems serving millions of users.
+          </blockquote>
+
+          <h3>Long bio (≈ 120 words)</h3>
+          <blockquote>
+            Bob Seamon is the founder of Voxivium. Over more than a decade as a software architect
+            and engineering leader at companies including Comcast and Warner Bros. Discovery, he
+            focused on designing the high-scale systems that power services for millions of users
+            — and on building the engineering cultures that sustain them. His graduate training in
+            transpersonal psychology shaped a leadership philosophy centered on the humans behind
+            the work, an orientation that informs Voxivium's design as a platform built to repair,
+            rather than exploit, the relationship between citizens and the institutions meant to
+            serve them. He founded Voxivium as a Public Benefit Corporation because the work
+            demands a structure that answers first to the public it serves.
+          </blockquote>
+
+          <p class="founder-links">
+            <a href="https://www.bobseamon.com/" rel="noopener" target="_blank">Personal site</a>
+            <span aria-hidden="true">·</span>
+            <a href="https://www.linkedin.com/in/bob-seamon/" rel="noopener" target="_blank"
+              >LinkedIn</a
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="assets" id="brand-assets">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Brand assets</p>
+        <h2>Logos, color palette, and usage notes.</h2>
+        <p class="lead">
+          All marks are © Voxivium, PBC. You may use them in editorial coverage of Voxivium without
+          asking, provided you don't alter the artwork or imply endorsement of unrelated content.
+          For any other use, email the press contact above.
+        </p>
+      </header>
+
+      <div class="grid">
+        <FeatureCard title="Wordmark for light backgrounds">
+          <p>Vector and raster formats. Use against white or light-toned surfaces.</p>
+          <ul class="downloads">
+            <li><a href="/press/voxivium-logo-light.svg" download>SVG (vector)</a></li>
+            <li><a href="/press/voxivium-logo-light.png" download>PNG (4557 × 1565)</a></li>
+          </ul>
+        </FeatureCard>
+
+        <FeatureCard title="Wordmark for dark backgrounds">
+          <p>Raster format. Use against near-black or dark-toned surfaces.</p>
+          <ul class="downloads">
+            <li><a href="/press/voxivium-logo-dark.png" download>PNG (4096 × 1407)</a></li>
+          </ul>
+        </FeatureCard>
+
+        <FeatureCard title="Primary brand colors">
+          <ul class="swatches">
+            <li>
+              <span class="swatch" style="background:#0B5996;" aria-hidden="true"></span>
+              <span>Brand blue — <code>#0B5996</code></span>
+            </li>
+            <li>
+              <span class="swatch swatch-dark" style="background:#040707;" aria-hidden="true"
+              ></span>
+              <span>Brand dark — <code>#040707</code></span>
+            </li>
+            <li>
+              <span class="swatch swatch-light" style="background:#F0F6FA;" aria-hidden="true"
+              ></span>
+              <span>Brand light — <code>#F0F6FA</code></span>
+            </li>
+          </ul>
+        </FeatureCard>
+
+        <FeatureCard title="Usage notes">
+          <ul class="usage">
+            <li>Do not recolor the wordmark.</li>
+            <li>Do not stretch, skew, or rotate.</li>
+            <li>Maintain clear space equal to the height of the "V" on all sides.</li>
+            <li>Minimum digital size: 120 px wide.</li>
+          </ul>
+        </FeatureCard>
+      </div>
+    </div>
+  </section>
+
+  <section class="quotes" id="quotes">
+    <div class="container">
+      <header>
+        <p class="eyebrow">Prepared quotes</p>
+        <h2>Attributable to Bob Seamon, Founder.</h2>
+        <p class="lead">
+          Use any of these directly. They're written to be quoted, not paraphrased. For a custom
+          quote on a specific angle, email the press contact above.
+        </p>
+      </header>
+
+      <div class="quote-grid">
+        <figure>
+          <blockquote>
+            Voxivium exists because most Americans agree on more than they think. They just don't
+            have a way to prove it. Our job is to provide the data.
+          </blockquote>
+          <figcaption>— Bob Seamon, Founder</figcaption>
+        </figure>
+
+        <figure>
+          <blockquote>
+            When a representative's vote diverges from what their constituents actually want, that
+            gap shouldn't be invisible. Voxivium turns it into a number anyone can see.
+          </blockquote>
+          <figcaption>— Bob Seamon, Founder</figcaption>
+        </figure>
+
+        <figure>
+          <blockquote>
+            We chose to be a Public Benefit Corporation because the work demands it. A platform
+            built to hold power accountable can't answer first to investors who want growth at any
+            cost.
+          </blockquote>
+          <figcaption>— Bob Seamon, Founder</figcaption>
+        </figure>
+
+        <figure>
+          <blockquote>
+            Privacy isn't a feature you bolt on at the end. It's a constraint that shapes the
+            architecture from day one. Anything less is a marketing claim, not a guarantee.
+          </blockquote>
+          <figcaption>— Bob Seamon, Founder</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    ;(() => {
+      document.querySelectorAll('.mail-obfuscated').forEach((a) => {
+        const u = a.getAttribute('data-u')
+        const d = a.getAttribute('data-d')
+        if (!u || !d) return
+        const addr = u + '@' + d
+        a.setAttribute('href', 'mailto:' + addr)
+        a.textContent = addr
+      })
+    })()
+  </script>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.01em;
+    margin: 0 0 1.25rem;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-brand-text1);
+    margin: 1.5rem 0 0.5rem;
+    letter-spacing: -0.005em;
+  }
+
+  .page-hero .lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text2);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    max-width: 40rem;
+  }
+
+  .toc {
+    margin: 2rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .toc-label {
+    color: var(--color-brand-text3);
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+
+  .toc a {
+    color: var(--color-brand-primary);
+    text-decoration: none;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-brand-el1);
+    background: var(--color-brand-bg);
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .toc a:hover {
+    background: var(--color-brand-surface);
+    border-color: var(--color-brand-el2);
+  }
+
+  .toc a:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+  }
+
+  .contact {
+    padding: clamp(2rem, 5vh, 3rem) 1.5rem;
+  }
+
+  .contact p {
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .mail-obfuscated {
+    color: var(--color-brand-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .about,
+  .facts,
+  .founder,
+  .quotes {
+    padding: clamp(2.5rem, 6vh, 4rem) 1.5rem;
+  }
+
+  .assets {
+    padding: clamp(3rem, 8vh, 5rem) 1.5rem;
+    background: var(--color-brand-surface);
+    border-block: 1px solid var(--color-brand-el1);
+  }
+
+  .facts {
+    background: var(--color-brand-surface);
+    border-block: 1px solid var(--color-brand-el1);
+  }
+
+  .about .container,
+  .facts .container,
+  .founder .container,
+  .assets .container,
+  .quotes .container {
+    max-width: 64rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    max-width: 44rem;
+    margin-inline: auto;
+  }
+
+  .lead {
+    margin: 1rem auto 0;
+    color: var(--color-brand-text3);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .boilerplate,
+  .founder-body {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  blockquote {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    background: var(--color-brand-bg);
+    border-left: 3px solid var(--color-brand-primary);
+    border-radius: 0 0.375rem 0.375rem 0;
+    color: var(--color-brand-text2);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .facts-list {
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 700px) {
+    .facts-list {
+      grid-template-columns: 1fr 2fr;
+      column-gap: 2rem;
+      row-gap: 1rem;
+    }
+
+    .facts-list > div {
+      display: contents;
+    }
+  }
+
+  .facts-list dt {
+    color: var(--color-brand-text3);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .facts-list dd {
+    color: var(--color-brand-text2);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0 0 0 0;
+  }
+
+  .founder-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  @media (min-width: 700px) {
+    .founder-card {
+      grid-template-columns: auto 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  .headshot {
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    aspect-ratio: 1984 / 2172;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-brand-el1);
+  }
+
+  .founder-links {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text3);
+    font-size: 0.9375rem;
+  }
+
+  .founder-links a {
+    color: var(--color-brand-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .founder-links span[aria-hidden] {
+    margin: 0 0.625rem;
+    color: var(--color-brand-text3);
+  }
+
+  .grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .downloads,
+  .usage,
+  .swatches {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .downloads a {
+    color: var(--color-brand-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .usage li {
+    color: var(--color-brand-text3);
+    line-height: 1.5;
+    padding-left: 1.125rem;
+    position: relative;
+  }
+
+  .usage li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 999px;
+    background: var(--color-brand-primary);
+  }
+
+  .swatches li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-brand-text3);
+  }
+
+  .swatch {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-brand-el1);
+    flex: 0 0 auto;
+  }
+
+  .swatch-light {
+    border-color: var(--color-brand-el2);
+  }
+
+  code {
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, 'Cascadia Mono', 'Roboto Mono', monospace;
+    font-size: 0.8125rem;
+    color: var(--color-brand-text2);
+  }
+
+  .quote-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 800px) {
+    .quote-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .quote-grid figure {
+    margin: 0;
+    padding: 1.5rem;
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+  }
+
+  .quote-grid blockquote {
+    background: transparent;
+    border-left: 0;
+    padding: 0;
+    border-radius: 0;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--color-brand-text1);
+  }
+
+  .quote-grid figcaption {
+    margin-top: 0.75rem;
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+</style>

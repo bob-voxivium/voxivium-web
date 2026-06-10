@@ -1,0 +1,71 @@
+---
+import '@styles/forms.css'
+import { US_STATES } from '@lib/states'
+---
+
+<form data-voxivium-form="voter" class="vox-form" novalidate>
+  <div class="form-field">
+    <label for="voter-firstName">
+      First name <span class="req" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="voter-firstName"
+      name="firstName"
+      type="text"
+      required
+      autocomplete="given-name"
+      maxlength="24"
+      aria-describedby="voter-firstName-error"
+    />
+    <p id="voter-firstName-error" class="form-error" data-error-for="firstName" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="voter-email">Email address <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="voter-email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      aria-describedby="voter-email-error"
+    />
+    <p id="voter-email-error" class="form-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="voter-state">State <span class="req" aria-hidden="true">*</span></label>
+    <select
+      id="voter-state"
+      name="state"
+      required
+      autocomplete="address-level1"
+      aria-describedby="voter-state-error"
+    >
+      <option value="" disabled selected>Select your state</option>
+      {US_STATES.map((s) => <option value={s.code}>{s.name}</option>)}
+    </select>
+    <p id="voter-state-error" class="form-error" data-error-for="state" hidden></p>
+  </div>
+
+  <input
+    type="text"
+    name="hp"
+    tabindex="-1"
+    autocomplete="off"
+    class="honeypot"
+    aria-hidden="true"
+  />
+
+  <div
+    class="cf-turnstile"
+    data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+    data-theme="auto"
+  >
+  </div>
+  <p class="form-error" data-error-for="turnstile" hidden></p>
+
+  <button type="submit">Notify me</button>
+
+  <p class="form-status" data-form-status hidden></p>
+</form>

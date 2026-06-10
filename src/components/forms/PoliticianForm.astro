@@ -1,0 +1,123 @@
+---
+import '@styles/forms.css'
+---
+
+<form data-voxivium-form="politician" class="vox-form" novalidate>
+  <div class="form-row">
+    <div class="form-field">
+      <label for="pol-firstName">First name <span class="req" aria-hidden="true">*</span></label>
+      <input
+        id="pol-firstName"
+        name="firstName"
+        type="text"
+        required
+        autocomplete="given-name"
+        maxlength="48"
+        aria-describedby="pol-firstName-error"
+      />
+      <p id="pol-firstName-error" class="form-error" data-error-for="firstName" hidden></p>
+    </div>
+    <div class="form-field">
+      <label for="pol-lastName">Last name <span class="req" aria-hidden="true">*</span></label>
+      <input
+        id="pol-lastName"
+        name="lastName"
+        type="text"
+        required
+        autocomplete="family-name"
+        maxlength="48"
+        aria-describedby="pol-lastName-error"
+      />
+      <p id="pol-lastName-error" class="form-error" data-error-for="lastName" hidden></p>
+    </div>
+  </div>
+
+  <div class="form-field">
+    <label for="pol-email">Email <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="pol-email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      aria-describedby="pol-email-error"
+    />
+    <p id="pol-email-error" class="form-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="pol-office"
+      >Office sought or held <span class="req" aria-hidden="true">*</span></label
+    >
+    <input
+      id="pol-office"
+      name="office"
+      type="text"
+      required
+      maxlength="120"
+      placeholder="e.g. U.S. House, City Council, Governor"
+      aria-describedby="pol-office-error"
+    />
+    <p id="pol-office-error" class="form-error" data-error-for="office" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="pol-jurisdiction">Jurisdiction <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="pol-jurisdiction"
+      name="jurisdiction"
+      type="text"
+      required
+      maxlength="120"
+      placeholder="e.g. CA-12, Cook County, IL"
+      aria-describedby="pol-jurisdiction-error"
+    />
+    <p id="pol-jurisdiction-error" class="form-error" data-error-for="jurisdiction" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="pol-message">Anything we should know? (optional)</label>
+    <textarea
+      id="pol-message"
+      name="message"
+      maxlength="2000"
+      rows="3"
+      aria-describedby="pol-message-error"></textarea>
+    <p id="pol-message-error" class="form-error" data-error-for="message" hidden></p>
+  </div>
+
+  <input
+    type="text"
+    name="hp"
+    tabindex="-1"
+    autocomplete="off"
+    class="honeypot"
+    aria-hidden="true"
+  />
+
+  <div
+    class="cf-turnstile"
+    data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+    data-theme="auto"
+  >
+  </div>
+  <p class="form-error" data-error-for="turnstile" hidden></p>
+
+  <button type="submit">Apply for early access</button>
+
+  <p class="form-status" data-form-status hidden></p>
+</form>
+
+<style>
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

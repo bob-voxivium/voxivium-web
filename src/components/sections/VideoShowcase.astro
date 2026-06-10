@@ -1,0 +1,112 @@
+---
+// Honest placeholder until the launch trailer exists — no autoplaying mock video.
+---
+
+<section class="video" id="watch" aria-labelledby="video-heading">
+  <div class="container">
+    <header>
+      <p class="eyebrow">Watch the pitch</p>
+      <h2 id="video-heading">The launch trailer is coming.</h2>
+      <p class="lead">
+        We're filming now. Sign up above to be notified the moment it goes live.
+      </p>
+    </header>
+
+    <div class="frame" aria-hidden="true">
+      <div class="frame-inner">
+        <svg viewBox="0 0 80 80" class="play-glyph" aria-hidden="true">
+          <circle cx="40" cy="40" r="38" fill="none" stroke="currentColor" stroke-width="2"
+          ></circle>
+          <path d="M32 26 L56 40 L32 54 Z" fill="currentColor"></path>
+        </svg>
+        <p class="frame-label">Launch trailer coming soon</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .video {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem;
+  }
+
+  .container {
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+
+  header {
+    max-width: 44rem;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h2 {
+    font-size: clamp(1.625rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .lead {
+    margin: 1rem auto 0;
+    color: var(--color-brand-text3);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    text-wrap: balance;
+  }
+
+  .frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 1rem;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        ellipse at center,
+        color-mix(in oklab, var(--color-brand-primary), transparent 70%) 0%,
+        transparent 70%
+      ),
+      var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el2);
+  }
+
+  .frame-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--color-brand-text3);
+  }
+
+  .play-glyph {
+    width: 4rem;
+    height: 4rem;
+    color: var(--color-brand-primary);
+    opacity: 0.85;
+  }
+
+  .frame-label {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-brand-text3);
+  }
+</style>

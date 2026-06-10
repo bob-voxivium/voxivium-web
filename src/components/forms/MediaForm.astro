@@ -1,0 +1,109 @@
+---
+import '@styles/forms.css'
+---
+
+<form data-voxivium-form="media" class="vox-form" novalidate>
+  <div class="form-field">
+    <label for="media-name">Name <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="media-name"
+      name="name"
+      type="text"
+      required
+      autocomplete="name"
+      maxlength="96"
+      aria-describedby="media-name-error"
+    />
+    <p id="media-name-error" class="form-error" data-error-for="name" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="media-email">Email <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="media-email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      aria-describedby="media-email-error"
+    />
+    <p id="media-email-error" class="form-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="media-organization"
+      >Organization <span class="req" aria-hidden="true">*</span></label
+    >
+    <input
+      id="media-organization"
+      name="organization"
+      type="text"
+      required
+      maxlength="120"
+      autocomplete="organization"
+      aria-describedby="media-organization-error"
+    />
+    <p id="media-organization-error" class="form-error" data-error-for="organization" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="media-role">Your role <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="media-role"
+      name="role"
+      type="text"
+      required
+      maxlength="120"
+      placeholder="e.g. Politics editor, research director"
+      aria-describedby="media-role-error"
+    />
+    <p id="media-role-error" class="form-error" data-error-for="role" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="media-useCase"
+      >How would you use the data? <span class="req" aria-hidden="true">*</span></label
+    >
+    <textarea
+      id="media-useCase"
+      name="useCase"
+      required
+      maxlength="2000"
+      rows="3"
+      placeholder="A short description of what you're hoping to publish or research."
+      aria-describedby="media-useCase-error"></textarea>
+    <p id="media-useCase-error" class="form-error" data-error-for="useCase" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="media-message">Anything else? (optional)</label>
+    <textarea
+      id="media-message"
+      name="message"
+      maxlength="2000"
+      rows="2"
+      aria-describedby="media-message-error"></textarea>
+    <p id="media-message-error" class="form-error" data-error-for="message" hidden></p>
+  </div>
+
+  <input
+    type="text"
+    name="hp"
+    tabindex="-1"
+    autocomplete="off"
+    class="honeypot"
+    aria-hidden="true"
+  />
+
+  <div
+    class="cf-turnstile"
+    data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+    data-theme="auto"
+  >
+  </div>
+  <p class="form-error" data-error-for="turnstile" hidden></p>
+
+  <button type="submit">Inquire about licensing</button>
+
+  <p class="form-status" data-form-status hidden></p>
+</form>

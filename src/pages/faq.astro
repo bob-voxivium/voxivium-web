@@ -1,0 +1,325 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+
+interface QA {
+  q: string
+  a: string
+}
+
+interface Group {
+  id: string
+  label: string
+  questions: QA[]
+}
+
+const groups: Group[] = [
+  {
+    id: 'general',
+    label: 'General',
+    questions: [
+      {
+        q: 'Does Voxivium favor one party or another?',
+        a: "No. Voxivium is non-partisan by mission and by structure. Our Public Benefit Corporation charter legally requires the mission to come first, ahead of any partisan or financial pressure. The platform is a transparency and data tool, not an advocacy group: every representative's votes are tracked the same way regardless of party, and constituent sentiment is reported back the same way regardless of who's in office. The premise is simple—when officials serve constituent needs instead of party agendas, democracy works better for everyone.",
+      },
+      {
+        q: 'What information is shared with politicians, media, and AI labs?',
+        a: 'Personally identifiable information is never shared. What our paid customers see is aggregated, anonymized sentiment—for example, a politician might see "72% of verified constituents in District X oppose Bill Y, and the top concern is Z." They will never see who you are or what you specifically said. Your voice contributes to a collective signal; the signal is what we report.',
+      },
+      {
+        q: 'How is Voxivium different from a social network or political news platform?',
+        a: "Voxivium is not a social network. There are no comment sections, no feeds, no public forums—nothing engineered to keep you scrolling through outrage. The platform is a safe and private place to state your positions and check how your representatives are voting. We're built for action and accountability, not engagement.",
+      },
+      {
+        q: 'What prevents someone from manipulating the data?',
+        a: 'Our biggest safeguard is that every user is a verified U.S. voter, scoped to their actual district—not an anonymous account or a self-reported zip code. This prevents bots, bad actors, foreign influence, and duplicate accounts from swaying the data. The whole point is real signals from real people, so the integrity safeguards are in the foundation, not bolted on.',
+      },
+      {
+        q: 'What is the business model? How does Voxivium sustain itself?',
+        a: 'Voter accounts are free, forever.  Voters can optionally subscribe for premium features. But the real revenue comes from paid subscriptions for politicians, media organizations, academic researchers, and AI labs—all of whom pay for access to aggregated, anonymized sentiment data. We never sell user data. As a Public Benefit Corporation, the structure of our charter aligns revenue with mission rather than with shareholder pressure.',
+      },
+      {
+        q: 'How is Voxivium different from other civic tech "report card" platforms?',
+        a: 'Three differences. First, depth: Voxivium builds your profile from around 70 precise policy questions rather than a handful of generic ones, and weights each accountability score by the issues you personally prioritize. Second, flow: most platforms only push data to users—Voxivium also delivers aggregated, district-scoped sentiment back to the politicians, so they get a real mandate rather than noise from bots, biased polling, and partisan media. Third, structure: as a Public Benefit Corporation with a 5:1 executive-to-employee pay ratio capped in our bylaws and Privacy-by-Design baked into the platform, the company itself is built to mirror the values we ask of government.',
+      },
+    ],
+  },
+  {
+    id: 'voters',
+    label: 'For voters',
+    questions: [
+      {
+        q: 'Is Voxivium really free for voters?',
+        a: 'Yes. Stating your positions, viewing accountability scores, and comparing candidates are free—forever, on every core feature. Voxivium is funded by paid accounts for politicians, media, and AI labs.',
+      },
+      {
+        q: 'Is my data anonymous?',
+        a: 'Yes. Your individual positions are never tied to your name in any aggregate, dashboard, or API. Voxivium reports sentiment, never individuals. The General section above has the full data-sharing policy.',
+      },
+      {
+        q: 'Where does Voxivium track? Federal? State? Local?',
+        a: 'Federal first. State and local races are on the roadmap—starting with state legislatures and big-city mayors.',
+      },
+      {
+        q: 'When will the app launch?',
+        a: 'Soon. Sign up on the home page to be notified as soon as the launch goes live.',
+      },
+      {
+        q: 'Why do you ask for my state?',
+        a: "We may opt for a state by state rollout, starting with a limited number of states. We may ask you to choose a state to begin with. We don't sell it or share it.",
+      },
+      {
+        q: "I don't live in the U.S.—can I still use the platform?",
+        a: "The Voxivium app requires ID verification and a valid U.S. voter registration. If you're a U.S. citizen registered to vote but living abroad, you're eligible. If you're not a U.S. citizen, the voter app isn't open to you. Our paid Media and Research API is a separate product, available regardless of citizenship—international researchers and journalists can subscribe to that directly.",
+      },
+    ],
+  },
+  {
+    id: 'politicians',
+    label: 'For politicians',
+    questions: [
+      {
+        q: 'How do I claim my politician account?',
+        a: "Every politician starts by being a voter. Once you have completed the ID verification and your voter registration is confirmed, we'll match you to your politician profile. If you're not in our system, we'll notify you once we add your politician profile to the platform. Voxivium is starting at the federal level with plans to expand to state and local levels.",
+      },
+      {
+        q: 'What data do I see?',
+        a: 'Aggregated, anonymized constituent sentiment scoped to your district or jurisdiction—plus your own public alignment score, broken down by issue and historical period.',
+      },
+      {
+        q: 'What is the Voxivium Politician Commitment?',
+        a: 'The Voxivium Politician Commitment is a commitment by elected officials to act and vote in alignment with their constituents. When wisdom or situations call to go against constituent sentiment, officials must explain why in writing.  Verified politicians agree to the commitment will have a badge displayed on their public profile on the Voxivium platform.'
+      },
+      {
+        q: 'Can I share my Voxivium score in campaign materials?',
+        a: 'Yes. Politician accounts include the right to publicly share an official Voxivium accountability score for campaign and official use.',
+      },
+      {
+        q: 'Can someone else manage my Voxivium account?',
+        a: 'Yes, but with limitations. You can assign a delagate to your account. However, only you can answer the Voxivium belief questions, and only you can agree to the Voxivium Politician Commitment.'      
+      },
+      {
+        q: 'What if I disagree with a vote being counted against me?',
+        a: "Every tracked vote is a public roll-call—the underlying record isn't disputable. The issue mapping, however, is transparent and reviewable. If a vote was miscategorized, we'll fix it.",
+      },
+      {
+        q: 'Does Voxivium endorse candidates?',
+        a: 'No. Voxivium is non-partisan and does not endorse, fundraise for, or campaign against any candidate.',
+      },
+    ],
+  },
+  {
+    id: 'media',
+    label: 'For media & research',
+    questions: [
+      {
+        q: "What's included in the media license?",
+        a: 'Access to aggregated voter sentiment statistics at national, state, and local levels, plus politician profiles and voting consistency data. Higher tiers include API access, cross-tab privileges, and a query credit pool.',
+      },
+      {
+        q: 'How is the data delivered?',
+        a: 'Pre-built dashboards for common queries, plus a documented REST API for custom analyses. Bulk exports are available on enterprise tiers.',
+      },
+      {
+        q: 'Can we publish data attributed to Voxivium?',
+        a: 'Yes—licenses include rights to publish, broadcast, and integrate the data with proper attribution.',
+      },
+      {
+        q: "What's the methodology?",
+        a: 'Sentiment is derived from positions stated by verified, registered U.S. voters. Methodology and known limitations are published openly with each dataset.',
+      },
+    ],
+  },
+  {
+    id: 'aiLab',
+    label: 'For AI labs',
+    questions: [
+      {
+        q: 'How is this different from public RLHF datasets?',
+        a: 'Voxivium represents verified, attributable U.S. citizens with stated positions across issues—not anonymous internet text and not paid contractors. The "ground truth" is the position graph of a representative cross-section of citizens, refreshed continuously.',
+      },
+      {
+        q: 'Can we use this to train models?',
+        a: "The Ground Truth license is structured for evaluation and alignment benchmarking, not training. The intent is a stable benchmark that doesn't drift as models are trained against it.",
+      },
+      {
+        q: 'How do you handle individual privacy in this dataset?',
+        a: 'All license outputs are aggregated. No individual responses are exposed at any tier.',
+      },
+      {
+        q: 'Is the dataset cross-partisan?',
+        a: 'Yes—by design. Voxivium recruits from the full electorate and reports on the issue, not the party. The dataset is balanced for ideological representation.',
+      },
+    ],
+  },
+]
+---
+
+<BaseLayout
+  title="FAQ — Voxivium"
+  description="Answers to common questions about Voxivium, grouped by audience: voters, politicians, media and research, and AI labs."
+>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">FAQ</p>
+      <h1>Frequently asked questions</h1>
+      <p class="lead">
+        Common questions, grouped by audience. Don't see yours? Sign up below and reply to the
+        welcome email.
+      </p>
+
+      <nav class="jump-nav" aria-label="Jump to section">
+        {groups.map((g) => <a href={`#${g.id}`}>{g.label}</a>)}
+      </nav>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="container">
+      {
+        groups.map((g) => (
+          <div class="group" id={g.id}>
+            <h2>{g.label}</h2>
+            <div class="qa-list">
+              {g.questions.map((qa) => (
+                <details>
+                  <summary>{qa.q}</summary>
+                  <p>{qa.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  .lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    max-width: 36rem;
+  }
+
+  .jump-nav {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .jump-nav a {
+    text-decoration: none;
+    background: var(--color-brand-surface);
+    color: var(--color-brand-text2);
+    border: 1px solid var(--color-brand-el2);
+    padding: 0.4rem 0.875rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .jump-nav a:hover {
+    background: var(--color-brand-primary);
+    color: white;
+  }
+
+  .faq {
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .group + .group {
+    margin-top: 3rem;
+  }
+
+  .group h2 {
+    font-size: clamp(1.375rem, 2.5vw, 1.625rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    margin: 0 0 1.25rem;
+    letter-spacing: -0.01em;
+    scroll-margin-top: 5rem;
+  }
+
+  .qa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  details {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.5rem;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: var(--color-brand-text1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: '+';
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--color-brand-text3);
+    transition: transform 200ms ease;
+    flex-shrink: 0;
+  }
+
+  details[open] summary::after {
+    transform: rotate(45deg);
+  }
+
+  details p {
+    padding: 0 1.25rem 1.25rem;
+    color: var(--color-brand-text2);
+    line-height: 1.65;
+    margin: 0;
+  }
+</style>

@@ -4,15 +4,17 @@ This file is the source of truth for how Claude should work in this repository. 
 
 ## 1. Project at a glance
 
-**What this is:** The public-facing marketing website for Voxivium — a Public Benefit Corporation building a non-partisan political accountability platform. The site's job is to inform visitors, build anticipation for the app launch, and drive Kickstarter conversions.
+**What this is:** The public-facing marketing website for Voxivium — a Public Benefit Corporation building a non-partisan political accountability platform. The site's job is to inform visitors, build anticipation for the app launch, and capture early-access signups across four audiences.
 
 **What this is NOT:** The app itself. No user accounts, no voter verification, no report cards, no political data. Those live in a separate Android codebase (Kotlin/Compose).
 
 **Primary goals, in priority order:**
 1. Explain what Voxivium does clearly enough that a first-time visitor "gets it" in under 30 seconds.
-2. Drive clicks to the Kickstarter campaign (or a "coming soon" placeholder until the live link is available).
+2. Drive early-access signups via the voter email form on the home page.
 3. Capture leads from four distinct audiences: voters, politicians, media/research organizations, and AI labs.
-4. Showcase Kickstarter video content prominently.
+4. Showcase the launch trailer prominently once it exists.
+
+**Note on Kickstarter:** Kickstarter framing has been removed from all user-facing copy and navigation. The `/kickstarter` page file and the `KickstarterCTA` component still exist in the repo for possible future reuse, but they are not linked from anywhere and should not be reintroduced into nav, hero, or page flows without an explicit conversation.
 
 **Audiences (treat each as a first-class persona):**
 - **Voters** — want to know what's in it for them; lightweight email signup.
@@ -27,10 +29,9 @@ Do not change these without an explicit conversation. They were chosen for AI-fr
 - **Framework:** Astro (latest stable). Use `.astro` files for pages and static layout. Use React islands (`client:load`, `client:visible`) only where genuine interactivity is required (forms, tabbed audience sections, video modals).
 - **Styling:** Tailwind CSS via the official Astro integration. No CSS-in-JS, no styled-components. Custom design tokens live in `tailwind.config.mjs` mapped from the Voxivium palette (see §4).
 - **Language:** TypeScript everywhere. `strict: true` in `tsconfig.json`. No `any` without an inline justification comment.
-- **Forms / backend:** Cloudflare Pages Functions (preferred) or AWS Lambda behind API Gateway if Cloudflare is rejected. The existing Lambda + DocumentDB email-capture function should be reused for the voter signup path; new audience-specific endpoints can be added alongside.
-- **Hosting:** Cloudflare Pages is the default target. AWS Amplify is the fallback. Build output must be a static site plus serverless functions — no always-on servers.
-- **Package manager:** pnpm. Lockfile is committed.
-- **Node version:** Pinned in `.nvmrc` and `package.json` engines field. Use the active LTS.
+- **Forms / backend:** AWS Lambda behind API Gateway. New Lambda functions are defined in `deploy/terraform/lambdas.tf`. Forms will use Cloudflare Turnstile for bot protection.
+- **Hosting:** AWS S3 bucket is the default hosting provider with Cloudflare for DNS and DDoS/WAF protection. Build output must be a static site plus serverless functions — no always-on servers.
+- **Deployment:** Terraform to set up backend infrastructure. Deployment of the website to AWS S3 bucket. See `deploy/README.md` for more information.
 
 ## 3. What "best practices" means here
 
@@ -88,10 +89,10 @@ Single font family for the whole site. Use **Inter** (variable font, self-hosted
 Plan for these routes. Build them in this order — don't scaffold pages that aren't needed yet.
 
 **Phase 1 (launch-critical):**
-- `/` — Hero, "what is Voxivium," audience tabs, Kickstarter CTA, video showcase, footer.
+- `/` — Hero, "what is Voxivium," audience tabs, video showcase, footer.
 - `/faq` — Common questions, grouped by audience.
 - `/about` — Mission, PBC structure, internal governance commitments (5:1 pay ratio, profit sharing, living wage).
-- `/kickstarter` — Dedicated landing page that funnels to the campaign.
+- `/kickstarter` — Dormant. Page exists for possible future reactivation; not linked from anywhere.
 
 **Phase 2 (post-launch):**
 - `/partnerships` — For media/research/AI labs.
@@ -108,7 +109,7 @@ The home page uses a tabbed component (React island) with four tabs: Voters | Po
 
 ## 6. Forms — current and future
 
-The existing infrastructure is a single AWS Lambda + DocumentDB capturing first name + email for voters. Extend, don't replace:
+Terraform defines the lambda functions, API Gateway endpoints, and SQS queues that will be used for the forms. Lambda functions should be written in Python 3.14.
 
 - **Voter form:** Same fields as today (first name, email). Posts to existing endpoint.
 - **Politician form:** Name, email, office sought/held, jurisdiction, optional message. New endpoint, new collection.
@@ -158,6 +159,10 @@ These are how I want you to behave in this codebase:
 ├── package.json
 ├── .env.example
 ├── .nvmrc
+├── deploy/
+│   ├── lambdas/             # Lambda functions
+│   ├── terraform/           # terraform files
+│   └── README.md            # How to deploy
 ├── public/
 │   ├── robots.txt
 │   ├── favicon.svg
