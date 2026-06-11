@@ -1,0 +1,59 @@
+---
+import '@styles/forms.css'
+---
+
+<!--
+  Sign-in form used by /subscribe (and reusable for any future authenticated
+  off-mobile flow). Firebase Web SDK is loaded as a side-effect of the page
+  script that wires this form; the form itself is plain HTML so it functions
+  with JS disabled (the submit will fail gracefully — JS-only sign-in is OK
+  for an authenticated payment surface, per CLAUDE.md §6 "progressive
+  enhancement" note: progressive enhancement applies to *lead-capture*
+  forms, not to authenticated flows that intrinsically need a session).
+-->
+<form data-voxivium-form="signin" class="vox-form" novalidate>
+  <div class="form-field">
+    <label for="signin-email">
+      Email address <span class="req" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="signin-email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      aria-describedby="signin-email-error"
+    />
+    <p id="signin-email-error" class="form-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="signin-password">
+      Password <span class="req" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="signin-password"
+      name="password"
+      type="password"
+      required
+      autocomplete="current-password"
+      minlength="6"
+      aria-describedby="signin-password-error"
+    />
+    <p id="signin-password-error" class="form-error" data-error-for="password" hidden></p>
+  </div>
+
+  <button type="submit">Sign in</button>
+
+  <p class="form-status" data-form-status hidden></p>
+
+  <p class="text-brand-text3 mt-2 text-sm">
+    <button
+      type="button"
+      data-action="forgot-password"
+      class="text-brand-primary underline-offset-2 hover:underline focus:underline"
+    >
+      Forgot password?
+    </button>
+  </p>
+</form>
