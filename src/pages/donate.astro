@@ -1,0 +1,201 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+
+// Voter Onboarding Fund donations — PayPal one-time payments for $25 / $50 /
+// $100 / custom. Backend (PayPal Orders/Capture webhook → fund_ledger
+// insert) is part of the next-session Lambdas.
+//
+// Per CEO #5 / features.md §12.2 / §13.2: small ($2 / $10) donations stay
+// in-app as IAPs because routing those out of the app at signup tanks
+// conversion; larger amounts come here for the better processor split
+// (PayPal ~3% vs. ~30% Apple/Google).
+//
+// No sign-in required — donors are not necessarily Voxivium users.
+
+const paypalClientID = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID
+const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
+---
+
+<BaseLayout
+  title="Donate to the Voter Onboarding Fund"
+  description="Help cover the cost of voter identity verification and registration checks for new Voxivium users."
+>
+  <section class="container mx-auto max-w-2xl px-6 py-16">
+    <p class="eyebrow text-brand-text3 text-sm font-medium tracking-wide uppercase">
+      Voter Onboarding Fund
+    </p>
+    <h1 class="text-brand-text1 mt-2 text-3xl font-semibold">
+      Help us onboard the next voter.
+    </h1>
+    <p class="text-brand-text2 mt-4 text-lg">
+      Every Voxivium voter is identity-verified and matched against their
+      voter registration before their voice contributes to district
+      aggregates. Each new verified voter costs us around $1 in third-party
+      service fees. The Voter Onboarding Fund covers that cost so signup
+      stays free for the citizen.
+    </p>
+    <p class="text-brand-text3 mt-4 text-sm">
+      Voxivium is a Public Benefit Corporation. Donations are not
+      tax-deductible. Funds are tracked transparently in our public ledger
+      and used exclusively to cover voter onboarding costs.
+    </p>
+
+    <div class="border-brand-el1 bg-brand-surface mt-10 rounded-lg border p-6">
+      <h2 class="text-brand-text1 text-xl font-semibold">Choose an amount</h2>
+
+      <fieldset class="mt-6">
+        <legend class="sr-only">Donation amount</legend>
+        <div class="grid grid-cols-3 gap-3">
+          <label class="border-brand-el1 hover:bg-brand-el1 has-checked:border-brand-primary has-checked:bg-brand-el1 cursor-pointer rounded-md border p-3 text-center transition-colors">
+            <input type="radio" name="amount" value="25" class="sr-only" checked />
+            <span class="text-brand-text1 block text-lg font-semibold">$25</span>
+            <span class="text-brand-text3 text-xs">≈ 25 voters</span>
+          </label>
+          <label class="border-brand-el1 hover:bg-brand-el1 has-checked:border-brand-primary has-checked:bg-brand-el1 cursor-pointer rounded-md border p-3 text-center transition-colors">
+            <input type="radio" name="amount" value="50" class="sr-only" />
+            <span class="text-brand-text1 block text-lg font-semibold">$50</span>
+            <span class="text-brand-text3 text-xs">≈ 50 voters</span>
+          </label>
+          <label class="border-brand-el1 hover:bg-brand-el1 has-checked:border-brand-primary has-checked:bg-brand-el1 cursor-pointer rounded-md border p-3 text-center transition-colors">
+            <input type="radio" name="amount" value="100" class="sr-only" />
+            <span class="text-brand-text1 block text-lg font-semibold">$100</span>
+            <span class="text-brand-text3 text-xs">≈ 100 voters</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="mt-6">
+        <label for="amount-custom" class="text-brand-text2 block text-sm font-medium">
+          Or enter a custom amount (USD, $1 minimum)
+        </label>
+        <div class="mt-1 flex items-center gap-2">
+          <span class="text-brand-text3 text-lg">$</span>
+          <input
+            id="amount-custom"
+            type="number"
+            inputmode="decimal"
+            step="0.01"
+            min="1"
+            class="border-brand-el1 bg-brand-bg text-brand-text1 focus:border-brand-primary block w-full rounded-md border px-3 py-2"
+            placeholder=""
+            aria-describedby="amount-custom-help"
+          />
+        </div>
+        <p id="amount-custom-help" class="text-brand-text3 mt-1 text-xs">
+          Entering a custom amount overrides the preset above.
+        </p>
+      </div>
+
+      <!-- PayPal Smart Buttons mount target -->
+      <div id="paypal-donate-button-container" class="mt-8"></div>
+
+      <!-- Surfaces while the Lambda backend is still TODO -->
+      <div data-state="backend-missing" hidden class="border-brand-el1 mt-6 rounded-lg border-2 border-dashed p-4">
+        <p class="text-brand-text3 text-sm">
+          <strong class="text-brand-text2">Backend not yet wired.</strong>
+          PayPal Smart Buttons require the
+          <code class="bg-brand-bg rounded px-1">POST /api/donate/create</code>
+          Lambda to be deployed (see deploy/lambdas/, next session). For now,
+          the button does not mount.
+        </p>
+      </div>
+
+      <p data-form-status class="form-status mt-4" hidden></p>
+    </div>
+  </section>
+
+  <script
+    is:inline
+    define:vars={{ paypalClientID, voxiviumAPIBase }}
+    type="module"
+  >
+    function selectedAmount() {
+      const custom = document.getElementById('amount-custom')
+      const customValue = custom?.value?.trim()
+      if (customValue) {
+        const parsed = Number(customValue)
+        if (Number.isFinite(parsed) && parsed >= 1) {
+          return Math.round(parsed * 100) / 100
+        }
+      }
+      const radio = document.querySelector('input[name="amount"]:checked')
+      const presetValue = radio ? Number(radio.value) : NaN
+      return Number.isFinite(presetValue) ? presetValue : 25
+    }
+
+    function surfaceStatus(msg) {
+      const el = document.querySelector('[data-form-status]')
+      if (!el) return
+      el.hidden = false
+      el.textContent = msg
+    }
+
+    if (!paypalClientID || paypalClientID === 'TODO') {
+      const bm = document.querySelector('[data-state="backend-missing"]')
+      if (bm) bm.hidden = false
+    } else {
+      const sdkSrc = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(paypalClientID)}&currency=USD&intent=capture`
+      const script = document.createElement('script')
+      script.src = sdkSrc
+      script.setAttribute('data-sdk-integration-source', 'voxivium-web')
+      script.addEventListener('load', () => {
+        if (!window.paypal) {
+          surfaceStatus('PayPal SDK loaded but window.paypal not defined.')
+          return
+        }
+        window.paypal
+          .Buttons({
+            style: { layout: 'vertical', label: 'donate', color: 'gold' },
+            createOrder: async () => {
+              const amount = selectedAmount()
+              const response = await fetch(`${voxiviumAPIBase}/api/donate/create`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount_usd: amount }),
+              })
+              if (!response.ok) {
+                throw new Error(`donate/create failed: ${response.status}`)
+              }
+              const data = await response.json()
+              if (!data.paypal_order_id) {
+                throw new Error('donate/create did not return a paypal_order_id')
+              }
+              return data.paypal_order_id
+            },
+            onApprove: async (paypalData) => {
+              // Server-side capture is handled by the webhook
+              // (PAYMENT.CAPTURE.COMPLETED → fund_ledger insert). Browser
+              // just shows a thank-you while that lands.
+              surfaceStatus(`Thank you! Your donation is being processed. PayPal order ID: ${paypalData.orderID}`)
+            },
+            onCancel: () => {
+              surfaceStatus('Donation cancelled. No charge was made.')
+            },
+            onError: (err) => {
+              surfaceStatus(`PayPal error: ${err?.message ?? err}`)
+            },
+          })
+          .render('#paypal-donate-button-container')
+      })
+      script.addEventListener('error', () => {
+        surfaceStatus('Failed to load PayPal SDK. Check your network and try again.')
+      })
+      document.head.appendChild(script)
+    }
+
+    // Highlight the radio when the custom amount field is cleared / non-empty.
+    const customInput = document.getElementById('amount-custom')
+    customInput?.addEventListener('input', () => {
+      if (customInput.value.trim()) {
+        const checked = document.querySelector('input[name="amount"]:checked')
+        if (checked) checked.checked = false
+      }
+    })
+
+    document.querySelectorAll('input[name="amount"]').forEach((radio) => {
+      radio.addEventListener('change', () => {
+        if (customInput) customInput.value = ''
+      })
+    })
+  </script>
+</BaseLayout>
