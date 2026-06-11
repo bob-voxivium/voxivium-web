@@ -121,7 +121,7 @@ import BaseLayout from '@layouts/BaseLayout.astro'
       while (Date.now() - start < timeoutMs) {
         try {
           const idToken = await getIdToken()
-          const response = await fetch(`${voxiviumAPIBase}/vuser/subscription`, {
+          const response = await fetch(`${voxiviumAPIBase}/voter/subscription`, {
             headers: { Authorization: `Bearer ${idToken}` },
           })
           if (response.ok) {
