@@ -28,6 +28,10 @@ interface ImportMetaEnv {
   // Voxivium backend base URL used by /subscribe to confirm entitlement
   // post-PayPal (server-validated; client never trusts a redirect alone).
   readonly PUBLIC_VOXIVIUM_API_BASE: string
+  // PayPal plan IDs (one per tier) — output of
+  // deploy/scripts/paypal_provision_catalog.py. Empty value means the
+  // corresponding tier's Smart Buttons won't mount.
+  readonly PUBLIC_PAYPAL_PLAN_ID_CIVIC_CONTRIBUTOR: string
 }
 
 interface ImportMeta {
