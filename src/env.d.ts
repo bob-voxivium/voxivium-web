@@ -31,7 +31,7 @@ interface ImportMetaEnv {
   // PayPal plan IDs (one per tier) — output of
   // deploy/scripts/paypal_provision_catalog.py. Empty value means the
   // corresponding tier's Smart Buttons won't mount.
-  readonly PUBLIC_PAYPAL_PLAN_ID_CIVIC_CONTRIBUTOR: string
+  readonly PUBLIC_PAYPAL_PLAN_ID_PREMIUM_SUBSCRIBER_YEARLY: string
 }
 
 interface ImportMeta {

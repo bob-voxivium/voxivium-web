@@ -80,7 +80,7 @@ PLANS_TO_PROVISION: list[PlanSpec] = [
         plan_description="Voxivium voter premium — $19.95 / year, auto-renewing.",
         price_usd="19.95",
         interval="YEAR",
-        env_key="PUBLIC_PAYPAL_PLAN_ID_CIVIC_CONTRIBUTOR",
+        env_key="PUBLIC_PAYPAL_PLAN_ID_PREMIUM_SUBSCRIBER_YEARLY",
     ),
 ]
 

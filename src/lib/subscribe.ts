@@ -7,7 +7,7 @@
  */
 
 /** Plan IDs the shared /subscribe page knows about. */
-export type SubscribePlanID = 'civic-contributor'
+export type SubscribePlanID = 'premium-subscriber-yearly'
 // Future tiers (politician-federal / -state / -local) land here when the
 // portal track ships. The page rejects unknown plan IDs.
 
@@ -28,14 +28,14 @@ export interface SubscribePlan {
 }
 
 export const SUBSCRIBE_PLANS: Record<SubscribePlanID, SubscribePlan> = {
-  'civic-contributor': {
-    id: 'civic-contributor',
-    displayName: 'Premium Subscriber',
+  'premium-subscriber-yearly': {
+    id: 'premium-subscriber-yearly',
+    displayName: 'Premium Subscriber Yearly',
     description:
       'Annual voter premium tier — AI-generated politician reviews, out-of-district report-card access, and shared-beliefs-in-your-community reports as they ship.',
     priceUSD: 19.95,
     priceLabel: '$19.95 / year',
-    paypalPlanIdEnvKey: 'PUBLIC_PAYPAL_PLAN_ID_CIVIC_CONTRIBUTOR',
+    paypalPlanIdEnvKey: 'PUBLIC_PAYPAL_PLAN_ID_PREMIUM_SUBSCRIBER_YEARLY',
     allowedOrigins: ['kmp-web'],
   },
 }
