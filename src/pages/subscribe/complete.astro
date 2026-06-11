@@ -1,0 +1,154 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+
+// Return target from PayPal Smart Buttons. The actual entitlement is
+// confirmed by the PayPal subscription webhook (server-side, source of
+// truth). This page polls the backend until the webhook lands (typically
+// <5s), then bounces back to the originating site so the user lands in the
+// app/portal with their subscription provisioned.
+//
+// On `status=cancelled` we surface a cancel screen with a "try again"
+// link back to /subscribe (preserving plan + origin).
+---
+
+<BaseLayout
+  title="Welcome to Voxivium"
+  description="Finishing your subscription setup."
+>
+  <section class="container mx-auto max-w-2xl px-6 py-16">
+    <!-- Provisioning state -->
+    <div data-state="provisioning" class="text-center">
+      <h1 class="text-brand-text1 text-3xl font-semibold">Welcome — provisioning your subscription</h1>
+      <p class="text-brand-text2 mt-4">
+        PayPal confirmed your payment. We're activating your subscription now —
+        this usually takes a few seconds. You'll be returned to the Voxivium
+        app automatically.
+      </p>
+      <div class="text-brand-text3 mt-8 text-sm" aria-live="polite">
+        <p data-poll-status>Checking entitlement…</p>
+      </div>
+    </div>
+
+    <!-- Cancelled state -->
+    <div data-state="cancelled" hidden class="text-center">
+      <h1 class="text-brand-text1 text-3xl font-semibold">Subscription not completed</h1>
+      <p class="text-brand-text2 mt-4">
+        You cancelled before completing payment. No charge was made.
+      </p>
+      <p class="text-brand-text3 mt-8">
+        <a
+          data-retry-link
+          href="/"
+          class="bg-brand-primary inline-block rounded-md px-4 py-2 font-semibold text-white"
+        >
+          Try again
+        </a>
+      </p>
+    </div>
+
+    <!-- Failed-provisioning state (polling exhausted) -->
+    <div data-state="failed" hidden class="text-center">
+      <h1 class="text-brand-text1 text-3xl font-semibold">Subscription pending</h1>
+      <p class="text-brand-text2 mt-4">
+        PayPal confirmed your payment, but we haven't yet received final
+        confirmation from PayPal's webhook. Your subscription will be
+        activated shortly — please open the Voxivium app in a few minutes.
+      </p>
+      <p class="text-brand-text3 mt-8 text-sm">
+        If you don't see your subscription active within an hour, contact
+        support with your PayPal subscription ID:
+        <code data-subscription-id class="bg-brand-bg rounded px-1"></code>.
+      </p>
+    </div>
+  </section>
+
+  <script is:inline type="module">
+    import { onAuthChanged, getIdToken } from '/src/lib/firebase/client.ts'
+    import { resolveReturnOrigin } from '/src/lib/subscribe.ts'
+
+    const params = new URLSearchParams(window.location.search)
+    const status = params.get('status')
+    const subscriptionID = params.get('subscription_id') ?? ''
+    const originSlug = params.get('origin')
+
+    const states = {
+      provisioning: document.querySelector('[data-state="provisioning"]'),
+      cancelled: document.querySelector('[data-state="cancelled"]'),
+      failed: document.querySelector('[data-state="failed"]'),
+    }
+    function show(name) {
+      for (const [k, el] of Object.entries(states)) {
+        if (!el) continue
+        el.hidden = k !== name
+      }
+    }
+
+    if (status === 'cancelled') {
+      show('cancelled')
+      const retry = document.querySelector('[data-retry-link]')
+      if (retry && originSlug) {
+        const back = resolveReturnOrigin(originSlug)
+        if (back) retry.setAttribute('href', back)
+      }
+    } else if (status !== 'success') {
+      // Unknown status — show provisioning as the safest default. The poll
+      // loop won't find an entitlement and will land on the failed-state
+      // copy, which is the same UX a user would see if PayPal returned
+      // with no useful status.
+      show('provisioning')
+    } else {
+      show('provisioning')
+      const sidEl = document.querySelector('[data-subscription-id]')
+      if (sidEl) sidEl.textContent = subscriptionID
+      onAuthChanged(async (user) => {
+        if (!user) {
+          // Lost the session — bounce to /subscribe to re-auth (the user
+          // can re-auth and we'll re-check entitlement on next poll).
+          window.location.assign('/subscribe')
+          return
+        }
+        await pollAndBounce()
+      })
+    }
+
+    async function pollAndBounce() {
+      const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
+      const statusEl = document.querySelector('[data-poll-status]')
+      const start = Date.now()
+      const timeoutMs = 60_000
+      const intervalMs = 2_000
+
+      while (Date.now() - start < timeoutMs) {
+        try {
+          const idToken = await getIdToken()
+          const response = await fetch(`${voxiviumAPIBase}/vuser/subscription`, {
+            headers: { Authorization: `Bearer ${idToken}` },
+          })
+          if (response.ok) {
+            const data = await response.json()
+            if (data?.active === true) {
+              if (statusEl) statusEl.textContent = 'Activated. Returning to the app…'
+              bounceToOrigin()
+              return
+            }
+          }
+        } catch {
+          /* swallow — the loop will retry */
+        }
+        await new Promise((r) => setTimeout(r, intervalMs))
+      }
+
+      show('failed')
+    }
+
+    function bounceToOrigin() {
+      if (!originSlug) return
+      const back = resolveReturnOrigin(originSlug)
+      if (!back) return
+      const url = new URL('/subscribe/complete', back)
+      url.searchParams.set('status', 'success')
+      url.searchParams.set('subscription_id', subscriptionID)
+      window.location.assign(url.toString())
+    }
+  </script>
+</BaseLayout>

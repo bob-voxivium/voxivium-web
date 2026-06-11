@@ -1,0 +1,265 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import SignInForm from '@components/forms/SignInForm.astro'
+
+// Shared off-mobile subscription checkout. Reads ?plan=…&origin=… and routes
+// through Firebase Auth + PayPal Smart Buttons. Backend Lambdas
+// (POST /api/subscribe/create + POST /webhooks/paypal/subscription) are
+// built in the next session — until they exist, this page validates the
+// query string, requires sign-in, and surfaces a "backend not yet wired"
+// state where the Smart Buttons would otherwise mount.
+//
+// See voxivium-web/CLAUDE.md §5 Phase 3, features.md §2.6.1.
+
+const paypalClientID = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID
+const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
+---
+
+<BaseLayout
+  title="Subscribe to Voxivium"
+  description="Complete your Voxivium subscription securely with PayPal."
+>
+  <section class="container mx-auto max-w-2xl px-6 py-16">
+    <p class="eyebrow text-brand-text3 text-sm font-medium tracking-wide uppercase">
+      Subscribe
+    </p>
+    <h1 class="text-brand-text1 mt-2 text-3xl font-semibold">Complete your subscription</h1>
+
+    <!-- Invalid-link state -->
+    <div data-state="invalid" hidden class="border-brand-el1 bg-brand-surface mt-8 rounded-lg border p-6">
+      <h2 class="text-brand-text1 text-xl font-semibold">This link isn't recognized</h2>
+      <p class="text-brand-text2 mt-2">
+        The subscription link is missing or has an unrecognized plan. Please
+        return to the app and try again.
+      </p>
+    </div>
+
+    <!-- Loading state -->
+    <div data-state="loading" class="text-brand-text3 mt-8" aria-live="polite">
+      <p>Checking your sign-in…</p>
+    </div>
+
+    <!-- Sign-in state -->
+    <div data-state="signin" hidden class="mt-8">
+      <h2 class="text-brand-text1 text-xl font-semibold">Sign in to continue</h2>
+      <p class="text-brand-text2 mt-2">
+        Use the same email and password you use in the Voxivium app.
+      </p>
+      <div class="mt-6 max-w-md">
+        <SignInForm />
+      </div>
+    </div>
+
+    <!-- Subscribe state -->
+    <div data-state="subscribe" hidden class="mt-8">
+      <div class="border-brand-el1 bg-brand-surface rounded-lg border p-6">
+        <h2 data-plan-name class="text-brand-text1 text-xl font-semibold"></h2>
+        <p data-plan-description class="text-brand-text2 mt-2"></p>
+        <p data-plan-price class="text-brand-primary mt-4 text-2xl font-bold"></p>
+
+        <p class="text-brand-text3 mt-4 text-sm">
+          You'll be charged through PayPal. You can cancel anytime from your
+          account.
+        </p>
+      </div>
+
+      <!-- PayPal Smart Buttons mount target -->
+      <div id="paypal-button-container" class="mt-6"></div>
+
+      <!-- Surfaces while the Lambda backend is still TODO -->
+      <div data-state="backend-missing" hidden class="border-brand-el1 mt-6 rounded-lg border-2 border-dashed p-4">
+        <p class="text-brand-text3 text-sm">
+          <strong class="text-brand-text2">Backend not yet wired.</strong>
+          PayPal Smart Buttons require the
+          <code class="bg-brand-bg rounded px-1">POST /api/subscribe/create</code>
+          Lambda to be deployed (see deploy/lambdas/, next session). For now,
+          the button does not mount.
+        </p>
+      </div>
+
+      <p class="form-status mt-4" data-form-status hidden></p>
+
+      <div class="text-brand-text3 mt-6 text-sm">
+        <button type="button" data-action="signout" class="underline-offset-2 hover:underline">
+          Sign out
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <script
+    is:inline
+    define:vars={{ paypalClientID, voxiviumAPIBase }}
+    type="module"
+  >
+    import { onAuthChanged, signIn, sendPasswordResetEmail, signOut, getIdToken } from '/src/lib/firebase/client.ts'
+    import { parseSubscribeQuery } from '/src/lib/subscribe.ts'
+
+    const states = {
+      loading: document.querySelector('[data-state="loading"]'),
+      invalid: document.querySelector('[data-state="invalid"]'),
+      signin: document.querySelector('[data-state="signin"]'),
+      subscribe: document.querySelector('[data-state="subscribe"]'),
+      backendMissing: document.querySelector('[data-state="backend-missing"]'),
+    }
+
+    function show(name) {
+      for (const [k, el] of Object.entries(states)) {
+        if (!el) continue
+        if (k === name) el.hidden = false
+        else if (k === 'backendMissing') {
+          /* sub-state inside subscribe — managed separately */
+        } else el.hidden = true
+      }
+    }
+
+    const q = parseSubscribeQuery(new URLSearchParams(window.location.search))
+    if (!q) {
+      show('invalid')
+    } else {
+      // Populate the plan card.
+      document.querySelector('[data-plan-name]').textContent = q.plan.displayName
+      document.querySelector('[data-plan-description]').textContent = q.plan.description
+      document.querySelector('[data-plan-price]').textContent = q.plan.priceLabel
+
+      // Sign-in / sign-out wiring.
+      const signinForm = document.querySelector('[data-voxivium-form="signin"]')
+      const statusEl = signinForm?.querySelector('[data-form-status]')
+
+      onAuthChanged((user) => {
+        if (user) {
+          show('subscribe')
+          mountPayPalOrFallback(q)
+        } else {
+          show('signin')
+        }
+      })
+
+      signinForm?.addEventListener('submit', async (event) => {
+        event.preventDefault()
+        const formData = new FormData(signinForm)
+        try {
+          await signIn(String(formData.get('email')), String(formData.get('password')))
+          // onAuthChanged will flip the state.
+        } catch (err) {
+          if (statusEl) {
+            statusEl.hidden = false
+            statusEl.textContent = `Sign-in failed: ${err.message ?? err}`
+          }
+        }
+      })
+
+      signinForm?.querySelector('[data-action="forgot-password"]')?.addEventListener('click', async () => {
+        const emailEl = signinForm.querySelector('input[name="email"]')
+        const email = emailEl?.value?.trim()
+        if (!email) {
+          if (statusEl) {
+            statusEl.hidden = false
+            statusEl.textContent = 'Enter your email above first, then click "Forgot password?"'
+          }
+          return
+        }
+        try {
+          await sendPasswordResetEmail(email)
+          if (statusEl) {
+            statusEl.hidden = false
+            statusEl.textContent = `Password reset email sent to ${email}. Check your inbox.`
+          }
+        } catch (err) {
+          if (statusEl) {
+            statusEl.hidden = false
+            statusEl.textContent = `Could not send reset email: ${err.message ?? err}`
+          }
+        }
+      })
+
+      document.querySelector('[data-action="signout"]')?.addEventListener('click', () => {
+        void signOut()
+      })
+    }
+
+    function mountPayPalOrFallback(q) {
+      const planIDEnvKey = q.plan.paypalPlanIdEnvKey
+      const planID = import.meta.env[planIDEnvKey]
+
+      if (!paypalClientID || paypalClientID === 'TODO' || !planID) {
+        // Backend not wired — surface the placeholder. Smart Buttons need
+        // both a real client-id AND a PayPal plan-id to mount.
+        const bm = document.querySelector('[data-state="backend-missing"]')
+        if (bm) bm.hidden = false
+        return
+      }
+
+      // Load the PayPal JS SDK with subscriptions intent. The SDK loader
+      // exposes `window.paypal.Buttons(...)`.
+      const sdkSrc = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(paypalClientID)}&vault=true&intent=subscription`
+      const script = document.createElement('script')
+      script.src = sdkSrc
+      script.setAttribute('data-sdk-integration-source', 'voxivium-web')
+      script.addEventListener('load', () => {
+        if (!window.paypal) {
+          surfaceStatus('PayPal SDK loaded but window.paypal not defined.')
+          return
+        }
+        window.paypal
+          .Buttons({
+            style: { layout: 'vertical', label: 'subscribe' },
+            createSubscription: async () => {
+              const idToken = await getIdToken()
+              if (!idToken) {
+                throw new Error('Not authenticated. Sign in again.')
+              }
+              const response = await fetch(`${voxiviumAPIBase}/api/subscribe/create`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${idToken}`,
+                },
+                body: JSON.stringify({
+                  plan: q.plan.id,
+                  origin: q.originSlug,
+                  paypalPlanID: planID,
+                }),
+              })
+              if (!response.ok) {
+                throw new Error(`subscribe/create failed: ${response.status}`)
+              }
+              const data = await response.json()
+              if (!data.paypal_subscription_id) {
+                throw new Error('subscribe/create did not return a paypal_subscription_id')
+              }
+              return data.paypal_subscription_id
+            },
+            onApprove: (paypalData) => {
+              const completeURL = new URL('/subscribe/complete', window.location.origin)
+              completeURL.searchParams.set('status', 'success')
+              completeURL.searchParams.set('subscription_id', paypalData.subscriptionID ?? '')
+              completeURL.searchParams.set('origin', q.originSlug)
+              window.location.assign(completeURL.toString())
+            },
+            onCancel: () => {
+              const completeURL = new URL('/subscribe/complete', window.location.origin)
+              completeURL.searchParams.set('status', 'cancelled')
+              completeURL.searchParams.set('origin', q.originSlug)
+              window.location.assign(completeURL.toString())
+            },
+            onError: (err) => {
+              surfaceStatus(`PayPal error: ${err?.message ?? err}`)
+            },
+          })
+          .render('#paypal-button-container')
+      })
+      script.addEventListener('error', () => {
+        surfaceStatus('Failed to load PayPal SDK. Check your network and try again.')
+      })
+      document.head.appendChild(script)
+    }
+
+    function surfaceStatus(msg) {
+      const el = document.querySelector('[data-state="subscribe"] [data-form-status]')
+      if (!el) return
+      el.hidden = false
+      el.textContent = msg
+    }
+  </script>
+</BaseLayout>
