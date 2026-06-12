@@ -14,15 +14,38 @@ const { title } = Astro.props
 </article>
 
 <style>
+  /* Surface styling per KMP STYLE_GUIDE §1 (24px corners) + §2 (subtle gradient
+     surface, diffuse low-alpha shadow). The gradient shifts ~5% from top-left to
+     bottom-right rather than a flat fill; the shadow is high-blur + low-alpha
+     so the card reads as floating without a hard outline. */
   .feature-card {
-    background: var(--color-brand-surface);
-    border: 1px solid var(--color-brand-el1);
-    border-radius: 0.75rem;
-    padding: 1.5rem;
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--color-brand-surface), white 4%) 0%,
+        var(--color-brand-surface) 60%,
+        color-mix(in oklab, var(--color-brand-surface), black 3%) 100%
+      );
+    border: 1px solid color-mix(in oklab, var(--color-brand-text1), transparent 88%);
+    border-radius: 1.5rem;
+    padding: 1.75rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     height: 100%;
+    box-shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.05);
+  }
+
+  :global(html.dark) .feature-card {
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--color-brand-surface), white 5%) 0%,
+        var(--color-brand-surface) 60%,
+        color-mix(in oklab, var(--color-brand-surface), black 8%) 100%
+      );
+    border-color: color-mix(in oklab, var(--color-brand-text1), transparent 82%);
+    box-shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.4);
   }
 
   .feature-card h3 {

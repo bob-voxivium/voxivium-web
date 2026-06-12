@@ -70,25 +70,11 @@ import PartnershipForm from '@components/forms/PartnershipForm.astro'
             availability of the commercial license.
           </p>
         </FeatureCard>
-        <FeatureCard title="Methodology input">
-          <p>
-            How issues are categorized, how alignment is scored, how partisan balance is reported —
-            these decisions get made early and stick for a long time. Founding partners are at the
-            table when we make them.
-          </p>
-        </FeatureCard>
         <FeatureCard title="Named attribution">
           <p>
             We list founding partners publicly (with your consent) as the organizations that helped
             make the platform possible. Case studies, co-marketing, and citation rights come with
             the territory.
-          </p>
-        </FeatureCard>
-        <FeatureCard title="Locked-in terms">
-          <p>
-            Pricing isn't published yet because the commercial platform hasn't launched. Partners
-            who join before launch lock in preferred terms that won't be available once the rate
-            card goes out.
           </p>
         </FeatureCard>
       </div>
@@ -229,22 +215,25 @@ import PartnershipForm from '@components/forms/PartnershipForm.astro'
             built on aggregated, anonymized data. This is in our bylaws.
           </p>
         </FeatureCard>
-        <FeatureCard title="No partisan funding strings">
-          <p>
-            We will not accept funding contingent on partisan outcomes, candidate endorsements, or
-            methodology choices that favor one party. Funders may not direct what gets measured.
-          </p>
-        </FeatureCard>
         <FeatureCard title="No campaign targeting">
           <p>
             Our data will not be used to micro-target voters for partisan campaign messaging.
             Licensing terms make this an explicit, enforceable restriction.
           </p>
         </FeatureCard>
-        <FeatureCard title="No donor influence on methodology">
+        <FeatureCard title="Open methodology, regardless of funder">
           <p>
-            How issues are framed, how alignment is scored, how the data is sampled — these are
-            documented publicly. Donors and partners see the same methodology everyone else does.
+            How issues are framed, how alignment is scored, how the data is sampled, who has
+            access — every methodological choice is documented publicly. No funder, partner, or
+            board member is consulted on those choices in advance, and they see them at the same
+            time as the public.
+          </p>
+        </FeatureCard>
+        <FeatureCard title="Documented funders">
+          <p>
+            We publish who funded us and what they funded. Sunlight is the defense, not denial —
+            our credibility rests on what readers can verify, not on assurances about who we'll
+            associate with.
           </p>
         </FeatureCard>
       </div>
@@ -446,7 +435,7 @@ import PartnershipForm from '@components/forms/PartnershipForm.astro'
   .disclosure {
     background: var(--color-brand-bg);
     border: 1px solid var(--color-brand-el1);
-    border-radius: 0.75rem;
+    border-radius: 1.5rem;
     margin-top: 2rem;
     overflow: hidden;
     transition:
