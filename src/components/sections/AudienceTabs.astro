@@ -73,6 +73,19 @@ const panels: PanelDef[] = [
 ]
 ---
 
+<!--
+  Scroll-target anchors for the four tabs. The existing AudienceTabs script
+  listens on hashchange and activates the matching tab, but without these
+  ids the browser has no element to scroll to when a link like /#voters is
+  clicked — the tab activates but the page stays at the top. Each anchor
+  carries scroll-margin-top so the section header sits below the sticky
+  header instead of behind it.
+-->
+<a id="voters" class="audience-anchor" aria-hidden="true" tabindex="-1"></a>
+<a id="politicians" class="audience-anchor" aria-hidden="true" tabindex="-1"></a>
+<a id="media" class="audience-anchor" aria-hidden="true" tabindex="-1"></a>
+<a id="aiLab" class="audience-anchor" aria-hidden="true" tabindex="-1"></a>
+
 <section class="audiences" id="audiences" aria-labelledby="audiences-heading" data-audience-tabs>
   <div class="container">
     <header>
@@ -202,6 +215,17 @@ const panels: PanelDef[] = [
 </script>
 
 <style>
+  .audience-anchor {
+    /* Invisible scroll target — block-level so it has its own line in flow,
+       zero-height so it doesn't push content, scroll-margin-top so the
+       section header lands below the sticky header (h-10 mobile, h-14 md). */
+    display: block;
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    scroll-margin-top: 96px;
+  }
+
   .audiences {
     padding: clamp(4rem, 10vh, 6rem) 1.5rem;
     background: var(--color-brand-surface);

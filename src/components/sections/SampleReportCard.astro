@@ -75,11 +75,13 @@ function gradeTone(grade: string): 'green' | 'yellow' | 'orange' | 'red' {
             <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
           </svg>
           <span class="phone-logo">
-            <svg viewBox="0 0 22 22" width="20" height="20" aria-hidden="true">
-              <rect x="2" y="2" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2"></rect>
-              <path d="M6 11.5l3.2 3.2L16 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-            </svg>
-            <span class="phone-logo-text">VOXIVIUM</span>
+            <img
+              src="/press/voxivium-logo-dark.png"
+              alt="Voxivium"
+              width="64"
+              height="22"
+              class="phone-logo-img"
+            />
           </span>
           <svg class="phone-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
             <circle cx="12" cy="9" r="3.5" fill="currentColor"></circle>
@@ -319,14 +321,12 @@ function gradeTone(grade: string): 'green' | 'yellow' | 'orange' | 'red' {
   .phone-logo {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    color: var(--phone-accent);
   }
 
-  .phone-logo-text {
-    font-size: 0.95rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
+  .phone-logo-img {
+    display: block;
+    height: 22px;
+    width: auto;
   }
 
   .phone-profile {
