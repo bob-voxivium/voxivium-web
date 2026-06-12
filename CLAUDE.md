@@ -67,19 +67,6 @@ Mirror these from the existing Android `Color.kt`. They live in `tailwind.config
 
 Dark mode is the default look-and-feel for this site. Honor `prefers-color-scheme` and provide a manual toggle in the header.
 
-### Visual identity — important nuance
-
-The user's vision is "red and blue circles converging in a flash of light at the center" as a hero motif, inspired by the app splash screen.
-
-**Execute this carefully.** Voxivium is non-partisan — the entire pitch is bridging divides. A hero that leads with strong red-vs-blue framing risks reading as partisan in a half-second glance, before the visitor reads any copy. Apply these guardrails:
-
-- **Blue is dominant.** Brand blue carries the visual weight. Red is an accent that exists *to be resolved* into the unity moment, not to compete with blue.
-- **The convergence is the focal point**, not the opposing sides. The "flash of light" / merged center should be the largest, brightest, most attention-grabbing element. The red and blue circles are supporting players that lead the eye inward.
-- **Avoid US-political shorthand.** No stars, no flag motifs, no donkey/elephant. This is about citizens uniting, not about Democrats vs. Republicans specifically.
-- **Implement as SVG with subtle CSS animation** (respecting `prefers-reduced-motion`). Circles fade/scale toward the center; the flash is a soft radial glow, not a literal explosion. No autoplaying video for the hero.
-
-If the user pushes for a more partisan-coded execution, build it but raise the concern once.
-
 ### Typography
 
 Single font family for the whole site. Use **Inter** (variable font, self-hosted via `@fontsource-variable/inter`) for body and headings. No second display font unless the user explicitly asks. Tight headings, generous body line-height (1.6+).
@@ -108,6 +95,8 @@ Plan for these routes. Build them in this order — don't scaffold pages that ar
 The home page uses a tabbed component (React island) with four tabs: Voters | Politicians | Media & Research | AI Labs. Each tab shows tailored copy and a tailored CTA / form. URL hash should reflect the active tab (`/#voters`, `/#politicians`, etc.) so it's linkable.
 
 ## 6. Forms — current and future
+
+**NOTE:** Info forms currently use AWS Lambda functions to process form submissions.
 
 Terraform defines the lambda functions, API Gateway endpoints, and SQS queues that will be used for the forms. Lambda functions should be written in Python 3.14.
 

@@ -13,12 +13,12 @@ const POLITICIAN = {
 }
 
 const CATEGORIES = [
-  { name: 'Foundational Principles & Constitutional Interpretation', grade: 'B' },
-  { name: 'Economic Values & Beliefs', grade: 'C' },
-  { name: 'Law & Order and Justice System', grade: 'B' },
-  { name: 'Social & Cultural Issues', grade: 'C' },
-  { name: 'International Relations & Foreign Policy', grade: 'D' },
-  { name: 'Core Personal Values', grade: 'A' }
+  { name: 'Economy and Work', grade: 'B' },
+  { name: 'Justice and Public Safety', grade: 'C' },
+  { name: 'Defense, Foreign Affairs, and Government', grade: 'B' },
+  { name: 'Health, Education, and Family', grade: 'C' },
+  { name: 'Environment and Technology', grade: 'D' },
+  { name: 'Rights and Personal Liberty', grade: 'A' }
 ] as const
 
 type Grade = 'A' | 'B' | 'C' | 'D' | 'F'
@@ -143,7 +143,7 @@ function gradeTone(grade: string): 'green' | 'yellow' | 'orange' | 'red' {
         </article>
         <article class="callout">
           <span class="callout-mark">2</span>
-          <h3>Five category grades</h3>
+          <h3>Six category grades</h3>
           <p>
             Drill into the areas that matter most. Each grade reflects only the
             votes Voxivium can verify, scored against your specific positions.
