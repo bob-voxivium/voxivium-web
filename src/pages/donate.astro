@@ -11,22 +11,21 @@ import OnboardingFundLiveStatus from '@components/sections/OnboardingFundLiveSta
 // chip in, and is also the destination for the in-app "Donate more"
 // CTA that bounces users out to better processor economics.
 //
-// Backend wiring status (2026-06-18): voxivium-mvp ships
-// `POST /donate/create` (PayPal Order) and `POST /webhooks/paypal`
-// (PAYMENT.CAPTURE.COMPLETED → fund_ledger credit). This page still
-// needs (separate session): (1) Cloudflare Turnstile widget + token
-// capture, (2) request-body alignment with the Go handler's
-// {amount_cents, turnstile_token} shape, (3) PayPal Smart Buttons
-// mount once the prior two land. The page renders the live fund
-// status today (read-only against the new GET /api/fund/status).
+// Wiring (2026-06-19): Cloudflare Turnstile widget renders inline; the
+// PayPal Smart Buttons mount only after PUBLIC_PAYPAL_CLIENT_ID is set.
+// On the buttons' createOrder, we read the Turnstile response token
+// from the hidden `cf-turnstile-response` input the widget injects,
+// post {amount_cents, turnstile_token} to voxivium-mvp's
+// POST /donate/create (no /api/ prefix — that's a v1 path, donate is
+// at root), and return the PayPal order id to the SDK. Capture happens
+// server-side via the PAYMENT.CAPTURE.COMPLETED webhook which writes
+// the fund_ledger row.
 //
 // No sign-in required — donors are not necessarily Voxivium users.
 
 const paypalClientID = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID
-// voxiviumAPIBase will be referenced again once the Turnstile-gated
-// PayPal Smart Buttons mount returns; the OnboardingFundLiveStatus
-// component already reads PUBLIC_VOXIVIUM_API_BASE directly for the
-// live balance fetch.
+const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
 ---
 
 <BaseLayout
@@ -102,19 +101,39 @@ const paypalClientID = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID
         </p>
       </div>
 
+      <!-- Cloudflare Turnstile widget. data-action lets the server-side
+           verifier scope the token to this surface. -->
+      <div class="mt-6">
+        <div
+          class="cf-turnstile"
+          data-sitekey={turnstileSiteKey}
+          data-action="donate-create"
+          data-theme="auto"
+        >
+        </div>
+        <p
+          class="text-brand-text3 mt-1 text-xs"
+          data-state="turnstile-missing-key"
+          hidden
+        >
+          Anti-bot challenge not configured (PUBLIC_TURNSTILE_SITE_KEY missing).
+        </p>
+      </div>
+
       <!-- PayPal Smart Buttons mount target -->
       <div id="paypal-donate-button-container" class="mt-8"></div>
 
-      <!-- Surfaces while the Turnstile widget + body-shape wiring are still TODO. -->
-      <div data-state="backend-missing" hidden class="border-brand-el1 mt-6 rounded-lg border-2 border-dashed p-4">
+      <!-- Surfaces when PayPal client id is absent (dev placeholder). -->
+      <div
+        data-state="paypal-missing"
+        hidden
+        class="border-brand-el1 mt-6 rounded-lg border-2 border-dashed p-4"
+      >
         <p class="text-brand-text3 text-sm">
-          <strong class="text-brand-text2">Backend wiring TODO.</strong>
-          Server endpoints are shipped on voxivium-mvp
-          (<code class="bg-brand-bg rounded px-1">POST /donate/create</code> +
-          <code class="bg-brand-bg rounded px-1">POST /webhooks/paypal</code>);
-          this page still needs Cloudflare Turnstile widget integration
-          and request-body alignment before PayPal Smart Buttons can mount.
-          See features.md §12.2 follow-ups.
+          <strong class="text-brand-text2">PayPal client id missing.</strong>
+          Set <code class="bg-brand-bg rounded px-1">PUBLIC_PAYPAL_CLIENT_ID</code>
+          in <code class="bg-brand-bg rounded px-1">.env.local</code> to mount
+          the Smart Buttons.
         </p>
       </div>
 
@@ -122,25 +141,150 @@ const paypalClientID = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID
     </div>
   </section>
 
+  <!-- Turnstile API. Auto-renders any .cf-turnstile element on the page. -->
   <script
     is:inline
-    define:vars={{ paypalClientID }}
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer></script>
+
+  <script
+    is:inline
+    define:vars={{ paypalClientID, voxiviumAPIBase, turnstileSiteKey }}
     type="module"
   >
-    // Until the Turnstile widget lands on this page, gate Smart Buttons
-    // off entirely and surface the TODO note. Keeps the form usable for
-    // copy review without exposing a broken submit path. The amount-pick
-    // helpers + Smart Buttons mount come back when Turnstile lands; see
-    // features.md §12.2 follow-ups.
-    const bm = document.querySelector('[data-state="backend-missing"]')
-    if (bm) bm.hidden = false
-
-    if (paypalClientID && paypalClientID !== 'TODO') {
-      // eslint-disable-next-line no-console
-      console.info('paypal client id present; awaiting turnstile widget integration before mount')
+    function selectedAmountCents() {
+      const custom = document.getElementById('amount-custom')
+      const customValue = custom?.value?.trim()
+      if (customValue) {
+        const parsed = Number(customValue)
+        if (Number.isFinite(parsed) && parsed >= 2) {
+          return Math.round(parsed * 100)
+        }
+      }
+      const radio = document.querySelector('input[name="amount"]:checked')
+      const presetValue = radio ? Number(radio.value) : NaN
+      const dollars = Number.isFinite(presetValue) ? presetValue : 25
+      return Math.round(dollars * 100)
     }
 
-    // Custom-amount + preset toggle wiring (no submit path yet).
+    function getTurnstileToken() {
+      // Cloudflare's widget injects a hidden input named
+      // `cf-turnstile-response` into the same form / parent as the
+      // .cf-turnstile div. We don't wrap in a <form> here, so search
+      // the document.
+      const input = document.querySelector('input[name="cf-turnstile-response"]')
+      return input?.value?.trim() ?? ''
+    }
+
+    function resetTurnstile() {
+      const widget = document.querySelector('.cf-turnstile')
+      if (widget && window.turnstile && typeof window.turnstile.reset === 'function') {
+        try {
+          window.turnstile.reset(widget)
+        } catch (_) {
+          // best-effort reset; ignore
+        }
+      }
+    }
+
+    function surfaceStatus(msg, kind) {
+      const el = document.querySelector('[data-form-status]')
+      if (!el) return
+      el.hidden = false
+      el.textContent = msg
+      if (kind) el.dataset.kind = kind
+    }
+
+    if (!turnstileSiteKey || turnstileSiteKey === 'TODO') {
+      const missing = document.querySelector('[data-state="turnstile-missing-key"]')
+      if (missing) missing.hidden = false
+    }
+
+    if (!paypalClientID || paypalClientID === 'TODO') {
+      const miss = document.querySelector('[data-state="paypal-missing"]')
+      if (miss) miss.hidden = false
+    } else {
+      const sdkSrc = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(paypalClientID)}&currency=USD&intent=capture`
+      const script = document.createElement('script')
+      script.src = sdkSrc
+      script.setAttribute('data-sdk-integration-source', 'voxivium-web')
+      script.addEventListener('load', () => {
+        if (!window.paypal) {
+          surfaceStatus('PayPal SDK loaded but window.paypal not defined.', 'error')
+          return
+        }
+        window.paypal
+          .Buttons({
+            style: { layout: 'vertical', label: 'donate', color: 'gold' },
+            createOrder: async () => {
+              const amountCents = selectedAmountCents()
+              if (!Number.isFinite(amountCents) || amountCents < 200) {
+                surfaceStatus('Please enter at least $2.', 'error')
+                throw new Error('amount below minimum')
+              }
+              const token = getTurnstileToken()
+              if (!token) {
+                surfaceStatus(
+                  'Please complete the anti-bot verification above before donating.',
+                  'error',
+                )
+                throw new Error('turnstile token missing')
+              }
+              const response = await fetch(`${voxiviumAPIBase}/donate/create`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  amount_cents: amountCents,
+                  turnstile_token: token,
+                }),
+              })
+              if (!response.ok) {
+                const body = await response.text().catch(() => '')
+                surfaceStatus(
+                  `Couldn't start the donation (${response.status}). Please try again.`,
+                  'error',
+                )
+                throw new Error(`donate/create failed: ${response.status} ${body}`)
+              }
+              const data = await response.json()
+              if (!data.paypal_order_id) {
+                surfaceStatus(
+                  "Server didn't return a PayPal order id; please retry.",
+                  'error',
+                )
+                throw new Error('donate/create missing paypal_order_id')
+              }
+              return data.paypal_order_id
+            },
+            onApprove: async (paypalData) => {
+              // Server-side capture is handled by the webhook
+              // (PAYMENT.CAPTURE.COMPLETED → fund_ledger insert). Browser
+              // just shows a thank-you while that lands.
+              surfaceStatus(
+                `Thank you! Your donation is being processed. PayPal order id: ${paypalData.orderID}`,
+                'success',
+              )
+              // Reset the Turnstile widget so a repeat donation starts
+              // fresh. The token we just consumed is single-use.
+              resetTurnstile()
+            },
+            onCancel: () => {
+              surfaceStatus('Donation cancelled. No charge was made.', 'info')
+            },
+            onError: (err) => {
+              surfaceStatus(`PayPal error: ${err?.message ?? err}`, 'error')
+            },
+          })
+          .render('#paypal-donate-button-container')
+      })
+      script.addEventListener('error', () => {
+        surfaceStatus('Failed to load PayPal SDK. Check your network and try again.', 'error')
+      })
+      document.head.appendChild(script)
+    }
+
+    // Highlight the radio when the custom amount field is cleared / non-empty.
     const customInput = document.getElementById('amount-custom')
     customInput?.addEventListener('input', () => {
       if (customInput.value.trim()) {
