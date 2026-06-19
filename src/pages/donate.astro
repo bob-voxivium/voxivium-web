@@ -1,31 +1,44 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro'
+import OnboardingFundLiveStatus from '@components/sections/OnboardingFundLiveStatus.astro'
 
-// Voter Onboarding Fund donations — PayPal one-time payments for $25 / $50 /
-// $100 / custom. Backend (PayPal Orders/Capture webhook → fund_ledger
-// insert) is part of the next-session Lambdas.
+// Voter Onboarding Fund donations — PayPal one-time payments. $2 minimum
+// (covers the donor's own onboarding + at least one more voter); presets
+// $25 / $50 / $100 plus custom.
 //
-// Per CEO #5 / features.md §12.2 / §13.2: small ($2 / $10) donations stay
-// in-app as IAPs because routing those out of the app at signup tanks
-// conversion; larger amounts come here for the better processor split
-// (PayPal ~3% vs. ~30% Apple/Google).
+// Per CEO #5 / features.md §12.2 / §13.2: small ($2 / $10) in-app IAPs
+// stay app-side; the web /donate page is for *anyone* who wants to
+// chip in, and is also the destination for the in-app "Donate more"
+// CTA that bounces users out to better processor economics.
+//
+// Backend wiring status (2026-06-18): voxivium-mvp ships
+// `POST /donate/create` (PayPal Order) and `POST /webhooks/paypal`
+// (PAYMENT.CAPTURE.COMPLETED → fund_ledger credit). This page still
+// needs (separate session): (1) Cloudflare Turnstile widget + token
+// capture, (2) request-body alignment with the Go handler's
+// {amount_cents, turnstile_token} shape, (3) PayPal Smart Buttons
+// mount once the prior two land. The page renders the live fund
+// status today (read-only against the new GET /api/fund/status).
 //
 // No sign-in required — donors are not necessarily Voxivium users.
 
 const paypalClientID = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID
-const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
+// voxiviumAPIBase will be referenced again once the Turnstile-gated
+// PayPal Smart Buttons mount returns; the OnboardingFundLiveStatus
+// component already reads PUBLIC_VOXIVIUM_API_BASE directly for the
+// live balance fetch.
 ---
 
 <BaseLayout
   title="Donate to the Voter Onboarding Fund"
-  description="Help cover the cost of voter identity verification and registration checks for new Voxivium users."
+  description="Every dollar you donate goes towards onboarding a new user."
 >
   <section class="container mx-auto max-w-2xl px-6 py-16">
     <p class="eyebrow text-brand-text3 text-sm font-medium tracking-wide uppercase">
       Voter Onboarding Fund
     </p>
     <h1 class="text-brand-text1 mt-2 text-3xl font-semibold">
-      Help us onboard the next voter.
+      Every dollar you donate goes towards onboarding a new user.
     </h1>
     <p class="text-brand-text2 mt-4 text-lg">
       Every Voxivium voter is identity-verified and matched against their
@@ -39,6 +52,8 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
       tax-deductible. Funds are tracked transparently in our public ledger
       and used exclusively to cover voter onboarding costs.
     </p>
+
+    <OnboardingFundLiveStatus class="mt-10" />
 
     <div class="border-brand-el1 bg-brand-surface mt-10 rounded-lg border p-6">
       <h2 class="text-brand-text1 text-xl font-semibold">Choose an amount</h2>
@@ -66,7 +81,7 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
 
       <div class="mt-6">
         <label for="amount-custom" class="text-brand-text2 block text-sm font-medium">
-          Or enter a custom amount (USD, $1 minimum)
+          Or enter a custom amount (USD, $2 minimum)
         </label>
         <div class="mt-1 flex items-center gap-2">
           <span class="text-brand-text3 text-lg">$</span>
@@ -75,28 +90,31 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
             type="number"
             inputmode="decimal"
             step="0.01"
-            min="1"
+            min="2"
             class="border-brand-el1 bg-brand-bg text-brand-text1 focus:border-brand-primary block w-full rounded-md border px-3 py-2"
             placeholder=""
             aria-describedby="amount-custom-help"
           />
         </div>
         <p id="amount-custom-help" class="text-brand-text3 mt-1 text-xs">
-          Entering a custom amount overrides the preset above.
+          Entering a custom amount overrides the preset above. $2 covers
+          your own onboarding plus one additional voter. Pay it forward!
         </p>
       </div>
 
       <!-- PayPal Smart Buttons mount target -->
       <div id="paypal-donate-button-container" class="mt-8"></div>
 
-      <!-- Surfaces while the Lambda backend is still TODO -->
+      <!-- Surfaces while the Turnstile widget + body-shape wiring are still TODO. -->
       <div data-state="backend-missing" hidden class="border-brand-el1 mt-6 rounded-lg border-2 border-dashed p-4">
         <p class="text-brand-text3 text-sm">
-          <strong class="text-brand-text2">Backend not yet wired.</strong>
-          PayPal Smart Buttons require the
-          <code class="bg-brand-bg rounded px-1">POST /api/donate/create</code>
-          Lambda to be deployed (see deploy/lambdas/, next session). For now,
-          the button does not mount.
+          <strong class="text-brand-text2">Backend wiring TODO.</strong>
+          Server endpoints are shipped on voxivium-mvp
+          (<code class="bg-brand-bg rounded px-1">POST /donate/create</code> +
+          <code class="bg-brand-bg rounded px-1">POST /webhooks/paypal</code>);
+          this page still needs Cloudflare Turnstile widget integration
+          and request-body alignment before PayPal Smart Buttons can mount.
+          See features.md §12.2 follow-ups.
         </p>
       </div>
 
@@ -106,84 +124,23 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
 
   <script
     is:inline
-    define:vars={{ paypalClientID, voxiviumAPIBase }}
+    define:vars={{ paypalClientID }}
     type="module"
   >
-    function selectedAmount() {
-      const custom = document.getElementById('amount-custom')
-      const customValue = custom?.value?.trim()
-      if (customValue) {
-        const parsed = Number(customValue)
-        if (Number.isFinite(parsed) && parsed >= 1) {
-          return Math.round(parsed * 100) / 100
-        }
-      }
-      const radio = document.querySelector('input[name="amount"]:checked')
-      const presetValue = radio ? Number(radio.value) : NaN
-      return Number.isFinite(presetValue) ? presetValue : 25
+    // Until the Turnstile widget lands on this page, gate Smart Buttons
+    // off entirely and surface the TODO note. Keeps the form usable for
+    // copy review without exposing a broken submit path. The amount-pick
+    // helpers + Smart Buttons mount come back when Turnstile lands; see
+    // features.md §12.2 follow-ups.
+    const bm = document.querySelector('[data-state="backend-missing"]')
+    if (bm) bm.hidden = false
+
+    if (paypalClientID && paypalClientID !== 'TODO') {
+      // eslint-disable-next-line no-console
+      console.info('paypal client id present; awaiting turnstile widget integration before mount')
     }
 
-    function surfaceStatus(msg) {
-      const el = document.querySelector('[data-form-status]')
-      if (!el) return
-      el.hidden = false
-      el.textContent = msg
-    }
-
-    if (!paypalClientID || paypalClientID === 'TODO') {
-      const bm = document.querySelector('[data-state="backend-missing"]')
-      if (bm) bm.hidden = false
-    } else {
-      const sdkSrc = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(paypalClientID)}&currency=USD&intent=capture`
-      const script = document.createElement('script')
-      script.src = sdkSrc
-      script.setAttribute('data-sdk-integration-source', 'voxivium-web')
-      script.addEventListener('load', () => {
-        if (!window.paypal) {
-          surfaceStatus('PayPal SDK loaded but window.paypal not defined.')
-          return
-        }
-        window.paypal
-          .Buttons({
-            style: { layout: 'vertical', label: 'donate', color: 'gold' },
-            createOrder: async () => {
-              const amount = selectedAmount()
-              const response = await fetch(`${voxiviumAPIBase}/api/donate/create`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount_usd: amount }),
-              })
-              if (!response.ok) {
-                throw new Error(`donate/create failed: ${response.status}`)
-              }
-              const data = await response.json()
-              if (!data.paypal_order_id) {
-                throw new Error('donate/create did not return a paypal_order_id')
-              }
-              return data.paypal_order_id
-            },
-            onApprove: async (paypalData) => {
-              // Server-side capture is handled by the webhook
-              // (PAYMENT.CAPTURE.COMPLETED → fund_ledger insert). Browser
-              // just shows a thank-you while that lands.
-              surfaceStatus(`Thank you! Your donation is being processed. PayPal order ID: ${paypalData.orderID}`)
-            },
-            onCancel: () => {
-              surfaceStatus('Donation cancelled. No charge was made.')
-            },
-            onError: (err) => {
-              surfaceStatus(`PayPal error: ${err?.message ?? err}`)
-            },
-          })
-          .render('#paypal-donate-button-container')
-      })
-      script.addEventListener('error', () => {
-        surfaceStatus('Failed to load PayPal SDK. Check your network and try again.')
-      })
-      document.head.appendChild(script)
-    }
-
-    // Highlight the radio when the custom amount field is cleared / non-empty.
+    // Custom-amount + preset toggle wiring (no submit path yet).
     const customInput = document.getElementById('amount-custom')
     customInput?.addEventListener('input', () => {
       if (customInput.value.trim()) {

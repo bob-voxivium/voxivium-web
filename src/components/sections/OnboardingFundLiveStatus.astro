@@ -1,0 +1,134 @@
+---
+// OnboardingFundLiveStatus — live read of the Voter Onboarding Fund balance.
+//
+// Used in two places:
+//   /donate          — between the page intro and the donation form, as a
+//                      transparency block so donors can see the live balance.
+//   / (landing page) — top-of-page banner via <OnboardingFundBanner /> which
+//                      wraps this component with the emphasized chrome.
+//
+// The component renders skeleton/copy server-side and fetches the live
+// number from voxivium-mvp's GET /api/fund/status on the client. The
+// number is expressed in *voters covered*, not dollars — a deliberate
+// brand choice (people understand "saves N voters" better than a dollar
+// balance, and it normalizes for ONBOARDING_COST_CENTS tuning).
+//
+// Variants are driven by data attributes (variant="banner"|"card") so a
+// single component can wear both hats.
+
+interface Props {
+  variant?: 'banner' | 'card'
+  class?: string
+}
+const { variant = 'card', class: className = '' } = Astro.props as Props
+
+const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
+---
+
+<div
+  data-fund-status
+  data-variant={variant}
+  class:list={[
+    'border-brand-el1 bg-brand-surface rounded-lg border p-4 text-sm',
+    variant === 'banner' && 'flex items-center justify-between gap-4',
+    className,
+  ]}
+  role="status"
+  aria-live="polite"
+>
+  <div>
+    <p class="text-brand-text3 text-xs font-medium tracking-wide uppercase">
+      Voter Onboarding Fund
+    </p>
+    <p
+      class="text-brand-text1 mt-1 font-semibold"
+      class:list={[variant === 'banner' ? 'text-lg' : 'text-2xl']}
+    >
+      <span data-fund-summary>Loading live balance…</span>
+    </p>
+    <p
+      class="text-brand-text3 mt-1 text-xs"
+      data-fund-detail
+      hidden
+    ></p>
+  </div>
+  {variant === 'banner' && (
+    <a
+      href="/donate"
+      class="bg-brand-primary text-brand-bg hover:opacity-90 shrink-0 rounded-md px-4 py-2 text-sm font-semibold transition-opacity"
+    >
+      Donate
+    </a>
+  )}
+</div>
+
+<script is:inline define:vars={{ voxiviumAPIBase }} type="module">
+  const root = document.currentScript?.previousElementSibling
+  // Walk back through possible whitespace nodes to find the data-fund-status host.
+  let host = root
+  while (host && !(host instanceof Element && host.hasAttribute('data-fund-status'))) {
+    host = host?.previousElementSibling ?? null
+  }
+  if (host) {
+    const summary = host.querySelector('[data-fund-summary]')
+    const detail = host.querySelector('[data-fund-detail]')
+    const variant = host.getAttribute('data-variant') ?? 'card'
+
+    if (!voxiviumAPIBase) {
+      if (summary) summary.textContent = 'Live balance unavailable — API base not configured.'
+      // leave host visible but un-emphasized; banner variant still has CTA
+    } else {
+      fetch(`${voxiviumAPIBase}/api/fund/status`, { credentials: 'omit' })
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))))
+        .then((data) => {
+          const balanceUsers = Number(data?.balance_users ?? 0)
+          const lifetimeVoters = Number(data?.voters_onboarded ?? 0)
+          const status = String(data?.status ?? 'HEALTHY').toUpperCase()
+
+          // User-facing copy varies by status. Negative balance reads as
+          // "operating advance" honestly — the fund went under and we're
+          // funding new voters from operating cash until donations refill it.
+          let headline
+          if (balanceUsers >= 0) {
+            const voterWord = balanceUsers === 1 ? 'voter' : 'voters'
+            headline = `Covers ~${balanceUsers.toLocaleString()} more ${voterWord}`
+          } else {
+            const carry = Math.abs(balanceUsers).toLocaleString()
+            headline = `Operating advance: ${carry} voters`
+          }
+          if (summary) summary.textContent = headline
+
+          if (detail) {
+            detail.hidden = false
+            detail.textContent = `${lifetimeVoters.toLocaleString()} voters onboarded to date.`
+          }
+
+          // Emphasize when below LOW. The banner variant uses inline
+          // styles to avoid a Tailwind class-purge round trip.
+          if (status === 'LOW' || status === 'CRITICAL' || status === 'HARD_BLOCKED') {
+            host.classList.remove('bg-brand-surface', 'border-brand-el1')
+            host.classList.add('border-brand-primary')
+            host.style.borderWidth = '2px'
+            if (status === 'CRITICAL' || status === 'HARD_BLOCKED') {
+              const urgency = document.createElement('p')
+              urgency.className = 'text-brand-primary mt-1 text-xs font-semibold uppercase tracking-wide'
+              urgency.textContent = status === 'HARD_BLOCKED'
+                ? 'Onboarding paused — your donation restarts it.'
+                : 'Critical — please consider donating.'
+              // append before the CTA on banner variant; just append for card variant
+              if (variant === 'banner') {
+                summary?.parentElement?.appendChild(urgency)
+              } else {
+                host.appendChild(urgency)
+              }
+            }
+          }
+        })
+        .catch((err) => {
+          if (summary) summary.textContent = 'Live balance unavailable right now.'
+          // eslint-disable-next-line no-console
+          console.warn('fund status fetch failed', err)
+        })
+    }
+  }
+</script>
