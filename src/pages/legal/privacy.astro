@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro'
 
-const lastUpdated = 'May 7, 2026'
+const lastUpdated = 'June 22, 2026'
 ---
 
 <BaseLayout
@@ -15,9 +15,8 @@ const lastUpdated = 'May 7, 2026'
         <h1>Privacy Policy</h1>
         <p class="meta">Last updated: {lastUpdated}</p>
         <p class="lead">
-          Voxivium is built on the principle that civic engagement and personal privacy must
-          coexist. This policy explains what information we collect, how we use it, and the
-          choices you have. We've written it in plain English.
+          This policy describes the personal information Voxivium collects, how it is used, with
+          whom it may be shared, and the rights you have with respect to that information.
         </p>
       </div>
     </header>
@@ -27,13 +26,14 @@ const lastUpdated = 'May 7, 2026'
         <h2>Scope</h2>
         <p>
           This policy covers <strong>voxivium.com</strong> (the website you're reading) and the
-          <strong>Voxivium app</strong> (currently in development, planned for U.S. launch). When
-          we say "Voxivium," "we," "us," or "our," we mean Voxivium, PBC, a Delaware Public Benefit
-          Corporation. When we say "you," we mean a visitor to our website or a user of our app.
+          <strong>Voxivium app</strong> . When we say "Voxivium," "we," "us," or "our," we mean 
+          Voxivium, PBC, a Delaware Public Benefit Corporation. When we say "you," we mean a 
+          visitor to our website or a user of our app.
         </p>
         <p>
-          Voxivium is currently available only to users in the United States. We do not knowingly
-          accept signups from outside the U.S.
+          Voxivium is available to citizens of the United States who are at least 18 years of age
+          and who are registered to vote in the United States. Eligibility is confirmed through
+          the identity verification and voter registration verification processes described below.
         </p>
 
         <h2>The information we collect</h2>
@@ -53,27 +53,32 @@ const lastUpdated = 'May 7, 2026'
           trackers on this site.
         </p>
         <p>
-          The site also stores your color-theme preference (light or dark) in your browser's
-          <code>localStorage</code>. That preference never leaves your device.
+          The site stores your color-theme preference (light or dark) in your browser's
+          <code>localStorage</code>. This preference is stored locally and is not transmitted to
+          Voxivium.
         </p>
 
         <h3>From users of the Voxivium app</h3>
         <p>
-          Once the app is live, creating a Voxivium voter account involves these categories of
+          Creating and maintaining a Voxivium voter account involves the following categories of
           information:
         </p>
         <ul>
           <li>
-            <strong>Account information.</strong> Your email address and password. Passwords are
-            stored as a one-way cryptographic hash—we never see your plaintext password.
+            <strong>Account information.</strong> Your email address. Authentication is handled
+            by Google Firebase Authentication, which manages credentials on Voxivium's behalf.
+            Your password is transmitted to Firebase Authentication at the time of sign-in or
+            registration; Voxivium does not store your password, in any form, and does not have
+            access to your plaintext password.
           </li>
           <li>
             <strong>Identity verification data.</strong> When you complete identity verification,
-            we forward the personal details required by our third-party identity-verification
-            provider (such as your full legal name, date of birth, and address) to that provider
-            for the sole purpose of confirming who you are. Voxivium does not collect or store
-            your government-issued identity documents. We retain only the verification result and
-            the facts we need to operate the service (see profile data, below).
+            Voxivium transmits the personal details required by its third-party identity
+            verification provider (such as full legal name, date of birth, and address) to that
+            provider for the purpose of verifying your identity. Voxivium does not collect or
+            store your government-issued identity documents. Voxivium retains only the
+            verification result and the data necessary to operate the service (see Profile data,
+            below).
           </li>
           <li>
             <strong>Voter registration verification.</strong> We use a third-party
@@ -93,14 +98,22 @@ const lastUpdated = 'May 7, 2026'
             orders, and court rulings.
           </li>
           <li>
-            <strong>Payment information.</strong> If you subscribe to a premium tier, payment
-            details are processed by our third-party payment processor. Voxivium does not store
-            full payment-card numbers; we receive only the limited transaction metadata required
-            to manage your subscription.
+            <strong>Payment information.</strong> Subscriptions and other purchases made through
+            the Voxivium mobile application on iOS are processed by Apple, and on Android by
+            Google, in each case subject to those providers' terms and privacy policies.
+            Subscriptions and other purchases made through the Voxivium website are processed by
+            our third-party payment processor. Voxivium does not store full payment card numbers;
+            it receives only the limited transaction metadata required to manage your account and
+            subscription.
           </li>
           <li>
-            <strong>Technical data.</strong> Device type, operating system, app version, IP
-            address, and similar diagnostic information used to deliver the service securely.
+            <strong>Technical and security data.</strong> When you access Voxivium, our servers
+            and infrastructure providers automatically receive certain technical information,
+            including IP address, device type, operating system, application or browser version,
+            and timestamps of access. This information is used solely to operate the service
+            securely and reliably, including for authentication, rate limiting, abuse and fraud
+            prevention, error diagnosis, and determining application version compatibility. It is
+            not used for advertising or behavioral profiling.
           </li>
           <li>
             <strong>Notification preferences.</strong> Your settings for push, email, and in-app
@@ -111,8 +124,9 @@ const lastUpdated = 'May 7, 2026'
         <h2>How we use your information</h2>
         <ul>
           <li>
-            <strong>To run the service.</strong> Generating your personal report cards, candidate
-            comparisons, polling experiences, and notifications all require the data above.
+            <strong>To operate the service.</strong> Generating your personal report cards,
+            candidate comparisons, polls, and notifications requires the information described
+            above.
           </li>
           <li>
             <strong>To keep your records current.</strong> We periodically re-check your voter
@@ -151,9 +165,8 @@ const lastUpdated = 'May 7, 2026'
 
         <h3>What we may share, only as aggregated and anonymized data</h3>
         <p>
-          The whole purpose of Voxivium is to translate civic input into a clear collective
-          signal. To paid customers (politicians, media organizations, academic researchers, and
-          AI labs), we may share <strong>aggregated, anonymized</strong> data derived from the
+          To paid customers (politicians, media organizations, academic researchers, and AI labs),
+          Voxivium may share <strong>aggregated, anonymized</strong> data derived from the
           following categories:
         </p>
         <ul>
@@ -173,15 +186,24 @@ const lastUpdated = 'May 7, 2026'
 
         <h3>Service providers</h3>
         <p>
-          We rely on a small set of vetted third parties to operate the service. Each is bound by
-          contract to use your data only as we direct:
+          Voxivium engages the following categories of third-party service providers to operate
+          the service. Each is bound by contract to process your information only on Voxivium's
+          instructions and only for the purposes described in this policy:
         </p>
         <ul>
           <li><strong>Identity verification:</strong> [IDV PROVIDER]</li>
           <li><strong>Voter registration verification:</strong> [VRV PROVIDER]</li>
+          <li>
+            <strong>Authentication and push notifications:</strong> Google Firebase
+            (Authentication and Cloud Messaging)
+          </li>
+          <li>
+            <strong>Mobile application distribution and in-application purchases:</strong> Apple
+            (iOS App Store) and Google (Google Play Store)
+          </li>
           <li><strong>Hosting and content delivery:</strong> Cloudflare</li>
           <li><strong>Web analytics:</strong> Cloudflare Web Analytics</li>
-          <li><strong>Payments:</strong> [PAYMENT PROCESSOR]</li>
+          <li><strong>Web payments:</strong> [PAYMENT PROCESSOR]</li>
           <li><strong>Email delivery:</strong> our transactional email provider</li>
         </ul>
 
@@ -241,11 +263,15 @@ const lastUpdated = 'May 7, 2026'
         <h2>Data retention</h2>
         <p>
           We retain your account data for as long as your account is active. When you delete your
-          account—or when we delete it for one of the reasons described below—your data is
-          removed from our production systems within <strong>30 days</strong> and is purged from
-          encrypted backups within <strong>90 days</strong>. After deletion, only the
-          aggregated, anonymized signal you contributed remains; that signal cannot be
-          reconstructed back to you.
+          account—or when we delete it for one of the reasons described below—your account
+          information, profile data, identity verification result, voter registration
+          verification result, civic input (including belief stances, importance ratings, polling
+          responses, and stances on legislation, executive orders, and court rulings), and
+          associated records are removed from our production systems within <strong>30 days</strong>
+          and are purged from encrypted backups within <strong>90 days</strong>. Aggregated,
+          anonymized statistics previously derived from civic input and disclosed to paid
+          customers in accordance with this policy are not individually identifiable and are not
+          recalled from those customers.
         </p>
         <p>We may delete an account, with or without notice, in the following cases:</p>
         <ul>
@@ -269,26 +295,34 @@ const lastUpdated = 'May 7, 2026'
 
         <h2>Security</h2>
         <p>
-          We protect your information with industry-standard safeguards: encryption in transit
-          (TLS) and at rest, scoped access controls, audit logging, and regular security reviews.
-          No system is perfectly secure, and we will not promise otherwise—but we will treat your
-          data with the care that civic trust requires.
+          Voxivium employs administrative, technical, and physical safeguards designed to protect
+          your information, including encryption in transit (TLS) and at rest, scoped access
+          controls, audit logging, and periodic security reviews. No method of transmission or
+          storage is completely secure, and Voxivium cannot guarantee absolute security.
         </p>
 
         <h2>Children</h2>
         <p>
-          Voxivium is intended for U.S. registered voters and is not directed to anyone under 18.
-          We do not knowingly collect personal information from children under 13. If you believe
-          a child has provided us with personal information, contact <a
+          Voxivium is restricted to United States citizens who are at least 18 years of age and
+          who are registered to vote, and the service is not directed to anyone under 18.
+          Voxivium does not knowingly collect personal information from children under 13. If you
+          believe a child has provided personal information to Voxivium, contact <a
             href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
-          > and we will promptly delete it.
+          > and the information will be deleted.
         </p>
 
-        <h2>International users</h2>
+        <h2>Access from outside the United States</h2>
         <p>
-          Voxivium currently operates only in the United States. Our servers and service
-          providers are located in the United States. If you are located outside the U.S., please
-          do not use the Voxivium app.
+          Voxivium operates in the United States, and our servers and service providers are
+          located in the United States. Access to Voxivium's account-holder features requires
+          verification of identity using a valid United States government-issued photo
+          identification and confirmation of active United States voter registration. Eligible
+          United States citizens accessing Voxivium from outside the United States are subject to
+          the same eligibility and verification requirements as users accessing the service from
+          within the United States. By accessing Voxivium from outside the United States, you
+          consent to the transfer of your information to, and the processing of your information
+          in, the United States, which may have data protection laws that differ from those of
+          your location.
         </p>
 
         <h2>Changes to this policy</h2>
