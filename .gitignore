@@ -1,0 +1,41 @@
+# Build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.claude/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Internal docs
+Voxivium Business Plan.pdf
+
+# Lambda vendored Python dependencies (installed by deploy/build-lambdas.sh
+# into <lambda>/vendor/ so terraform's archive_file picks them up).
+deploy/lambdas/*/vendor/
+deploy/terraform/.build/
+
+# Terraform-cache directories
+voxivium-web/deploy/terraform/.terraform
+deploy/terraform/bootstrap/.terraform/providers
+.terraform
