@@ -75,7 +75,7 @@ PLANS_TO_PROVISION: list[PlanSpec] = [
             "Annual voter premium tier — AI-generated politician reviews, "
             "out-of-district report-card access."
         ),
-        product_category="DIGITAL_GOODS",
+        product_category="SOFTWARE",
         plan_name="Premium Subscriber Yearly",
         plan_description="Voxivium voter premium — $19.95 / year, auto-renewing.",
         price_usd="19.95",
