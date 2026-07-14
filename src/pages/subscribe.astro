@@ -13,6 +13,13 @@ import SignInForm from '@components/forms/SignInForm.astro'
 
 const paypalClientID = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID
 const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
+// Vite's env replacement is a static text transform — dynamic
+// `import.meta.env[key]` lookups don't work in is:inline browser scripts.
+// Add one entry per PlanSpec in subscribe.ts as new tiers ship.
+const paypalPlanIDs: Record<string, string | undefined> = {
+  PUBLIC_PAYPAL_PLAN_ID_PREMIUM_SUBSCRIBER_YEARLY:
+    import.meta.env.PUBLIC_PAYPAL_PLAN_ID_PREMIUM_SUBSCRIBER_YEARLY,
+}
 ---
 
 <BaseLayout
@@ -89,7 +96,7 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
 
   <script
     is:inline
-    define:vars={{ paypalClientID, voxiviumAPIBase }}
+    define:vars={{ paypalClientID, voxiviumAPIBase, paypalPlanIDs }}
     type="module"
   >
     import { onAuthChanged, signIn, sendPasswordResetEmail, signOut, getIdToken } from '/src/lib/firebase/client.ts'
@@ -180,7 +187,7 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
 
     function mountPayPalOrFallback(q) {
       const planIDEnvKey = q.plan.paypalPlanIdEnvKey
-      const planID = import.meta.env[planIDEnvKey]
+      const planID = paypalPlanIDs[planIDEnvKey]
 
       if (!paypalClientID || paypalClientID === 'TODO' || !planID) {
         // Backend not wired — surface the placeholder. Smart Buttons need
@@ -209,16 +216,15 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE
               if (!idToken) {
                 throw new Error('Not authenticated. Sign in again.')
               }
-              const response = await fetch(`${voxiviumAPIBase}/api/subscribe/create`, {
+              const response = await fetch(`${voxiviumAPIBase}/api/v1/voter/subscribe/create`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                   Authorization: `Bearer ${idToken}`,
                 },
                 body: JSON.stringify({
-                  plan: q.plan.id,
-                  origin: q.originSlug,
-                  paypalPlanID: planID,
+                  plan_name: q.plan.displayName,
+                  paypal_plan_id: planID,
                 }),
               })
               if (!response.ok) {
