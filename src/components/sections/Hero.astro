@@ -1,14 +1,26 @@
 ---
-// Cross-partisan-popular issues. Pew / AP-NORC / Gallup all show >70% agreement
-// across party lines on each of these. The displayed agreement % is computed
-// from the actual dot field at runtime, so it stays honest to the visualization.
+// Cross-partisan-popular issues. Every question below polls at >75% support
+// across party lines in recent nationally representative polling, and each is
+// framed in language that doesn't code as either a progressive or conservative
+// talking point. Sources:
+//   - Term limits on Congress:              ~80% (Pew, McLaughlin & Associates)
+//   - Congressional stock-trading ban:      86% (U. Maryland Program for Public
+//                                                Consultation, 2024; R:87 D:88 I:81)
+//   - Paper ballot backups:                 84% (Pew, Feb 2024; R:87 D:82)
+//   - Independent federal spending audit:   89% (Cato Institute; R:99 D:83 I:89)
+//   - VA healthcare fully funded:           ~82% (bipartisan, historic)
+//   - Federal judges' financial disclosure: 85% (Fix the Court / Navigator;
+//                                                D:91 I:86 R:78)
+//   - Cap price of essential medications:   ~75% (KFF, AP-NORC)
+// The displayed agreement % is computed from the actual dot field at runtime,
+// so it stays honest to the visualization.
 const ISSUES = [
-  { question: 'Should term limits be imposed on Congress?', skew: 0.77 },
-  { question: 'Should the President face the same criminal laws as everyone else?', skew: 0.72 },
-  { question: 'Should the government ensure all citizens have access to healthcare?', skew: 0.67 },
-  { question: 'Should federal law enforcement investigate itself without outside oversight?', skew: 0.22 },
+  { question: 'Should term limits be imposed on Congress?', skew: 0.80 },
+  { question: 'Should members of Congress be prohibited from trading individual stocks?', skew: 0.86 },
+  { question: 'Should electronic voting machines be required to print a paper backup of every ballot?', skew: 0.84 },
+  { question: 'Should all federal spending be audited annually by an independent body?', skew: 0.89 },
   { question: 'Should the government fully fund VA healthcare for veterans?', skew: 0.82 },
-  { question: 'Should higher earners pay a larger percentage of their income in taxes?', skew: 0.68 },
+  { question: 'Should federal judges be required to publicly disclose their financial interests?', skew: 0.85 },
   { question: 'Should the government cap the cost of essential medications?', skew: 0.75 }
 ]
 ---
@@ -41,6 +53,7 @@ const ISSUES = [
         <span class="chyron-pct" data-chyron-pct>—</span>
         <span class="chyron-label">of verified citizens agree</span>
       </div>
+      <p class="chyron-disclaimer">Illustrative now — user-powered stats coming soon.</p>
     </div>
   </div>
 </section>
@@ -618,6 +631,15 @@ const ISSUES = [
   .chyron-q {
     color: var(--color-brand-text1);
     font-weight: 500;
+  }
+
+  .chyron-disclaimer {
+    margin: 0;
+    padding-top: 0.15rem;
+    font-size: 0.72rem;
+    font-style: italic;
+    color: var(--color-brand-text4);
+    letter-spacing: 0.01em;
   }
 
   @media (prefers-reduced-motion: reduce) {
