@@ -73,20 +73,7 @@ const panels: PanelDef[] = [
 ]
 ---
 
-<!--
-  Scroll-target anchors for the four tabs. The existing AudienceTabs script
-  listens on hashchange and activates the matching tab, but without these
-  ids the browser has no element to scroll to when a link like /#voters is
-  clicked — the tab activates but the page stays at the top. Each anchor
-  carries scroll-margin-top so the section header sits below the sticky
-  header instead of behind it.
--->
-<a id="voters" class="audience-anchor" aria-hidden="true" tabindex="-1"></a>
-<a id="politicians" class="audience-anchor" aria-hidden="true" tabindex="-1"></a>
-<a id="media" class="audience-anchor" aria-hidden="true" tabindex="-1"></a>
-<a id="aiLab" class="audience-anchor" aria-hidden="true" tabindex="-1"></a>
-
-<section class="audiences" id="audiences" aria-labelledby="audiences-heading" data-audience-tabs>
+<section class="audiences" id="voters" aria-labelledby="audiences-heading" data-audience-tabs>
   <div class="container">
     <header>
       <p class="eyebrow">Built for everyone in the conversation</p>
@@ -159,6 +146,8 @@ const panels: PanelDef[] = [
       function activate(tabId, opts) {
         const focus = opts && opts.focus
         const updateHash = !opts || opts.updateHash !== false
+        const scroll = opts && opts.scroll
+        const smooth = !opts || opts.smooth !== false
         let didChange = false
         tabs.forEach((t) => {
           const active = t.dataset.tab === tabId
@@ -173,6 +162,9 @@ const panels: PanelDef[] = [
         })
         if (didChange && updateHash && history.replaceState) {
           history.replaceState(null, '', `#${tabId}`)
+        }
+        if (scroll) {
+          root.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' })
         }
       }
 
@@ -193,12 +185,30 @@ const panels: PanelDef[] = [
 
       const initialHash = window.location.hash.slice(1)
       if (initialHash && validTabs.includes(initialHash)) {
-        activate(initialHash, { updateHash: false })
+        // Native anchor scroll handles id="voters" for us on load; for the
+        // other three we need to scroll manually. Skip smooth so it's not
+        // a distracting animation on first paint.
+        activate(initialHash, { updateHash: false, scroll: initialHash !== 'voters', smooth: false })
       }
 
       window.addEventListener('hashchange', () => {
         const h = window.location.hash.slice(1)
-        if (validTabs.includes(h)) activate(h, { updateHash: false })
+        if (validTabs.includes(h)) activate(h, { updateHash: false, scroll: true })
+      })
+
+      // Same-page clicks on tab-hash links: browsers skip the scroll when the
+      // hash didn't change (e.g. clicking "Get early access" while already
+      // at /#voters). Intercept and scroll manually.
+      document.addEventListener('click', (e) => {
+        const target = e.target
+        if (!(target instanceof Element)) return
+        const link = target.closest('a[href]')
+        if (!link) return
+        const href = link.getAttribute('href') || ''
+        const m = href.match(/^\/?#(voters|politicians|media|aiLab)$/)
+        if (!m) return
+        e.preventDefault()
+        activate(m[1], { scroll: true })
       })
     })
   })()
@@ -215,21 +225,11 @@ const panels: PanelDef[] = [
 </script>
 
 <style>
-  .audience-anchor {
-    /* Invisible scroll target — block-level so it has its own line in flow,
-       zero-height so it doesn't push content, scroll-margin-top so the
-       section header lands below the sticky header (h-10 mobile, h-14 md). */
-    display: block;
-    visibility: hidden;
-    height: 0;
-    margin: 0;
-    scroll-margin-top: 96px;
-  }
-
   .audiences {
     padding: clamp(4rem, 10vh, 6rem) 1.5rem;
     background: var(--color-brand-surface);
     border-block: 1px solid var(--color-brand-el1);
+    scroll-margin-top: 96px;
   }
 
   .container {
