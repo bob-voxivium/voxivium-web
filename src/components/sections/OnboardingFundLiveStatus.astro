@@ -63,13 +63,12 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
 </div>
 
 <script is:inline define:vars={{ voxiviumAPIBase }} type="module">
-  const root = document.currentScript?.previousElementSibling
-  // Walk back through possible whitespace nodes to find the data-fund-status host.
-  let host = root
-  while (host && !(host instanceof Element && host.hasAttribute('data-fund-status'))) {
-    host = host?.previousElementSibling ?? null
-  }
-  if (host) {
+  // `document.currentScript` is null inside a module script per spec, so
+  // find hosts by attribute instead of by DOM position. The :not() guard
+  // makes this idempotent if the component ever renders more than once
+  // on a single page (each host binds exactly once).
+  document.querySelectorAll('[data-fund-status]:not([data-fund-bound])').forEach((host) => {
+    host.setAttribute('data-fund-bound', 'true')
     const summary = host.querySelector('[data-fund-summary]')
     const detail = host.querySelector('[data-fund-detail]')
     const variant = host.getAttribute('data-variant') ?? 'card'
@@ -77,58 +76,59 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
     if (!voxiviumAPIBase) {
       if (summary) summary.textContent = 'Live balance unavailable — API base not configured.'
       // leave host visible but un-emphasized; banner variant still has CTA
-    } else {
-      fetch(`${voxiviumAPIBase}/api/fund/status`, { credentials: 'omit' })
-        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))))
-        .then((data) => {
-          const balanceUsers = Number(data?.balance_users ?? 0)
-          const lifetimeVoters = Number(data?.voters_onboarded ?? 0)
-          const status = String(data?.status ?? 'HEALTHY').toUpperCase()
+      return
+    }
 
-          // User-facing copy varies by status. Negative balance reads as
-          // "operating advance" honestly — the fund went under and we're
-          // funding new voters from operating cash until donations refill it.
-          let headline
-          if (balanceUsers >= 0) {
-            const voterWord = balanceUsers === 1 ? 'voter' : 'voters'
-            headline = `Covers ~${balanceUsers.toLocaleString()} more ${voterWord}`
-          } else {
-            const carry = Math.abs(balanceUsers).toLocaleString()
-            headline = `Operating advance: ${carry} voters`
-          }
-          if (summary) summary.textContent = headline
+    fetch(`${voxiviumAPIBase}/api/fund/status`, { credentials: 'omit' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))))
+      .then((data) => {
+        const balanceUsers = Number(data?.balance_users ?? 0)
+        const lifetimeVoters = Number(data?.voters_onboarded ?? 0)
+        const status = String(data?.status ?? 'HEALTHY').toUpperCase()
 
-          if (detail) {
-            detail.hidden = false
-            detail.textContent = `${lifetimeVoters.toLocaleString()} voters onboarded to date.`
-          }
+        // User-facing copy varies by status. Negative balance reads as
+        // "operating advance" honestly — the fund went under and we're
+        // funding new voters from operating cash until donations refill it.
+        let headline
+        if (balanceUsers >= 0) {
+          const voterWord = balanceUsers === 1 ? 'voter' : 'voters'
+          headline = `Covers ~${balanceUsers.toLocaleString()} more ${voterWord}`
+        } else {
+          const carry = Math.abs(balanceUsers).toLocaleString()
+          headline = `Operating advance: ${carry} voters`
+        }
+        if (summary) summary.textContent = headline
 
-          // Emphasize when below LOW. The banner variant uses inline
-          // styles to avoid a Tailwind class-purge round trip.
-          if (status === 'LOW' || status === 'CRITICAL' || status === 'HARD_BLOCKED') {
-            host.classList.remove('bg-brand-surface', 'border-brand-el1')
-            host.classList.add('border-brand-primary')
-            host.style.borderWidth = '2px'
-            if (status === 'CRITICAL' || status === 'HARD_BLOCKED') {
-              const urgency = document.createElement('p')
-              urgency.className = 'text-brand-primary mt-1 text-xs font-semibold uppercase tracking-wide'
-              urgency.textContent = status === 'HARD_BLOCKED'
-                ? 'Onboarding paused — your donation restarts it.'
-                : 'Critical — please consider donating.'
-              // append before the CTA on banner variant; just append for card variant
-              if (variant === 'banner') {
-                summary?.parentElement?.appendChild(urgency)
-              } else {
-                host.appendChild(urgency)
-              }
+        if (detail) {
+          detail.hidden = false
+          detail.textContent = `${lifetimeVoters.toLocaleString()} voters onboarded to date.`
+        }
+
+        // Emphasize when below LOW. The banner variant uses inline
+        // styles to avoid a Tailwind class-purge round trip.
+        if (status === 'LOW' || status === 'CRITICAL' || status === 'HARD_BLOCKED') {
+          host.classList.remove('bg-brand-surface', 'border-brand-el1')
+          host.classList.add('border-brand-primary')
+          host.style.borderWidth = '2px'
+          if (status === 'CRITICAL' || status === 'HARD_BLOCKED') {
+            const urgency = document.createElement('p')
+            urgency.className = 'text-brand-primary mt-1 text-xs font-semibold uppercase tracking-wide'
+            urgency.textContent = status === 'HARD_BLOCKED'
+              ? 'Onboarding paused — your donation restarts it.'
+              : 'Critical — please consider donating.'
+            // append before the CTA on banner variant; just append for card variant
+            if (variant === 'banner') {
+              summary?.parentElement?.appendChild(urgency)
+            } else {
+              host.appendChild(urgency)
             }
           }
-        })
-        .catch((err) => {
-          if (summary) summary.textContent = 'Live balance unavailable right now.'
-          // eslint-disable-next-line no-console
-          console.warn('fund status fetch failed', err)
-        })
-    }
-  }
+        }
+      })
+      .catch((err) => {
+        if (summary) summary.textContent = 'Live balance unavailable right now.'
+        // eslint-disable-next-line no-console
+        console.warn('fund status fetch failed', err)
+      })
+  })
 </script>
