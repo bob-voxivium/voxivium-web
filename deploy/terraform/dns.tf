@@ -4,32 +4,23 @@
 # Prerequisite: voxivium.com is added to Cloudflare and its nameservers are
 # changed at the registrar (Route 53 in your case) to Cloudflare's.
 #
-# These records are PROXIED (orange cloud) so traffic flows through
-# Cloudflare's edge — that's what gives you DDoS, WAF, and the IP-range
-# bucket policy match.
+# The apex record (voxivium.com) is created by the static_site module in
+# website.tf. The www record is created here because the module only takes
+# a single hostname; both point at the same CloudFront distribution.
 #
-# If you'd rather manage DNS by hand in the Cloudflare dashboard, comment
-# this whole file out and skip the cloudflare provider in providers.tf.
+# Records are PROXIED (orange cloud) so traffic flows through Cloudflare's
+# edge — that's what gives you DDoS, WAF, and (now) valid end-to-end TLS
+# when the zone is set to "Full (strict)".
 # =============================================================================
-
-resource "cloudflare_record" "apex" {
-  zone_id = var.cloudflare_zone_id
-  name    = "@"
-  type    = "CNAME" # Cloudflare flattens CNAME-on-apex automatically
-  content = aws_s3_bucket_website_configuration.site.website_endpoint
-  proxied = true
-  ttl     = 1 # 1 = automatic when proxied
-  comment = "Apex pointing at S3 website endpoint, proxied through Cloudflare"
-}
 
 resource "cloudflare_record" "www" {
   zone_id = var.cloudflare_zone_id
   name    = "www"
   type    = "CNAME"
-  content = aws_s3_bucket_website_configuration.site.website_endpoint
+  content = module.site.cloudfront_domain
   proxied = true
-  ttl     = 1
-  comment = "www subdomain pointing at S3 website endpoint, proxied through Cloudflare"
+  ttl     = 1 # 1 = automatic when proxied
+  comment = "www subdomain fronted by same CloudFront distribution as the apex"
 }
 
 # SES domain verification: TXT record. After `terraform apply`, get the

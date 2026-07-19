@@ -18,10 +18,10 @@ resource "aws_apigatewayv2_api" "forms" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins  = ["https://${var.domain_name}", "https://${var.site_subdomain}"]
-    allow_methods  = ["POST", "OPTIONS"]
-    allow_headers  = ["content-type"]
-    max_age        = 3600
+    allow_origins     = ["https://${var.domain_name}", "https://${var.site_subdomain}"]
+    allow_methods     = ["POST", "OPTIONS"]
+    allow_headers     = ["content-type"]
+    max_age           = 3600
     allow_credentials = false
   }
 }
@@ -66,8 +66,8 @@ resource "aws_apigatewayv2_stage" "default" {
   auto_deploy = true
 
   default_route_settings {
-    throttling_burst_limit = 20  # max concurrent
-    throttling_rate_limit  = 10  # requests/second sustained
+    throttling_burst_limit = 20 # max concurrent
+    throttling_rate_limit  = 10 # requests/second sustained
   }
 
   access_log_settings {

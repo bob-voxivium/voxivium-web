@@ -1,84 +1,51 @@
 # =============================================================================
-# S3 website hosting
+# Static site hosting — voxivium.com apex + www
 # =============================================================================
-# The bucket uses the S3 *website* endpoint (not the REST endpoint) because
-# we want index.html / error.html routing. The bucket policy restricts access
-# to Cloudflare's edge IPs, so the bucket is not directly readable from the
-# public internet — visitors only ever reach it through Cloudflare's CDN.
+# Private S3 bucket + CloudFront (edge cache + valid TLS at the AWS edge) +
+# Cloudflare (DNS + WAF + client TLS). Because CloudFront terminates with a
+# valid *.cloudfront.net cert, the zone can safely run in Cloudflare's
+# "Full (strict)" SSL mode — matching what api.voxivium.com (ALB) requires.
+#
+# Prior setup: S3 website endpoint + Cloudflare-IP-allowlist bucket policy,
+# which only worked in "Flexible" SSL mode. Adding api.voxivium.com forced
+# the zone to Full (strict), which broke the apex origin (S3 website
+# endpoints do not speak TLS).
 # =============================================================================
 
-resource "aws_s3_bucket" "site" {
-  bucket = var.domain_name
+module "site" {
+  source = "./modules/static_site"
+
+  name_prefix         = "voxivium-${var.environment}"
+  hostname            = var.domain_name
+  cloudflare_zone_id  = var.cloudflare_zone_id
+  spa_fallback        = false # Astro pre-renders every route; no SPA fallback needed
+  price_class         = "PriceClass_100"
+  default_root_object = "index.html"
+
+  # Astro's directory build writes /donate/index.html, /about/index.html, etc.
+  # CloudFront's default_root_object only rewrites "/"; every other subdirectory
+  # request needs the edge function to append "index.html" or S3 (private, OAC)
+  # returns 403 AccessDenied.
+  resolve_directory_index = true
+
+  # Cloudflare forwards the original Host header to CloudFront, so the
+  # distribution must recognize both hostnames as aliases (else CloudFront
+  # returns 403 before reaching the origin). The ACM cert covers both.
+  aliases             = [var.domain_name, var.site_subdomain]
+  acm_certificate_arn = aws_acm_certificate_validation.site.certificate_arn
 }
 
-# Static website hosting config. With this enabled, the bucket exposes a
-# website endpoint like voxivium.com.s3-website-us-east-1.amazonaws.com.
-resource "aws_s3_bucket_website_configuration" "site" {
-  bucket = aws_s3_bucket.site.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    # Astro builds src/pages/404.astro into dist/404.html when output is static.
-    key = "404.html"
-  }
+output "site_bucket_name" {
+  description = "S3 bucket that deploy.sh syncs the built site into."
+  value       = module.site.bucket_name
 }
 
-# We need the website endpoint to be reachable from Cloudflare, so we have
-# to allow some level of public access. Block ACLs/policies we don't control,
-# but allow the bucket policy itself.
-resource "aws_s3_bucket_public_access_block" "site" {
-  bucket = aws_s3_bucket.site.id
-
-  block_public_acls       = true
-  block_public_policy     = false # we DO want our restrictive policy to apply
-  ignore_public_acls      = true
-  restrict_public_buckets = false
+output "site_cloudfront_distribution_id" {
+  description = "CloudFront distribution id. deploy.sh uses this to invalidate the edge cache after a sync."
+  value       = module.site.cloudfront_distribution_id
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "site" {
-  bucket = aws_s3_bucket.site.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-# Bucket policy: anonymous GetObject is allowed ONLY when the request comes
-# from a Cloudflare edge IP. Direct hits to the S3 website URL from anywhere
-# else get a 403.
-data "aws_iam_policy_document" "site" {
-  statement {
-    sid       = "AllowCloudflareReadOnly"
-    effect    = "Allow"
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.site.arn}/*"]
-
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-
-    condition {
-      test     = "IpAddress"
-      variable = "aws:SourceIp"
-      values   = var.cloudflare_ip_ranges
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "site" {
-  bucket = aws_s3_bucket.site.id
-  policy = data.aws_iam_policy_document.site.json
-
-  # The public access block must allow the policy before we attach it
-  depends_on = [aws_s3_bucket_public_access_block.site]
-}
-
-output "site_website_endpoint" {
-  value       = aws_s3_bucket_website_configuration.site.website_endpoint
-  description = "Point Cloudflare CNAME at this hostname"
+output "site_cloudfront_domain" {
+  description = "CloudFront distribution hostname (xxx.cloudfront.net). Cloudflare CNAMEs for voxivium.com and www.voxivium.com point here."
+  value       = module.site.cloudfront_domain
 }
