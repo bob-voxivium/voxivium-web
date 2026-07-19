@@ -5,8 +5,8 @@ Terraform configuration for the voxivium.com static site, contact forms, and mai
 ## Architecture
 
 ```
-voxivium.com (Cloudflare DNS + DDoS/WAF)
-    ├── Static site → S3 (locked to Cloudflare IPs)
+voxivium.com (Cloudflare DNS + DDoS/WAF, "Full (strict)" SSL)
+    ├── Static site → CloudFront → private S3 (OAC)
     └── /api/* → API Gateway HTTP API
                     ├── POST /subscribe → Lambda → DynamoDB (record_type=voter)
                     └── POST /contact   → Lambda → DynamoDB
@@ -38,7 +38,8 @@ voxivium-infra/
 │   ├── backend.tf             # S3 remote state
 │   ├── variables.tf           # All configurable inputs
 │   ├── terraform.tfvars.example
-│   ├── website.tf             # S3 site bucket + Cloudflare-only policy
+│   ├── website.tf             # static_site module (S3 + CloudFront + OAC) + outputs
+│   ├── modules/static_site/   # Reusable CloudFront-fronted-S3 module (mirrored from voxivium-mvp)
 │   ├── storage.tf             # DynamoDB submissions table + sparse pending GSI
 │   ├── secrets.tf             # SSM SecureString parameters
 │   ├── lambdas.tf             # 4 Lambda functions + IAM + EventBridge
@@ -183,11 +184,16 @@ cp .env.example .env
 pnpm install
 pnpm build
 
-aws s3 sync ./dist/ s3://voxivium.com/ --delete
+aws s3 sync ./dist/ "s3://$(terraform -chdir=deploy/terraform output -raw site_bucket_name)/" --delete
+
+aws cloudfront create-invalidation \
+  --distribution-id "$(terraform -chdir=deploy/terraform output -raw site_cloudfront_distribution_id)" \
+  --paths '/*'
 ```
 
-Astro outputs to `dist/`, not `build/`. Add a deploy script or GitHub Action to
-do this on push to main.
+Astro outputs to `dist/`, not `build/`. In practice you can just run
+`./deploy/deploy.sh` which does the sync + CloudFront invalidation +
+Cloudflare cache purge for you.
 
 ### Step 10 — Test
 
@@ -355,7 +361,7 @@ DynamoDB record as `resume_text`, and discards the binary.
 ## Security notes
 
 - All Lambda IAM roles follow least privilege — `subscribe` and `contact` only get PutItem on the submissions table, `list_subscribers` only gets Scan, the drain role only gets Query (on the GSI) + UpdateItem, etc.
-- S3 bucket only accepts requests from Cloudflare IP ranges (update list periodically from cloudflare.com/ips)
+- S3 bucket is fully private; only CloudFront (via OAC + SourceArn condition) can read from it. Public traffic reaches the site through Cloudflare → CloudFront only.
 - All form endpoints require Cloudflare Turnstile verification server-side
 - Turnstile and Textbelt secrets stored encrypted in SSM, never in Terraform state, never in env vars
 - SES `SendEmail` permission is conditioned on the From address — even if the drain Lambda were compromised, it can only send as no-reply@voxivium.com

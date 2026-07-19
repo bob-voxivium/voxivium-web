@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
-# Build the Astro site and deploy to AWS S3, then purge the Cloudflare cache.
+# Build the Astro site and deploy to AWS S3, then invalidate the CloudFront
+# and Cloudflare caches so the new bundle serves at the edge immediately.
 #
 # Usage:
-#   ./deploy/deploy.sh             build + sync + Cloudflare cache purge
-#   ./deploy/deploy.sh --no-purge  skip the Cloudflare cache purge
+#   ./deploy/deploy.sh             build + sync + invalidate CloudFront + purge Cloudflare
+#   ./deploy/deploy.sh --no-purge  skip the Cloudflare edge purge (CloudFront invalidation still runs)
 #   ./deploy/deploy.sh --dry-run   show what would change without writing
 #   ./deploy/deploy.sh --help
 
 set -euo pipefail
 
-BUCKET="voxivium.com"
 CLOUDFLARE_ZONE_ID="db1548373f1b0aa81cc6d18bfb50fdfc"
 
 usage() {
   cat <<'EOF'
-Build the Astro site and deploy to AWS S3, then purge the Cloudflare cache.
+Build the Astro site and deploy to AWS S3, then invalidate CloudFront and
+purge the Cloudflare edge cache.
 
 Usage:
-  ./deploy/deploy.sh             build + sync + Cloudflare cache purge
-  ./deploy/deploy.sh --no-purge  skip the Cloudflare cache purge
+  ./deploy/deploy.sh             build + sync + invalidate CloudFront + purge Cloudflare
+  ./deploy/deploy.sh --no-purge  skip the Cloudflare edge purge (CloudFront invalidation still runs)
   ./deploy/deploy.sh --dry-run   show what would change without writing
   ./deploy/deploy.sh --help      this message
 EOF
@@ -42,6 +43,7 @@ done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+TF_DIR="$SCRIPT_DIR/terraform"
 cd "$REPO_ROOT"
 
 if [[ ! -f .env ]]; then
@@ -51,6 +53,19 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
+echo "→ Reading bucket + CloudFront distribution id from terraform outputs..."
+BUCKET=$(terraform -chdir="$TF_DIR" output -raw site_bucket_name 2>/dev/null || true)
+DIST_ID=$(terraform -chdir="$TF_DIR" output -raw site_cloudfront_distribution_id 2>/dev/null || true)
+
+if [[ -z "$BUCKET" || -z "$DIST_ID" ]]; then
+  echo "error: could not read 'site_bucket_name' / 'site_cloudfront_distribution_id' from terraform state." >&2
+  echo "  Run 'terraform -chdir=$TF_DIR apply' first, then retry." >&2
+  exit 1
+fi
+
+echo "  bucket=$BUCKET"
+echo "  distribution=$DIST_ID"
+
 echo "→ Building site (pnpm build)..."
 pnpm build
 
@@ -58,15 +73,22 @@ echo "→ Syncing dist/ to s3://${BUCKET}/ ..."
 aws s3 sync ./dist/ "s3://${BUCKET}/" --delete ${DRYRUN}
 
 if [[ -n "$DRYRUN" ]]; then
-  echo "(dry-run; skipping Cloudflare cache purge)"
+  echo "(dry-run; skipping CloudFront invalidation and Cloudflare cache purge)"
   exit 0
 fi
+
+echo "→ Invalidating CloudFront cache (${DIST_ID})..."
+aws cloudfront create-invalidation \
+  --distribution-id "$DIST_ID" \
+  --paths '/*' \
+  --output text --query 'Invalidation.Id' \
+  | sed 's/^/  invalidation id: /'
 
 if [[ "$PURGE" != "true" ]]; then
   echo "→ Skipping Cloudflare cache purge (--no-purge)."
 elif [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
   echo "→ CLOUDFLARE_API_TOKEN not set; skipping Cloudflare cache purge."
-  echo "  To force-refresh edge cache, run 'Purge Everything' from the Cloudflare dashboard."
+  echo "  To force-refresh Cloudflare edge, run 'Purge Everything' from the Cloudflare dashboard."
 else
   echo "→ Purging Cloudflare cache..."
   response=$(curl -s -X POST \
