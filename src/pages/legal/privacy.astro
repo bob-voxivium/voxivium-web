@@ -67,9 +67,16 @@ const lastUpdated = 'June 22, 2026'
           <li>
             <strong>Account information.</strong> Your email address. Authentication is handled
             by Google Firebase Authentication, which manages credentials on Voxivium's behalf.
-            Your password is transmitted to Firebase Authentication at the time of sign-in or
-            registration; Voxivium does not store your password, in any form, and does not have
-            access to your plaintext password.
+            You may register and sign in either by setting a password or by using a third-party
+            sign-in provider (Sign in with Google or Sign in with Apple). Where you set a
+            password, your password is transmitted to Firebase Authentication at the time of
+            sign-in or registration; Voxivium does not store your password, in any form, and does
+            not have access to your plaintext password. Where you use a third-party sign-in
+            provider, that provider authenticates you and transmits to Voxivium a limited set of
+            information consisting of your email address — or, if you use Sign in with Apple's
+            private email relay, a relay email address — and a unique account identifier. Voxivium
+            does not receive the password for, or any other credentials to, your account with that
+            provider.
           </li>
           <li>
             <strong>Identity verification data.</strong> When you complete identity verification,
@@ -196,6 +203,10 @@ const lastUpdated = 'June 22, 2026'
           <li>
             <strong>Authentication and push notifications:</strong> Google Firebase
             (Authentication and Cloud Messaging)
+          </li>
+          <li>
+            <strong>Federated sign-in (identity providers):</strong> Google (Sign in with Google)
+            and Apple (Sign in with Apple)
           </li>
           <li>
             <strong>Mobile application distribution and in-application purchases:</strong> Apple
