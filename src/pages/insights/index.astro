@@ -1,0 +1,206 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { absoluteUrl, ORG_ID } from '@lib/seo'
+
+const posts = (await getCollection('insights', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+)
+
+const dateFmt = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+})
+
+// A CollectionPage listing every post, so crawlers can see the set as a set
+// rather than inferring it from links alone.
+const listSchema = {
+  '@type': 'CollectionPage',
+  name: 'Voxivium Insights',
+  description:
+    'Plain explanations of how political accountability data works — how votes are tracked, how scores are built, and what the numbers do and do not show.',
+  url: absoluteUrl('/insights'),
+  isPartOf: { '@id': ORG_ID },
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: posts.map((post, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: absoluteUrl(`/insights/${post.id}/`),
+      name: post.data.title,
+    })),
+  },
+}
+---
+
+<BaseLayout
+  title="Insights — How Political Accountability Data Actually Works"
+  description="Plain explanations of how congressional votes are tracked, how Voxivium builds a score from your beliefs, and what these numbers do and don't tell you."
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Insights', path: '/insights' },
+  ]}
+  schema={[listSchema]}
+>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Insights</p>
+      <h1>How this actually works.</h1>
+      <p class="lead">
+        Explanations of how accountability data is built and what it can honestly tell you. Every
+        claim here is sourced, and every methodology piece describes what the number misses as well
+        as what it captures.
+      </p>
+      <p class="feed-link">
+        <a href="/rss.xml">Subscribe by RSS</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="listing">
+    <div class="container">
+      {
+        posts.length === 0 ? (
+          <p class="empty">First pieces are being written now. Check back shortly.</p>
+        ) : (
+          <ul class="post-list">
+            {posts.map((post) => (
+              <li class="post-item">
+                <article>
+                  <p class="meta">
+                    <span class="topic">{post.data.topic}</span>
+                    <time datetime={post.data.publishDate.toISOString()}>
+                      {dateFmt.format(post.data.publishDate)}
+                    </time>
+                  </p>
+                  <h2>
+                    <a href={`/insights/${post.id}/`}>{post.data.title}</a>
+                  </h2>
+                  <p class="excerpt">{post.data.description}</p>
+                </article>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-brand-text1);
+    margin: 0;
+  }
+
+  .lead {
+    margin: 1.25rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--color-brand-text3);
+  }
+
+  .feed-link {
+    margin: 1.5rem 0 0;
+    font-size: 0.9375rem;
+  }
+
+  .feed-link a {
+    color: var(--color-brand-primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-brand-primary), transparent 60%);
+  }
+
+  .feed-link a:hover {
+    border-bottom-color: var(--color-brand-primary);
+  }
+
+  .listing {
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-item {
+    padding: 2rem 0;
+    border-top: 1px solid var(--color-brand-el1);
+  }
+
+  .post-item:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-brand-text4);
+  }
+
+  .topic {
+    color: var(--color-brand-primary);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .post-item h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 650;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  .post-item h2 a {
+    color: var(--color-brand-text1);
+    text-decoration: none;
+  }
+
+  .post-item h2 a:hover {
+    color: var(--color-brand-primary);
+  }
+
+  .excerpt {
+    margin: 0.625rem 0 0;
+    color: var(--color-brand-text3);
+    line-height: 1.6;
+  }
+
+  .empty {
+    color: var(--color-brand-text3);
+  }
+</style>

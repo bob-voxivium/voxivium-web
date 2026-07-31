@@ -1,0 +1,352 @@
+---
+import type { GetStaticPaths } from 'astro'
+import { getCollection, render } from 'astro:content'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { absoluteUrl, FOUNDER_ID, ORG_ID, SITE_URL } from '@lib/seo'
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection('insights', ({ data }) => !data.draft)
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }))
+}) satisfies GetStaticPaths
+
+const { post } = Astro.props
+const { Content, headings } = await render(post)
+
+const { title, description, publishDate, updatedDate, author, topic, sources, ogImage } = post.data
+
+const dateFmt = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+})
+
+const url = absoluteUrl(`/insights/${post.id}/`)
+
+const articleSchema = {
+  '@type': 'Article',
+  '@id': `${url}#article`,
+  headline: title,
+  description,
+  datePublished: publishDate.toISOString(),
+  dateModified: (updatedDate ?? publishDate).toISOString(),
+  // Bylined to a real, identifiable person. Google's guidance for civic and
+  // political content leans hard on verifiable authorship.
+  author: { '@id': FOUNDER_ID, name: author },
+  publisher: { '@id': ORG_ID },
+  isPartOf: { '@id': `${SITE_URL}/#website` },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  image: absoluteUrl(ogImage ?? '/og/default.png'),
+  articleSection: topic,
+  inLanguage: 'en-US',
+  citation: sources.map((s) => ({
+    '@type': 'CreativeWork',
+    name: s.label,
+    url: s.url,
+  })),
+}
+
+// Only h2s — h3s make the rail noisy at these article lengths.
+const toc = headings.filter((h) => h.depth === 2)
+---
+
+<BaseLayout
+  {title}
+  {description}
+  ogType="article"
+  ogImage={ogImage}
+  publishedTime={publishDate.toISOString()}
+  modifiedTime={(updatedDate ?? publishDate).toISOString()}
+  {author}
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Insights', path: '/insights' },
+    { name: title, path: `/insights/${post.id}` },
+  ]}
+  schema={[articleSchema]}
+>
+  <article class="post">
+    <header class="post-header">
+      <div class="container">
+        <p class="meta">
+          <a class="topic" href="/insights">{topic}</a>
+          <time datetime={publishDate.toISOString()}>{dateFmt.format(publishDate)}</time>
+        </p>
+        <h1>{title}</h1>
+        <p class="lead">{description}</p>
+        <p class="byline">
+          By {author}
+          {
+            updatedDate && (
+              <span class="updated">
+                {' · Updated '}
+                <time datetime={updatedDate.toISOString()}>{dateFmt.format(updatedDate)}</time>
+              </span>
+            )
+          }
+        </p>
+      </div>
+    </header>
+
+    {
+      toc.length > 2 && (
+        <nav class="toc container" aria-label="On this page">
+          <span class="toc-label">On this page</span>
+          {toc.map((h) => (
+            <a href={`#${h.slug}`}>{h.text}</a>
+          ))}
+        </nav>
+      )
+    }
+
+    <div class="post-body container">
+      <Content />
+    </div>
+
+    <footer class="post-footer container">
+      <h2 id="sources">Sources</h2>
+      <ul class="sources">
+        {
+          sources.map((s) => (
+            <li>
+              <a href={s.url} rel="noopener nofollow" target="_blank">
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="post-cta">
+        <p>
+          Voxivium is building the tool this article describes: a free, non-partisan way to see how
+          your representatives actually vote, graded against what you care about.
+        </p>
+        <a class="cta" href="/#voters">Get early access</a>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .container {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding-inline: 1.5rem;
+  }
+
+  .post-header {
+    padding: clamp(3rem, 8vh, 5rem) 0 0;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--color-brand-text4);
+  }
+
+  .topic {
+    color: var(--color-brand-primary);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  h1 {
+    font-size: clamp(1.875rem, 4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-brand-text1);
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .lead {
+    margin: 1.25rem 0 0;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-brand-text3);
+  }
+
+  .byline {
+    margin: 1.25rem 0 0;
+    font-size: 0.875rem;
+    color: var(--color-brand-text4);
+  }
+
+  .toc {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    padding-block: 1rem;
+    border-block: 1px solid var(--color-brand-el1);
+    font-size: 0.875rem;
+  }
+
+  .toc-label {
+    color: var(--color-brand-text4);
+    font-weight: 600;
+  }
+
+  .toc a {
+    color: var(--color-brand-text3);
+    text-decoration: none;
+  }
+
+  .toc a:hover {
+    color: var(--color-brand-primary);
+  }
+
+  .post-body {
+    padding-top: 2.5rem;
+    color: var(--color-brand-text2);
+    line-height: 1.7;
+  }
+
+  .post-body :global(h2) {
+    margin: 2.75rem 0 0.875rem;
+    font-size: 1.5rem;
+    font-weight: 650;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--color-brand-text1);
+    scroll-margin-top: 5rem;
+  }
+
+  .post-body :global(h3) {
+    margin: 2rem 0 0.625rem;
+    font-size: 1.15rem;
+    font-weight: 620;
+    color: var(--color-brand-text1);
+    scroll-margin-top: 5rem;
+  }
+
+  .post-body :global(p) {
+    margin: 0 0 1.25rem;
+  }
+
+  .post-body :global(ul),
+  .post-body :global(ol) {
+    margin: 0 0 1.25rem;
+    padding-left: 1.25rem;
+  }
+
+  .post-body :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .post-body :global(a) {
+    color: var(--color-brand-primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-brand-primary), transparent 60%);
+  }
+
+  .post-body :global(a:hover) {
+    border-bottom-color: var(--color-brand-primary);
+  }
+
+  .post-body :global(strong) {
+    color: var(--color-brand-text1);
+    font-weight: 640;
+  }
+
+  .post-body :global(blockquote) {
+    margin: 1.75rem 0;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    border-left: 3px solid var(--color-brand-el2);
+    color: var(--color-brand-text3);
+  }
+
+  .post-body :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .post-body :global(th),
+  .post-body :global(td) {
+    text-align: left;
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--color-brand-el1);
+  }
+
+  .post-body :global(th) {
+    color: var(--color-brand-text1);
+    font-weight: 620;
+  }
+
+  .post-body :global(code) {
+    background: var(--color-brand-surface);
+    border-radius: 0.25rem;
+    padding: 0.1em 0.35em;
+    font-size: 0.9em;
+  }
+
+  .post-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-brand-el1);
+  }
+
+  .post-footer h2 {
+    font-size: 1.125rem;
+    font-weight: 620;
+    color: var(--color-brand-text1);
+    margin: 0 0 0.75rem;
+  }
+
+  .sources {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.9375rem;
+    color: var(--color-brand-text3);
+    line-height: 1.6;
+  }
+
+  .sources li {
+    margin-bottom: 0.4rem;
+  }
+
+  .sources a {
+    color: var(--color-brand-text3);
+  }
+
+  .sources a:hover {
+    color: var(--color-brand-primary);
+  }
+
+  .post-cta {
+    margin-top: 2.5rem;
+    padding: 1.75rem;
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+    background: var(--color-brand-surface);
+  }
+
+  .post-cta p {
+    margin: 0 0 1.25rem;
+    color: var(--color-brand-text2);
+    line-height: 1.6;
+  }
+
+  .cta {
+    display: inline-block;
+    background: var(--color-brand-primary);
+    color: var(--color-brand-on-primary);
+    font-weight: 600;
+    padding: 0.7rem 1.35rem;
+    border-radius: 0.375rem;
+    text-decoration: none;
+  }
+
+  .cta:hover {
+    opacity: 0.9;
+  }
+</style>

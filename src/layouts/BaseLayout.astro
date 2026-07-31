@@ -118,6 +118,12 @@ const graph = noindex
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Voxivium Insights"
+      href="/rss.xml"
+    />
 
     <meta name="generator" content={Astro.generator} />
 
@@ -176,6 +182,9 @@ const graph = noindex
             class="text-brand-text2 hover:text-brand-primary transition-colors"
           >
             Partnerships
+          </a>
+          <a href="/insights" class="text-brand-text2 hover:text-brand-primary transition-colors">
+            Insights
           </a>
           <a href="/faq" class="text-brand-text2 hover:text-brand-primary transition-colors">
             FAQ
@@ -279,6 +288,11 @@ const graph = noindex
             href="/partnerships"
             class="text-brand-text2 hover:bg-brand-surface hover:text-brand-primary rounded-md px-3 py-2 transition-colors"
             >Partnerships</a
+          >
+          <a
+            href="/insights"
+            class="text-brand-text2 hover:bg-brand-surface hover:text-brand-primary rounded-md px-3 py-2 transition-colors"
+            >Insights</a
           >
           <a
             href="/faq"
