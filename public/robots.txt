@@ -1,4 +1,72 @@
+# voxivium.com — crawler policy
+#
+# Policy: permissive, including AI crawlers. Decided by CEO 2026-07-31.
+#
+# Rationale: this is a marketing site with no proprietary content. Being
+# quoted when someone asks an assistant "what is Voxivium" is free
+# distribution, and blocking AI crawlers would sit oddly beside a business
+# model that sells aggregated sentiment data to AI labs. Revisit only with
+# an explicit decision — do not tighten this file incidentally.
+#
+# Note: crawlers are not blocked from /subscribe here on purpose. Those pages
+# carry <meta name="robots" content="noindex">, and a page must be crawlable
+# for that directive to be read. Disallowing them would leave them indexable
+# by URL alone.
+
 User-agent: *
+Allow: /
+
+# Search
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Assistant / AI crawlers — explicitly welcomed
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: meta-externalagent
 Allow: /
 
 Sitemap: https://voxivium.com/sitemap-index.xml
