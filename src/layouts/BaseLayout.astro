@@ -2,6 +2,14 @@
 import interWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url'
 import '@fontsource-variable/inter'
 import '@styles/global.css'
+import JsonLd from '@components/seo/JsonLd.astro'
+import {
+  breadcrumbSchema,
+  organizationSchema,
+  personSchema,
+  websiteSchema,
+  type Breadcrumb,
+} from '@lib/seo'
 
 interface Props {
   title: string
@@ -18,6 +26,10 @@ interface Props {
   publishedTime?: string
   modifiedTime?: string
   author?: string
+  /** Trail from home to this page. Omit on the home page itself. */
+  breadcrumbs?: Breadcrumb[]
+  /** Extra JSON-LD nodes merged into this page's @graph (FAQPage, Article, …). */
+  schema?: Record<string, unknown>[]
 }
 
 const {
@@ -31,10 +43,25 @@ const {
   publishedTime,
   modifiedTime,
   author,
+  breadcrumbs,
+  schema = [],
 } = Astro.props
 
 const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).toString()
 const ogImageURL = new URL(ogImage, Astro.site).toString()
+
+// Organization and WebSite are asserted on every indexable page so the entity
+// resolves no matter which page a crawler reaches first. Noindexed pages skip
+// the graph entirely — there's nothing to describe to a search engine there.
+const graph = noindex
+  ? []
+  : [
+      organizationSchema(),
+      websiteSchema(),
+      personSchema(),
+      ...(breadcrumbs?.length ? [breadcrumbSchema(breadcrumbs)] : []),
+      ...schema,
+    ]
 ---
 
 <!doctype html>
@@ -91,6 +118,8 @@ const ogImageURL = new URL(ogImage, Astro.site).toString()
     <link rel="manifest" href="/favicon/site.webmanifest" />
 
     <meta name="generator" content={Astro.generator} />
+
+    {graph.length > 0 && <JsonLd schema={graph} />}
 
     <script is:inline>
       ;(() => {

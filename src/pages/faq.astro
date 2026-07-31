@@ -152,11 +152,30 @@ const groups: Group[] = [
     ],
   },
 ]
+
+// Every Q&A on the page, flattened for FAQPage structured data. Google requires
+// the marked-up answer to match the visible answer exactly, so this reads from
+// the same `groups` array that renders below — it can't drift.
+const faqSchema = {
+  '@type': 'FAQPage',
+  mainEntity: groups.flatMap((group) =>
+    group.questions.map((qa) => ({
+      '@type': 'Question',
+      name: qa.q,
+      acceptedAnswer: { '@type': 'Answer', text: qa.a },
+    }))
+  ),
+}
 ---
 
 <BaseLayout
-  title="FAQ — Voxivium"
-  description="Answers to common questions about Voxivium, grouped by audience: voters, politicians, media and research, and AI labs."
+  title="FAQ — How Voxivium Works, for Voters and Partners"
+  description="Answers to common questions about Voxivium: how representatives are graded, what data is shared, how voter verification works, and how the platform stays non-partisan."
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'FAQ', path: '/faq' },
+  ]}
+  schema={[faqSchema]}
 >
   <section class="page-hero">
     <div class="container">

@@ -29,8 +29,12 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
 ---
 
 <BaseLayout
-  title="Donate to the Voter Onboarding Fund"
-  description="Every dollar you donate goes towards onboarding a new user."
+  title="Donate to the Voter Onboarding Fund — Voxivium"
+  description="Voter verification costs Voxivium money per person. Every dollar you donate covers onboarding for another verified voter. $2 minimum, no subscription."
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Support us', path: '/donate' },
+  ]}
 >
   <section class="container mx-auto max-w-2xl px-6 py-16">
     <p class="eyebrow text-brand-text3 text-sm font-medium tracking-wide uppercase">

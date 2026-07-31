@@ -1,0 +1,24 @@
+---
+/**
+ * Emits one JSON-LD block. Pass any number of schema nodes; they're wrapped in
+ * an `@graph` so nodes can cross-reference each other by `@id` instead of being
+ * duplicated on every page.
+ *
+ * `set:html` is safe here because the payload is JSON.stringify output from
+ * our own typed objects, never user input. `<` is escaped anyway so a stray
+ * string value can't close the script tag early.
+ */
+interface Props {
+  schema: Record<string, unknown> | Record<string, unknown>[]
+}
+
+const { schema } = Astro.props
+
+const nodes = Array.isArray(schema) ? schema : [schema]
+const payload = JSON.stringify({ '@context': 'https://schema.org', '@graph': nodes }).replace(
+  /</g,
+  '\\u003c'
+)
+---
+
+<script type="application/ld+json" is:inline set:html={payload} />

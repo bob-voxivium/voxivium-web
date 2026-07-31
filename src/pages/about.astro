@@ -6,6 +6,10 @@ import FeatureCard from '@components/ui/FeatureCard.astro'
 <BaseLayout
   title="About Voxivium — A Public Benefit Corporation for civic accountability"
   description="Voxivium is a Public Benefit Corporation building a non-partisan platform for political accountability and transparency. Read about our mission and internal commitments."
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'About', path: '/about' },
+  ]}
 >
   <section class="page-hero">
     <div class="container">
