@@ -86,6 +86,7 @@ Plan for these routes. Build them in this order — don't scaffold pages that ar
 - `/careers` — Job listings, culture, the governance commitments again.
 - `/press` — Press kit, logos, founder bio.
 - `/legal/privacy` and `/legal/terms`.
+- `/insights` — Editorial content collection. See §11.
 
 **Phase 3 (when ready):**
 - Payment / API subscription flows for politicians, media, AI labs. These will likely warrant their own subdomain or app — discuss before building inline.
@@ -173,11 +174,49 @@ These are how I want you to behave in this codebase:
 ## 10. Out of scope (don't build these without asking)
 
 - App-like features (user accounts, dashboards, report cards). Those belong in the app, not the marketing site.
-- A blog or CMS. If content needs change frequency, we'll add Astro content collections; we don't need a headless CMS yet.
+- **A headless CMS.** Editorial content now ships as an Astro content collection at `/insights` (see §11). That remains the mechanism; we do not need a CMS on top of it. *(Amended 2026-07-31 — this bullet previously ruled out editorial content entirely.)*
 - Internationalization. English only for v1. Architect routes so i18n is feasible later, but don't ship it.
 - A/B testing infrastructure. Premature.
 - Live chat widgets. They hurt performance and clash with the trusted-utility tone.
 
+## 11. Editorial content — `/insights`
+
+Added 2026-07-31 at CEO direction. Technical SEO makes the site findable for the
+brand name; it cannot make it rank for the questions people actually search,
+which are about their own representatives. That needs pages answering them.
+
+**Mechanism.** Astro content collection. Posts are Markdown in
+`src/content/insights/`, schema in `src/content.config.ts`, rendered by
+`src/pages/insights/[...slug].astro`. RSS at `/rss.xml`.
+
+**Named "insights", not "blog".** "Blog" reads scrappy-startup and works against
+the trusted-utility voice in §7. Same SEO value either way.
+
+**Every post must cite at least one source.** Enforced by the Zod schema, so the
+build fails without it. Voxivium's whole claim is that it reports verifiable
+facts; editorial pages making factual claims without citations undercut that.
+Verify statistics against the primary source before publishing — do not cite
+from memory, and never invent a URL that has not been checked to resolve.
+
+**Non-partisanship applies with full force here**, more than anywhere else on
+the site. Use issues with genuine cross-partisan support. Give partisan
+breakdowns when citing polling, so readers can check the claim of consensus
+themselves. Never frame one party as the problem.
+
+**Methodology posts must state limitations.** An accountability platform that
+hides what its own numbers fail to capture is doing marketing rather than
+measurement.
+
+**Bylines are real people.** Google's quality guidance for civic and political
+content weights identifiable authorship heavily. Default author is set in
+`src/lib/seo.ts`.
+
+See `deploy/SEO.md` for the page-addition checklist and verification steps.
+
 ---
 
-*Last updated: when this file was created. Update the date and a one-line changelog entry at the bottom of any meaningful change.*
+*Last updated: 2026-07-31.*
+
+**Changelog**
+- 2026-07-31 — Added §11 (`/insights` editorial collection) and amended §10 to
+  permit it. Added `/insights` to the §5 route plan.
