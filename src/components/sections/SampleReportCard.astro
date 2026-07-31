@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets'
 import reyesPortrait from '@assets/images/reyes.png'
+import darkLogo from '@assets/images/vox-logo-dark.png'
 
 // Marketing-only sample. The politician is fictional and the scores are
 // illustrative. Real cards in the app pull from public voting records and
@@ -75,11 +76,12 @@ function gradeTone(grade: string): 'green' | 'yellow' | 'orange' | 'red' {
             <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
           </svg>
           <span class="phone-logo">
-            <img
-              src="/press/voxivium-logo-dark.png"
+            <Image
+              src={darkLogo}
               alt="Voxivium"
-              width="64"
-              height="22"
+              width={64}
+              height={22}
+              densities={[1, 2]}
               class="phone-logo-img"
             />
           </span>
