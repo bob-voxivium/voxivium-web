@@ -62,9 +62,16 @@ import BaseLayout from '@layouts/BaseLayout.astro'
     </div>
   </section>
 
-  <script is:inline type="module">
-    import { onAuthChanged, getIdToken } from '/src/lib/firebase/client.ts'
-    import { resolveReturnOrigin } from '/src/lib/subscribe.ts'
+  <!--
+    Bundled, NOT is:inline (Bugs.md §4.c). An inline script ships verbatim,
+    so the '/src/lib/*.ts' imports below used to reach production unresolved
+    and 403 there — the module never loaded, and this page sat on its
+    provisioning spinner forever after a user had already paid. It only
+    worked in `astro dev`, where Vite serves and transpiles /src/* live.
+  -->
+  <script>
+    import { onAuthChanged, getIdToken } from '@lib/firebase/client'
+    import { resolveReturnOrigin } from '@lib/subscribe'
 
     const params = new URLSearchParams(window.location.search)
     const status = params.get('status')
@@ -100,15 +107,26 @@ import BaseLayout from '@layouts/BaseLayout.astro'
       show('provisioning')
       const sidEl = document.querySelector('[data-subscription-id]')
       if (sidEl) sidEl.textContent = subscriptionID
-      onAuthChanged(async (user) => {
-        if (!user) {
-          // Lost the session — bounce to /subscribe to re-auth (the user
-          // can re-auth and we'll re-check entitlement on next poll).
-          window.location.assign('/subscribe')
-          return
-        }
-        await pollAndBounce()
-      })
+      // Same guard as /subscribe (Bugs.md §4.c): getFirebaseAuth() throws on
+      // missing PUBLIC_FIREBASE_* config, which would abort this module and
+      // leave the "provisioning" spinner up forever. That is a worse failure
+      // here than on /subscribe — this user has already been charged — so
+      // fall through to the pending copy, which tells them their payment is
+      // safe and gives them their subscription ID.
+      try {
+        onAuthChanged(async (user) => {
+          if (!user) {
+            // Lost the session — bounce to /subscribe to re-auth (the user
+            // can re-auth and we'll re-check entitlement on next poll).
+            window.location.assign('/subscribe')
+            return
+          }
+          await pollAndBounce()
+        })
+      } catch (err) {
+        console.error('subscribe/complete: auth check failed', err)
+        show('failed')
+      }
     }
 
     async function pollAndBounce() {
@@ -121,7 +139,12 @@ import BaseLayout from '@layouts/BaseLayout.astro'
       while (Date.now() - start < timeoutMs) {
         try {
           const idToken = await getIdToken()
-          const response = await fetch(`${voxiviumAPIBase}/voter/subscription`, {
+          // /api/v1 prefix is required — every voter route is mounted under
+          // it (cmd/api/main.go: apiGroup := e.Group("/api/v1")). Without it
+          // the poll 404s on every attempt, so a successful subscription
+          // still ended in the 60-second timeout and the "pending" screen.
+          // The sibling call in subscribe.astro already had the prefix.
+          const response = await fetch(`${voxiviumAPIBase}/api/v1/voter/subscription`, {
             headers: { Authorization: `Bearer ${idToken}` },
           })
           if (response.ok) {

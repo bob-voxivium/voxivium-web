@@ -46,6 +46,48 @@ const paypalPlanIDs: Record<string, string | undefined> = {
       <p>Checking your sign-in…</p>
     </div>
 
+    <!--
+      Sign-in-check failure state (Bugs.md §4.c).
+
+      The page previously had no way to say "the check itself broke". The
+      sign-in probe can fail in two ways that both used to leave the loading
+      message on screen indefinitely, with the reason visible only in the
+      browser console:
+
+        1. getFirebaseAuth() throws — missing/placeholder PUBLIC_FIREBASE_*
+           at build time — which aborted the rest of the module, so even the
+           sign-in form never got wired up.
+        2. The module never runs at all (bundle or network failure), or
+           Firebase never answers, so nothing flips the state.
+
+      A watchdog below covers case 2, since no amount of try/catch inside a
+      module helps when the module itself doesn't execute.
+    -->
+    <div data-state="error" hidden class="border-brand-el1 bg-brand-surface mt-8 rounded-lg border p-6">
+      <h2 class="text-brand-text1 text-xl font-semibold">We couldn't check your sign-in</h2>
+      <p class="text-brand-text2 mt-2">
+        Something went wrong loading the sign-in check, so we can't continue
+        to payment. Your account and any existing subscription are unaffected.
+      </p>
+      <p class="text-brand-text3 mt-2 text-sm" data-error-detail hidden></p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button
+          type="button"
+          data-action="retry"
+          class="bg-brand-primary text-brand-onPrimary rounded-lg px-4 py-2 font-medium"
+        >
+          Try again
+        </button>
+        <a href="/" class="text-brand-text2 px-4 py-2 underline-offset-2 hover:underline">
+          Back to voxivium.com
+        </a>
+      </div>
+      <p class="text-brand-text3 mt-4 text-sm">
+        If this keeps happening, you can subscribe from the Voxivium app on
+        iPhone or Android, or contact support@voxivium.com.
+      </p>
+    </div>
+
     <!-- Sign-in state -->
     <div data-state="signin" hidden class="mt-8">
       <h2 class="text-brand-text1 text-xl font-semibold">Sign in to continue</h2>
@@ -94,23 +136,110 @@ const paypalPlanIDs: Record<string, string | undefined> = {
     </div>
   </section>
 
+  <!--
+    Watchdog — deliberately a classic script, not a module.
+
+    If the module below fails to load or parse (blocked bundle, offline,
+    a stray syntax error), none of its code runs and no try/catch inside it
+    can help. This runs first, independently, and reveals the error state if
+    nothing has reported progress in time. Also covers Firebase never
+    answering, which produces no error at all — just silence.
+  -->
+  <script is:inline>
+    ;(function () {
+      const TIMEOUT_MS = 12000
+      window.__voxSubscribeProgress = false
+
+      window.voxSubscribeShowError = function (detail) {
+        window.__voxSubscribeProgress = true
+        const loading = document.querySelector('[data-state="loading"]')
+        const error = document.querySelector('[data-state="error"]')
+        if (loading) loading.hidden = true
+        if (!error) return
+        error.hidden = false
+        const detailEl = error.querySelector('[data-error-detail]')
+        if (detailEl && detail) {
+          detailEl.hidden = false
+          // Shown verbatim on purpose: this page is reached by a handful of
+          // beta users, and "Firebase config missing: apiKey" in front of
+          // them is worth more than a generic apology in a support thread.
+          detailEl.textContent = String(detail)
+        }
+      }
+
+      document.addEventListener('click', function (event) {
+        const target = event.target
+        if (target && target.closest && target.closest('[data-action="retry"]')) {
+          window.location.reload()
+        }
+      })
+
+      window.setTimeout(function () {
+        if (!window.__voxSubscribeProgress) {
+          window.voxSubscribeShowError(
+            'The sign-in check did not respond. This is usually a network problem or a blocked script.'
+          )
+        }
+      }, TIMEOUT_MS)
+
+      window.addEventListener('unhandledrejection', function (event) {
+        if (window.__voxSubscribeProgress) return
+        window.voxSubscribeShowError(event.reason && (event.reason.message || event.reason))
+      })
+    })()
+  </script>
+
+  <!--
+    Build-time config handed to the bundled script below as inert JSON.
+
+    This used to ride on `define:vars`, which forces `is:inline` — and an
+    inline script is emitted VERBATIM: Astro doesn't bundle it or resolve its
+    imports. So `import … from '/src/lib/firebase/client.ts'` shipped to
+    production unchanged, where that path 403s (it's a TypeScript source file
+    that only exists in the repo). The module never loaded, so nothing ran
+    and the page sat on "Checking your sign-in…" forever — Bugs.md §4.c.
+
+    It worked in `astro dev` because Vite serves and transpiles /src/* on the
+    fly, which is exactly what made it invisible until production.
+  -->
   <script
-    is:inline
-    define:vars={{ paypalClientID, voxiviumAPIBase, paypalPlanIDs }}
-    type="module"
-  >
-    import { onAuthChanged, signIn, sendPasswordResetEmail, signOut, getIdToken } from '/src/lib/firebase/client.ts'
-    import { parseSubscribeQuery } from '/src/lib/subscribe.ts'
+    type="application/json"
+    id="subscribe-config"
+    set:html={JSON.stringify({ paypalClientID, voxiviumAPIBase, paypalPlanIDs }).replace(
+      /</g,
+      '\\u003c'
+    )}
+  />
+
+  <script>
+    import {
+      onAuthChanged,
+      signIn,
+      sendPasswordResetEmail,
+      signOut,
+      getIdToken,
+    } from '@lib/firebase/client'
+    import { parseSubscribeQuery } from '@lib/subscribe'
+
+    const config = JSON.parse(
+      document.getElementById('subscribe-config')?.textContent ?? '{}'
+    )
+    const paypalClientID = config.paypalClientID
+    const voxiviumAPIBase = config.voxiviumAPIBase
+    const paypalPlanIDs = config.paypalPlanIDs ?? {}
 
     const states = {
       loading: document.querySelector('[data-state="loading"]'),
       invalid: document.querySelector('[data-state="invalid"]'),
       signin: document.querySelector('[data-state="signin"]'),
       subscribe: document.querySelector('[data-state="subscribe"]'),
+      error: document.querySelector('[data-state="error"]'),
       backendMissing: document.querySelector('[data-state="backend-missing"]'),
     }
 
     function show(name) {
+      // Tell the watchdog we got somewhere, so it stops counting.
+      window.__voxSubscribeProgress = true
       for (const [k, el] of Object.entries(states)) {
         if (!el) continue
         if (k === name) el.hidden = false
@@ -118,6 +247,14 @@ const paypalPlanIDs: Record<string, string | undefined> = {
           /* sub-state inside subscribe — managed separately */
         } else el.hidden = true
       }
+    }
+
+    /** Hands off to the watchdog's renderer so there's one error path. */
+    function showError(detail) {
+      for (const [k, el] of Object.entries(states)) {
+        if (el && k !== 'error') el.hidden = true
+      }
+      window.voxSubscribeShowError?.(detail)
     }
 
     const q = parseSubscribeQuery(new URLSearchParams(window.location.search))
@@ -133,14 +270,21 @@ const paypalPlanIDs: Record<string, string | undefined> = {
       const signinForm = document.querySelector('[data-voxivium-form="signin"]')
       const statusEl = signinForm?.querySelector('[data-form-status]')
 
-      onAuthChanged((user) => {
-        if (user) {
-          show('subscribe')
-          mountPayPalOrFallback(q)
-        } else {
-          show('signin')
-        }
-      })
+      // getFirebaseAuth() throws when PUBLIC_FIREBASE_* is missing or still
+      // "TODO" — which is exactly the misconfiguration most likely to reach
+      // production, and which used to abort this whole module silently.
+      try {
+        onAuthChanged((user) => {
+          if (user) {
+            show('subscribe')
+            mountPayPalOrFallback(q)
+          } else {
+            show('signin')
+          }
+        })
+      } catch (err) {
+        showError(err?.message ?? err)
+      }
 
       signinForm?.addEventListener('submit', async (event) => {
         event.preventDefault()
