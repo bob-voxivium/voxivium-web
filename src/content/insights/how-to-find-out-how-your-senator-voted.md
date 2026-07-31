@@ -59,6 +59,30 @@ None of this makes voting records unreliable. They remain the most direct eviden
 
 ## The practical problem
 
-Doing this well for one bill is easy. Doing it across a full term, for two senators and a representative, comparing the pattern against what you actually believe, is a research project most people will never take on.
+Everything above is free, and you should use it. For a single bill you care about, looking up the tally takes two minutes and gives you a fact rather than someone's characterization of a fact.
 
-That gap is the reason Voxivium exists. The records are public; the work of turning them into an answer to "does this person vote the way I would" is what has been missing.
+The difficulty is scale. One senator serving a full term casts hundreds of recorded votes. You have two senators and a representative. To answer "do these people vote the way I would," you would need to read each vote, work out what it actually decided, decide whether it bears on something you care about, judge whether their position matched yours, and then weigh all of it by how much each issue matters to you.
+
+That is a research project measured in weeks. Almost nobody does it, which means most people vote on impressions.
+
+## What a report card does with the same records
+
+Voxivium automates that comparison. It reads from the same public sources described above, so nothing here depends on private data or on trusting our interpretation of events.
+
+**You define the standard first.** Before seeing any grade, you answer where you stand across 20 policy domains, grouped into six categories, and say how much each one matters to you. Positions are recorded on a sliding scale rather than yes-or-no, because most people do not hold their views at full intensity.
+
+That weighting is what makes the grade yours rather than generic. Two people with identical positions get different grades for the same senator if they rank the issues differently. A score that skips the weighting is measuring an average voter who does not exist.
+
+**The grade breaks down instead of summarizing.** You get one overall letter, but you can open it. Overall resolves into six category grades, each category into its domains, each domain into the specific beliefs underneath, and each belief into the actual roll call votes behind it. Four levels down from a letter grade, you are looking at the same tally on senate.gov you would have found by hand.
+
+That structure exists so the number is checkable. A grade you cannot take apart is a claim you have to accept on faith, which is the thing this whole exercise is meant to replace.
+
+**Your district is shown alongside you.** Each position displays where your district's verified voters actually sit, as a range rather than a single number. You see both whether your representative matches you and whether they match the people they represent. Those are different questions and they frequently have different answers.
+
+**Gaps are marked, not filled.** Where there is not enough voting evidence on an issue, the interface says so rather than showing a confident grade built on two data points. Unanswered questions of your own are flagged the same way, so you always know how much of the picture is actually complete.
+
+## What this does not replace
+
+A report card is a summary of a voting record, and everything above about what voting records miss still applies. Procedural votes, bundled bills, and the bills that quietly die in committee are limits of the source material, not problems automation solves. We go through those limits in more detail in [what a voting record shows, and what it misses](/insights/what-a-voting-record-shows-and-misses/).
+
+So the honest framing is narrow. Voxivium does the volume of work you would not do by hand, and shows its work so you can check any piece of it. The underlying records stay public and free, and if you want to verify a single vote yourself, the first half of this article tells you exactly how.
