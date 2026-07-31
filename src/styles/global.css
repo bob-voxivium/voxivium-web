@@ -8,6 +8,11 @@
     color-scheme: light dark;
 
     --color-brand-primary: #0b5996;
+    /* Foreground for content on a brand-primary fill. Light mode's primary is
+       dark enough that white clears AA at 7.2:1. Dark mode's primary is the
+       lightened #6bb6e8, where white manages only 2.2:1 — so it flips to near
+       black (8.5:1). Never hardcode white on a primary fill. */
+    --color-brand-on-primary: #ffffff;
     --color-brand-bg: #f0f6fa;
     --color-brand-surface: #ddeaf4;
     --color-brand-el1: #c9ddf0;
@@ -21,6 +26,7 @@
 
   html.dark {
     --color-brand-primary: #6bb6e8;
+    --color-brand-on-primary: #0a1117;
     --color-brand-bg: #0a1117;
     --color-brand-surface: #121e29;
     --color-brand-el1: #1a2a38;

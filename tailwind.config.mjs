@@ -7,6 +7,9 @@ export default {
       colors: {
         brand: {
           primary: 'var(--color-brand-primary)',
+          // Text/icon color for content sitting ON a brand-primary fill.
+          // Not the same as text1 — see global.css for why it flips per theme.
+          onPrimary: 'var(--color-brand-on-primary)',
           bg: 'var(--color-brand-bg)',
           surface: 'var(--color-brand-surface)',
           el1: 'var(--color-brand-el1)',
