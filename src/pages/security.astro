@@ -1,0 +1,567 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { ORG_ID, absoluteUrl } from '@lib/seo'
+
+// Technical reference page. The plain-language version for voters lives at
+// /insights/who-can-see-what-you-believe/ and links here for detail.
+//
+// DISCLOSURE RULE for anyone editing this file: describe architectural
+// properties and control categories, never implementation specifics. Do not
+// name which tables or columns carry which protection, do not state software
+// versions, host names, account identifiers, rate-limit thresholds, or which
+// planned controls are not yet deployed. That last one matters most — stating
+// that a specific defense is absent is an invitation. Certification status is
+// a different question and is stated plainly below; that is safe to disclose
+// and dishonest to omit.
+
+const lastUpdated = 'August 1, 2026'
+
+const pageSchema = {
+  '@type': 'WebPage',
+  '@id': `${absoluteUrl('/security')}#webpage`,
+  name: 'Security at Voxivium',
+  description:
+    'How Voxivium protects voter data: identity separated from political belief by design, encryption, access control, retention limits, and the security standards the platform is engineered against.',
+  url: absoluteUrl('/security'),
+  isPartOf: { '@id': ORG_ID },
+  dateModified: '2026-08-01',
+  about: [
+    { '@type': 'Thing', name: 'Information security' },
+    { '@type': 'Thing', name: 'Data privacy' },
+    { '@type': 'Thing', name: 'Pseudonymization' },
+  ],
+}
+---
+
+<BaseLayout
+  title="Security at Voxivium — How Your Data Is Protected"
+  description="How Voxivium separates your identity from your political beliefs at the database level, plus the encryption, access controls, and retention limits behind the platform."
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Security', path: '/security' },
+  ]}
+  schema={[pageSchema]}
+>
+  <article class="doc">
+    <header class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Security</p>
+        <h1>How Voxivium protects your data.</h1>
+        <p class="lead">
+          Voxivium asks people to record what they believe about politics. That is sensitive
+          information, and the platform is built on the assumption that it must never be traceable
+          back to the individual who provided it. This page describes how that is enforced.
+        </p>
+        <p class="meta">Last updated: {lastUpdated}</p>
+
+        <nav class="toc" aria-label="On this page">
+          <span class="toc-label">On this page</span>
+          <a href="#separation">Identity separation</a>
+          <a href="#encryption">Encryption</a>
+          <a href="#access">Access control</a>
+          <a href="#identity">Identity verification</a>
+          <a href="#retention">Retention and deletion</a>
+          <a href="#never">What we never do</a>
+          <a href="#standards">Standards</a>
+          <a href="#disclosure">Reporting an issue</a>
+        </nav>
+
+        <p class="aside">
+          Prefer this without the technical detail? Read
+          <a href="/insights/who-can-see-what-you-believe/">who can see what you believe</a>.
+        </p>
+      </div>
+    </header>
+
+    <section class="container" id="separation">
+      <h2>Your identity is separated from your beliefs</h2>
+      <p>
+        This is the central design decision, and everything else is secondary to it.
+      </p>
+      <p>
+        Voxivium has to know who you are. Verifying that each user is a real, registered U.S. voter
+        scoped to an actual district is what makes the aggregate data meaningful, and it is what
+        keeps bots and duplicate accounts from distorting it. Voxivium also has to know what you
+        believe, because that is the product.
+      </p>
+      <p>
+        It does not follow that those two facts should live together, and on Voxivium they do not.
+      </p>
+      <p>
+        Personally identifiable information is held in a <strong>separate database</strong> from
+        every record of political belief. The two are reachable only through different credentials,
+        over a network path scoped so that only the application service can reach the sensitive
+        side at all.
+      </p>
+      <p>
+        Belief records do not reference you. They reference an <strong>opaque pseudonymous
+        identifier</strong> that carries no personal meaning and cannot be reversed into an
+        identity by inspection. The direct identifiers that once linked these records were
+        <strong>removed from the belief database entirely</strong> rather than merely hidden from
+        queries. A copy of the belief database, taken on its own, does not contain the information
+        needed to attribute a single position to a single person.
+      </p>
+      <p>
+        Only one narrow service layer is capable of resolving a pseudonymous identifier back to a
+        person, and it is the only path through which sensitive records are read or written.
+        Application code elsewhere in the system has no route to that data.
+      </p>
+
+      <div class="callout">
+        <p>
+          The practical consequence: the aggregate reporting that politicians, media organizations,
+          and research partners pay for is computed entirely from the side of the system that does
+          not know who anyone is.
+        </p>
+      </div>
+    </section>
+
+    <section class="container" id="encryption">
+      <h2>Encryption</h2>
+      <p>
+        All traffic between your device and Voxivium is encrypted in transit using current TLS.
+        Database connections are configured to refuse unencrypted sessions, so an internal service
+        cannot accidentally open one.
+      </p>
+      <p>
+        Stored data is encrypted at rest, and automated backups are encrypted with it. Backups are
+        retained on a defined schedule and are subject to the same access restrictions as the
+        primary systems.
+      </p>
+      <p>
+        Credentials, API keys, and service secrets are held in a managed secrets store with access
+        scoped per service. None are committed to source control, and the repositories are
+        configured so that they cannot be.
+      </p>
+    </section>
+
+    <section class="container" id="access">
+      <h2>Access control and auditing</h2>
+      <p>
+        Access follows least privilege. Each service authenticates with its own credentials and
+        holds only the permissions its function requires. The credentials used to reach sensitive
+        data are distinct from those used for everything else, and are not interchangeable.
+      </p>
+      <p>
+        Administrative operations require an explicit privileged claim rather than a role a normal
+        account can acquire, and are additionally gated on session freshness, so a long-lived
+        session cannot be used to perform a sensitive action without recent re-authentication.
+      </p>
+      <p>
+        Privileged and out-of-band administrative operations authenticate against the cloud
+        provider's own identity system rather than the application's, which means they cannot be
+        reached with a stolen application credential.
+      </p>
+      <p>
+        Every administrative action writes an audit record identifying the actor, the action, the
+        records affected, and a before-and-after diff of what changed. Audit writes occur in the
+        same transaction as the change itself, so an action cannot succeed without being recorded.
+      </p>
+    </section>
+
+    <section class="container" id="identity">
+      <h2>Identity verification</h2>
+      <p>
+        Voxivium does not build its own document-and-liveness verification. That work is performed
+        by <a href="https://didit.me/" rel="noopener" target="_blank">Didit</a>, a specialist
+        identity-verification provider, and Voxivium receives the verification outcome.
+      </p>
+      <p>
+        This is deliberate. Document verification is a domain where a specialist with completed
+        third-party audits is meaningfully safer than an in-house implementation. Didit holds SOC 2
+        Type&nbsp;I, ISO/IEC 27001, ISO/IEC 27017, and ISO/IEC 27018 certifications, operates under
+        a GDPR data processing agreement, and carries iBeta Level&nbsp;1 presentation-attack
+        detection.
+      </p>
+      <p>
+        Callbacks from the verification provider are authenticated with an HMAC signature over the
+        message body and rejected outside a short freshness window, so a replayed or forged
+        callback cannot mark an account as verified.
+      </p>
+    </section>
+
+    <section class="container" id="retention">
+      <h2>Data minimization, retention, and deletion</h2>
+      <p>
+        Voxivium collects what verification and district matching require, and does not collect
+        contact lists, device address books, browsing history, or location beyond the district
+        resolution the product needs.
+      </p>
+      <p>
+        Account deletion is available from account settings and runs in two stages.
+      </p>
+      <ul>
+        <li>
+          <strong>Immediately.</strong> Personal fields are anonymized, the account is signed out,
+          and your positions are removed from every district and national aggregate. Not filtered
+          out at query time — the records are physically moved out of the tables that aggregate
+          reporting reads, so no future query can reach them by oversight.
+        </li>
+        <li>
+          <strong>After the retention window.</strong> A scheduled job permanently removes the
+          remaining personal record and your belief and stance records from both databases,
+          along with cached report cards and history.
+        </li>
+      </ul>
+      <p>
+        The two-stage design exists so that an accidental deletion is survivable for a limited
+        period while the visible effect is immediate. The full policy, including the categories of
+        data collected and the legal bases for retention, is in the
+        <a href="/legal/privacy">Privacy Policy</a>.
+      </p>
+    </section>
+
+    <section class="container" id="never">
+      <h2>What Voxivium does not do</h2>
+      <ul class="commitments">
+        <li>
+          <strong>Individual data is never sold.</strong> Not to politicians, not to campaigns, not
+          to media organizations, not to AI labs, not to anyone. The commercial product is
+          aggregated, anonymized sentiment.
+        </li>
+        <li>
+          <strong>No customer ever sees an individual position.</strong> A politician sees that a
+          share of verified constituents in their district holds a view. They cannot see who, and
+          the system does not have a mechanism that would let them.
+        </li>
+        <li>
+          <strong>No campaign targeting.</strong> Voxivium does not provide lists, segments, or
+          any capability for reaching identified individuals based on their stated beliefs.
+        </li>
+        <li>
+          <strong>No behavioral advertising and no tracking pixels.</strong> This website runs no
+          third-party advertising or fingerprinting scripts.
+        </li>
+      </ul>
+    </section>
+
+    <section class="container" id="standards">
+      <h2>The standards Voxivium is engineered against</h2>
+      <p>
+        Voxivium's architecture is built against established information security and privacy
+        frameworks. Each is linked below with the part of the platform it informs.
+      </p>
+
+      <dl class="standards">
+        <dt>
+          <a href="https://www.iso.org/standard/27018" rel="noopener" target="_blank"
+            >ISO/IEC 27018</a
+          >
+          <span class="std-sub">Protection of PII in public clouds</span>
+        </dt>
+        <dd>
+          The framework closest to Voxivium's core problem. Its guidance on de-identification,
+          purpose limitation, and restricting the ability to re-link data to an individual is what
+          the identity-separation architecture above is designed to satisfy.
+        </dd>
+
+        <dt>
+          <a href="https://www.iso.org/standard/27001" rel="noopener" target="_blank"
+            >ISO/IEC 27001</a
+          >
+          <span class="std-sub">Information security management systems</span>
+        </dt>
+        <dd>
+          Informs how security is managed rather than merely implemented: risk assessment, access
+          control policy, cryptographic controls, logging, supplier relationships, and incident
+          handling.
+        </dd>
+
+        <dt>
+          <a href="https://www.iso.org/standard/27017" rel="noopener" target="_blank"
+            >ISO/IEC 27017</a
+          >
+          <span class="std-sub">Security controls for cloud services</span>
+        </dt>
+        <dd>
+          Addresses the division of responsibility between a cloud provider and its customer,
+          separation in virtualized environments, and administrative-operation monitoring. Voxivium
+          runs entirely on managed cloud infrastructure, which makes this allocation explicit
+          rather than assumed.
+        </dd>
+
+        <dt>
+          <a
+            href="https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2"
+            rel="noopener"
+            target="_blank">SOC 2</a
+          >
+          <span class="std-sub">AICPA Trust Services Criteria</span>
+        </dt>
+        <dd>
+          The Security, Confidentiality, and Privacy criteria are the ones that bear on Voxivium,
+          and they map onto the access control, audit logging, encryption, and retention practices
+          described above. Voxivium requires SOC 2 attestation of the vendors that touch the most
+          sensitive part of the flow.
+        </dd>
+      </dl>
+
+      <div class="callout callout--status">
+        <p>
+          <strong>On certification status.</strong> Voxivium has not yet completed formal
+          third-party audit against these frameworks. The architecture is built against them, and
+          the identity-verification provider that handles document data is independently certified
+          against several of them. When Voxivium completes its own audits, the results will be
+          published here.
+        </p>
+      </div>
+    </section>
+
+    <section class="container" id="disclosure">
+      <h2>Reporting a security issue</h2>
+      <p>
+        If you believe you have found a vulnerability, please report it to
+        <a href="mailto:privacy@voxivium.com">privacy@voxivium.com</a>. Include enough detail to
+        reproduce the issue. You will get an acknowledgment, and we will keep you informed as it is
+        resolved.
+      </p>
+      <p>
+        Please give us a reasonable opportunity to fix an issue before disclosing it publicly. We
+        will not pursue legal action against researchers who investigate and report in good faith,
+        act within the scope of their own accounts, avoid degrading the service, and do not access,
+        modify, or retain other people's data.
+      </p>
+      <p class="meta">
+        Machine-readable contact details are published at
+        <a href="/.well-known/security.txt">/.well-known/security.txt</a> per
+        <a href="https://www.rfc-editor.org/rfc/rfc9116.html" rel="noopener" target="_blank"
+          >RFC 9116</a
+        >.
+      </p>
+    </section>
+
+    <section class="container">
+      <div class="post-cta">
+        <p>
+          Voxivium is free for voters, and always will be. Every account is a verified U.S. voter,
+          and no individual's positions are ever exposed.
+        </p>
+        <a class="cta" href="/#voters">Get early access</a>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .container {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding-inline: 1.5rem;
+  }
+
+  .page-hero {
+    padding: clamp(3.5rem, 9vh, 5.5rem) 0 1rem;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-brand-text1);
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .lead {
+    margin: 1.25rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--color-brand-text3);
+  }
+
+  .meta {
+    margin: 1rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--color-brand-text4);
+  }
+
+  .toc {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.15rem;
+    padding-block: 1rem;
+    border-block: 1px solid var(--color-brand-el1);
+    font-size: 0.875rem;
+  }
+
+  .toc-label {
+    color: var(--color-brand-text4);
+    font-weight: 600;
+  }
+
+  .toc a {
+    color: var(--color-brand-text3);
+    text-decoration: none;
+  }
+
+  .toc a:hover {
+    color: var(--color-brand-primary);
+  }
+
+  .aside {
+    margin: 1.25rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--color-brand-text3);
+  }
+
+  section {
+    padding-top: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    color: var(--color-brand-text1);
+    margin: 0 0 0.875rem;
+    scroll-margin-top: 5rem;
+  }
+
+  p {
+    margin: 0 0 1.25rem;
+    line-height: 1.7;
+    color: var(--color-brand-text2);
+  }
+
+  strong {
+    color: var(--color-brand-text1);
+    font-weight: 640;
+  }
+
+  a {
+    color: var(--color-brand-primary);
+    text-decoration: none;
+  }
+
+  /* Prose links must not rely on color alone to be distinguishable (WCAG 1.4.1).
+     Scoped to body copy so the TOC chips and the CTA button keep their own
+     treatment. */
+  section a:not(.cta),
+  .aside a {
+    border-bottom: 1px solid color-mix(in oklab, var(--color-brand-primary), transparent 60%);
+  }
+
+  section a:not(.cta):hover,
+  .aside a:hover {
+    border-bottom-color: var(--color-brand-primary);
+  }
+
+  ul {
+    margin: 0 0 1.25rem;
+    padding-left: 1.25rem;
+    line-height: 1.7;
+    color: var(--color-brand-text2);
+  }
+
+  li {
+    margin-bottom: 0.75rem;
+  }
+
+  .commitments {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .commitments li {
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .commitments li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.65em;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--color-brand-primary);
+  }
+
+  .callout {
+    margin: 0 0 1.25rem;
+    padding: 1.25rem 1.5rem;
+    border-left: 3px solid var(--color-brand-primary);
+    background: var(--color-brand-surface);
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .callout p {
+    margin: 0;
+  }
+
+  .callout--status {
+    border-left-color: var(--color-brand-el3);
+  }
+
+  .standards {
+    margin: 0 0 1.25rem;
+  }
+
+  .standards dt {
+    margin-top: 1.5rem;
+    font-weight: 650;
+    color: var(--color-brand-text1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .standards dt:first-child {
+    margin-top: 0;
+  }
+
+  .std-sub {
+    font-weight: 400;
+    font-size: 0.875rem;
+    color: var(--color-brand-text4);
+  }
+
+  .standards dd {
+    margin: 0.375rem 0 0;
+    line-height: 1.7;
+    color: var(--color-brand-text2);
+  }
+
+  .post-cta {
+    margin-top: 1.5rem;
+    padding: 1.75rem;
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.75rem;
+    background: var(--color-brand-surface);
+  }
+
+  .post-cta p {
+    margin: 0 0 1.25rem;
+  }
+
+  .cta {
+    display: inline-block;
+    background: var(--color-brand-primary);
+    color: var(--color-brand-on-primary);
+    font-weight: 600;
+    padding: 0.7rem 1.35rem;
+    border-radius: 0.375rem;
+  }
+
+  .cta:hover {
+    opacity: 0.9;
+  }
+
+  article {
+    padding-bottom: 2rem;
+  }
+</style>

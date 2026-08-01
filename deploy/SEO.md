@@ -73,7 +73,7 @@ Bing's index also feeds several AI assistants.
 After the next deploy, run these against the live URLs:
 
 - Google Rich Results Test — <https://search.google.com/test/rich-results>
-  - `https://voxivium.com/faq/` should report **FAQ** (27 questions)
+  - `https://voxivium.com/faq/` should report **FAQ** (33 questions)
   - any `/insights/` post should report **Article** and **Breadcrumbs**
 - Schema.org validator — <https://validator.schema.org/>
 - Social cards — paste a URL into LinkedIn's Post Inspector
@@ -122,6 +122,8 @@ needed occasionally. `npx -y` fetches it transiently.
 | --- | --- | --- | --- | --- | --- |
 | `/` | 100 | 100 | 96 | 100 | 1.7 s |
 | `/insights/how-candidate-scoring-works/` | 100 | 100 | 100 | 100 | 1.5 s |
+| `/security/` | 100 | 100 | 100 | 100 | 1.5 s |
+| `/faq/` | 100 | 100 | 100 | 100 | 1.5 s |
 
 The home page's 96 on best practices is four Cloudflare Turnstile console
 errors (code 110200, "domain not allowed"), which is expected on `localhost`
@@ -131,7 +133,45 @@ deploy and confirm the errors are absent.
 
 ---
 
-## 4. Decisions on record
+## 4. The security page — editing rules
+
+`src/pages/security.astro` describes Voxivium's security posture publicly. Two
+constraints apply, and they pull in opposite directions, so read both.
+
+**Never publish implementation specifics.** Describe architectural properties
+and control categories. Do not name which tables or columns carry which
+protection, software versions, host names, account identifiers, rate-limit
+thresholds, or key rotation intervals. Most importantly: **never state that a
+planned control is not yet deployed.** Naming an absent defense is an
+invitation. The build has no way to catch this, so it is on the author.
+
+**Do state certification status honestly.** This is a different kind of
+disclosure and the rule inverts. Saying "we have not completed third-party
+audit" is safe, and omitting it while linking SOC 2 and ISO 27001 would imply a
+certification that does not exist. Use "engineered against" and "built
+against"; never "compliant," "certified," or "audited," which are the words
+that turn a design claim into a misrepresentation.
+
+The distinction: *certification status* is public and honest to state. *Which
+specific controls are missing* is not.
+
+A crude regression check for the first rule:
+
+```bash
+node -e "
+const t=require('fs').readFileSync('dist/security/index.html','utf8').replace(/<[^>]*>/g,' ');
+const banned=['vuser','pseudonym_id','pgcrypto','RLS','Row-Level','KMS','Postgres','voxivium_pii','AES','Turnstile','WAF','CloudFront','Secrets Manager','Lambda','ECS','RDS'];
+const hits=banned.filter(w=>t.includes(w));
+console.log(hits.length?'LEAKED: '+hits.join(', '):'clean');
+"
+```
+
+`public/.well-known/security.txt` (RFC 9116) carries the researcher contact.
+Its `Expires` field must be refreshed before it lapses — an expired file reads
+as an abandoned channel. **Confirm it serves over HTTPS after the first
+deploy**; dot-directories occasionally need attention in S3/CloudFront setups.
+
+## 5. Decisions on record
 
 **AI crawlers are allowed.** Decided by CEO, 2026-07-31. `public/robots.txt`
 names GPTBot, ClaudeBot, PerplexityBot, CCBot, Google-Extended and others
@@ -143,6 +183,15 @@ obeyed if the crawler is allowed to fetch the page and read it. Disallowing the
 path in `robots.txt` would leave the URL eligible for indexing with no
 description. Leave it as is.
 
+**Certification status is stated, not omitted.** Decided by CEO, 2026-08-01.
+`/security` cites SOC 2 and ISO/IEC 27001/27017/27018 as design targets and
+states plainly that third-party audit has not been completed. The alternative —
+citing the frameworks with no status line — reads as a certification claim, and
+the paying customers are media organizations, universities, and AI labs, every
+one of which runs vendor security review. **SOC 1 is deliberately not cited**:
+it covers controls over financial reporting, not security, and citing it would
+read as uninformed to that audience.
+
 **The home page `<h1>` stays brand copy.** "Common ground, made visible."
 carries no keyword signal, and that is a deliberate trade. Search intent is
 carried by the `<title>`, the meta description, and section `<h2>`s. Decided by
@@ -150,7 +199,7 @@ CEO, 2026-07-31.
 
 ---
 
-## 5. Known gaps
+## 6. Known gaps
 
 - **`sameAs` lists only LinkedIn.** `src/lib/seo.ts` holds the array. Add X,
   YouTube, and others as they go live. Never add a URL that does not resolve.

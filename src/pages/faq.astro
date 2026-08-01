@@ -10,6 +10,12 @@ interface Group {
   id: string
   label: string
   questions: QA[]
+  /**
+   * Optional "read more" link rendered after the group's questions. Kept out of
+   * the answer strings on purpose: answers render as plain text so the FAQPage
+   * markup matches the visible text exactly, which Google requires.
+   */
+  link?: { href: string; label: string }
 }
 
 const groups: Group[] = [
@@ -40,6 +46,37 @@ const groups: Group[] = [
       {
         q: 'How is Voxivium different from other civic tech "report card" platforms?',
         a: 'Three differences. First, depth: Voxivium builds your profile from 20 domains consisting of over 100 precise policy questions rather than a handful of generic ones, and weights each accountability score by the issues you personally prioritize. Second, flow: most platforms only push data to users—Voxivium also delivers aggregated, district-scoped sentiment back to the politicians, so they get a real mandate rather than noise from bots, biased polling, and partisan media. Third, structure: as a Public Benefit Corporation with a 5:1 executive-to-employee pay ratio capped in our bylaws and Privacy-by-Design baked into the platform, the company itself is built to mirror the values we ask of government.',
+      },
+    ],
+  },
+  {
+    id: 'security',
+    label: 'Security & your data',
+    link: { href: '/security', label: 'Read the full security overview' },
+    questions: [
+      {
+        q: 'How does Voxivium protect my personal information?',
+        a: "By keeping it apart from everything you believe. Your identity—name, date of birth, address, the details that confirm you're a registered voter—lives in one database. Your political positions live in a different one, filed under a meaningless identifier rather than your name. The two are reached through separate credentials over separate network paths, and the information that once linked them was deleted from the beliefs side rather than just hidden from it. Everything is encrypted in transit and at rest, including backups.",
+      },
+      {
+        q: 'Could a data breach expose what I believe?',
+        a: "No system is unbreakable, and anyone claiming otherwise is either uninformed or selling something. What a responsible design does is limit what a breach would actually yield. Because your identity and your beliefs are held separately, a copy of the belief database on its own is a large collection of opinions attached to meaningless numbers, with nothing in it that says whose opinions they are. That's the difference between data being hidden and data being absent: hidden data can be exposed by a bug or a misconfiguration, and absent data cannot.",
+      },
+      {
+        q: 'Who at Voxivium can see my individual answers?',
+        a: 'Access follows least privilege, so each part of the system holds only the permissions its job requires, and the credentials that reach sensitive data are separate from the ones used for everything else. Administrative actions require a specific elevated permission plus recent re-authentication, so a long-lived session cannot be used to reach sensitive data. Every administrative action writes a permanent audit record of who did what and exactly what changed, written in the same database transaction as the change itself—so an action cannot succeed without being logged.',
+      },
+      {
+        q: 'Is Voxivium certified against SOC 2, ISO 27001, or similar standards?',
+        a: 'Not yet, and we would rather say so than let you assume otherwise. The platform is engineered against those frameworks—ISO/IEC 27018 in particular, which covers protecting personal data in cloud systems and is the closest match to how Voxivium is built—but we have not completed formal third-party audit. Didit, the specialist provider that handles identity-document verification, is independently certified: SOC 2 Type I, ISO/IEC 27001, 27017, and 27018, with a GDPR data processing agreement. When Voxivium completes its own audits, the results will be published on the security page.',
+      },
+      {
+        q: 'What data does Voxivium share with politicians, media, or AI labs?',
+        a: 'Aggregate counts, never individuals. A politician can see that a share of verified constituents in their district holds a position. They cannot see who, and no subscription tier, partnership, or commercial arrangement unlocks that—the capability does not exist in the product. Individual data is never sold to anyone, and Voxivium does not provide lists, segments, or any means of reaching identified people based on what they believe.',
+      },
+      {
+        q: 'What happens to my data if I delete my account?',
+        a: 'Deletion runs in two stages. Immediately, your personal fields are anonymized, you are signed out, and your positions are removed from every district and national aggregate—the records are physically moved out of the tables that aggregate reporting reads, so no future query can reach them by mistake. After a short retention window, a scheduled job permanently deletes the remaining personal record along with your belief and stance records from both databases. The delay exists so an accidental deletion is recoverable for a limited period, not so anything is quietly kept.',
       },
     ],
   },
@@ -206,6 +243,11 @@ const faqSchema = {
                 </details>
               ))}
             </div>
+            {g.link && (
+              <p class="group-link">
+                <a href={g.link.href}>{g.link.label}</a>
+              </p>
+            )}
           </div>
         ))
       }
@@ -281,6 +323,21 @@ const faqSchema = {
 
   .group + .group {
     margin-top: 3rem;
+  }
+
+  .group-link {
+    margin: 1.25rem 0 0;
+    font-size: 0.9375rem;
+  }
+
+  .group-link a {
+    color: var(--color-brand-primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-brand-primary), transparent 60%);
+  }
+
+  .group-link a:hover {
+    border-bottom-color: var(--color-brand-primary);
   }
 
   .group h2 {

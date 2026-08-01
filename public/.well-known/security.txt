@@ -1,0 +1,11 @@
+# Voxivium security contact — RFC 9116
+# https://www.rfc-editor.org/rfc/rfc9116.html
+#
+# Refresh Expires before it lapses. An expired security.txt reads as an
+# abandoned channel, which is worse than not publishing one.
+
+Contact: mailto:privacy@voxivium.com
+Expires: 2027-08-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://voxivium.com/.well-known/security.txt
+Policy: https://voxivium.com/security
