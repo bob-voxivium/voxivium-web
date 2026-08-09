@@ -262,16 +262,49 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
               return data.paypal_order_id
             },
             onApprove: async (paypalData) => {
-              // Server-side capture is handled by the webhook
-              // (PAYMENT.CAPTURE.COMPLETED → fund_ledger insert). Browser
-              // just shows a thank-you while that lands.
-              surfaceStatus(
-                `Thank you! Your donation is being processed. PayPal order id: ${paypalData.orderID}`,
-                'success',
-              )
-              // Reset the Turnstile widget so a repeat donation starts
-              // fresh. The token we just consumed is single-use.
-              resetTurnstile()
+              // Approval does NOT charge the donor. PayPal leaves the
+              // order in APPROVED until the merchant captures it, and an
+              // uncaptured order silently expires. Donations taken before
+              // 2026-08-09 stopped here and showed a thank-you for money
+              // that was never collected, so this call is the payment.
+              surfaceStatus('Completing your donation with PayPal…', 'info')
+              try {
+                const response = await fetch(`${voxiviumAPIBase}/donate/capture`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ paypal_order_id: paypalData.orderID }),
+                })
+                if (!response.ok) {
+                  const body = await response.text().catch(() => '')
+                  // 402 is the server telling us PayPal declined and the
+                  // donor was not charged. Say exactly that — never imply
+                  // a payment may have gone through when it did not.
+                  surfaceStatus(
+                    response.status === 402
+                      ? 'PayPal could not complete the payment. You have not been charged — please try again.'
+                      : `We couldn't complete the donation (${response.status}). If you were charged, contact support with PayPal order id ${paypalData.orderID}.`,
+                    'error',
+                  )
+                  throw new Error(`donate/capture failed: ${response.status} ${body}`)
+                }
+                const data = await response.json()
+                // The capture id is the donor's proof of payment. Show it
+                // even if the receipt email failed, so they always leave
+                // with a transaction identifier.
+                const receiptLine = data.receipt_sent
+                  ? 'A receipt is on its way to your PayPal email address.'
+                  : 'Please save this transaction ID — we could not send your receipt email.'
+                surfaceStatus(
+                  `Thank you! Your donation is complete. Transaction ID: ${data.capture_id}. ${receiptLine}`,
+                  'success',
+                )
+              } finally {
+                // Reset the Turnstile widget so a repeat donation starts
+                // fresh. The token we consumed at createOrder is
+                // single-use, and this runs on the failure path too so a
+                // retry isn't blocked by a spent token.
+                resetTurnstile()
+              }
             },
             onCancel: () => {
               surfaceStatus('Donation cancelled. No charge was made.', 'info')
