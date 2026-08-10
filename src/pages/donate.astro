@@ -2,9 +2,13 @@
 import BaseLayout from '@layouts/BaseLayout.astro'
 import OnboardingFundLiveStatus from '@components/sections/OnboardingFundLiveStatus.astro'
 
-// Voter Onboarding Fund donations — PayPal one-time payments. $2 minimum
-// (covers the donor's own onboarding + at least one more voter); presets
-// $25 / $50 / $100 plus custom.
+// Voter Onboarding Fund donations — PayPal one-time payments. $2 minimum;
+// presets $25 / $50 / $100 plus custom.
+//
+// Onboarding costs $0.25 per verified voter as of 2026-08-09 (was $1.00),
+// so every figure quoted on this page is dollars x 4. The authoritative
+// value is ONBOARDING_COST_CENTS on voxivium-mvp — if it changes again,
+// this copy is wrong until it is updated with it.
 //
 // Per CEO #5 / features.md §12.2 / §13.2: small ($2 / $10) in-app IAPs
 // stay app-side; the web /donate page is for *anyone* who wants to
@@ -30,7 +34,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
 
 <BaseLayout
   title="Donate to the Voter Onboarding Fund — Voxivium"
-  description="Voter verification costs Voxivium money per person. Every dollar you donate covers onboarding for another verified voter. $2 minimum, no subscription."
+  description="Voter verification costs Voxivium money per person. Every dollar you donate onboards four more verified voters. $2 minimum, no subscription."
   breadcrumbs={[
     { name: 'Home', path: '/' },
     { name: 'Support us', path: '/donate' },
@@ -41,14 +45,14 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
       Voter Onboarding Fund
     </p>
     <h1 class="text-brand-text1 mt-2 text-3xl font-semibold">
-      Every dollar you donate goes towards onboarding a new user.
+      Every dollar you donate onboards four new voters.
     </h1>
     <p class="text-brand-text2 mt-4 text-lg">
       Every Voxivium voter is identity-verified and matched against their
       voter registration before their voice contributes to district
-      aggregates. Each new verified voter costs us around $1 in third-party
-      service fees. The Voter Onboarding Fund covers that cost so signup
-      stays free for the citizen.
+      aggregates. Each new verified voter costs us about 25 cents in
+      third-party service fees. The Voter Onboarding Fund covers that cost
+      so signup stays free for the citizen.
     </p>
     <p class="text-brand-text3 mt-4 text-sm">
       Voxivium is a Public Benefit Corporation. Donations are not
@@ -67,17 +71,17 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
           <label class="border-brand-el1 hover:bg-brand-el1 has-checked:border-brand-primary has-checked:bg-brand-el1 cursor-pointer rounded-md border p-3 text-center transition-colors">
             <input type="radio" name="amount" value="25" class="sr-only" checked />
             <span class="text-brand-text1 block text-lg font-semibold">$25</span>
-            <span class="text-brand-text3 text-xs">≈ 25 voters</span>
+            <span class="text-brand-text3 text-xs">≈ 100 voters</span>
           </label>
           <label class="border-brand-el1 hover:bg-brand-el1 has-checked:border-brand-primary has-checked:bg-brand-el1 cursor-pointer rounded-md border p-3 text-center transition-colors">
             <input type="radio" name="amount" value="50" class="sr-only" />
             <span class="text-brand-text1 block text-lg font-semibold">$50</span>
-            <span class="text-brand-text3 text-xs">≈ 50 voters</span>
+            <span class="text-brand-text3 text-xs">≈ 200 voters</span>
           </label>
           <label class="border-brand-el1 hover:bg-brand-el1 has-checked:border-brand-primary has-checked:bg-brand-el1 cursor-pointer rounded-md border p-3 text-center transition-colors">
             <input type="radio" name="amount" value="100" class="sr-only" />
             <span class="text-brand-text1 block text-lg font-semibold">$100</span>
-            <span class="text-brand-text3 text-xs">≈ 100 voters</span>
+            <span class="text-brand-text3 text-xs">≈ 400 voters</span>
           </label>
         </div>
       </fieldset>
@@ -100,8 +104,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
           />
         </div>
         <p id="amount-custom-help" class="text-brand-text3 mt-1 text-xs">
-          Entering a custom amount overrides the preset above. $2 covers
-          your own onboarding plus one additional voter. Pay it forward!
+          Entering a custom amount overrides the preset above. $2 onboards
+          eight voters. Pay it forward!
         </p>
       </div>
 

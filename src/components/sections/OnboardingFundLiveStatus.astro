@@ -13,6 +13,12 @@
 // brand choice (people understand "saves N voters" better than a dollar
 // balance, and it normalizes for ONBOARDING_COST_CENTS tuning).
 //
+// It deliberately shows fund CAPACITY only. A cumulative "N voters
+// onboarded to date" line was removed 2026-08-09 (CEO): pre-launch it
+// published a small user count that undersells the platform, and it is
+// the one number here that measures traction rather than need. The API
+// still returns voters_onboarded — it is simply not rendered.
+//
 // Variants are driven by data attributes (variant="banner"|"card") so a
 // single component can wear both hats.
 
@@ -46,11 +52,6 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
     >
       <span data-fund-summary>Loading live balance…</span>
     </p>
-    <p
-      class="text-brand-text3 mt-1 text-xs"
-      data-fund-detail
-      hidden
-    ></p>
   </div>
   {variant === 'banner' && (
     <a
@@ -70,7 +71,6 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
   document.querySelectorAll('[data-fund-status]:not([data-fund-bound])').forEach((host) => {
     host.setAttribute('data-fund-bound', 'true')
     const summary = host.querySelector('[data-fund-summary]')
-    const detail = host.querySelector('[data-fund-detail]')
     const variant = host.getAttribute('data-variant') ?? 'card'
 
     if (!voxiviumAPIBase) {
@@ -83,7 +83,6 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))))
       .then((data) => {
         const balanceUsers = Number(data?.balance_users ?? 0)
-        const lifetimeVoters = Number(data?.voters_onboarded ?? 0)
         const status = String(data?.status ?? 'HEALTHY').toUpperCase()
 
         // User-facing copy varies by status. Negative balance reads as
@@ -98,11 +97,6 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
           headline = `Operating advance: ${carry} voters`
         }
         if (summary) summary.textContent = headline
-
-        if (detail) {
-          detail.hidden = false
-          detail.textContent = `${lifetimeVoters.toLocaleString()} voters onboarded to date.`
-        }
 
         // Emphasize when below LOW. The banner variant uses inline
         // styles to avoid a Tailwind class-purge round trip.
@@ -127,7 +121,6 @@ const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
       })
       .catch((err) => {
         if (summary) summary.textContent = 'Live balance unavailable right now.'
-        // eslint-disable-next-line no-console
         console.warn('fund status fetch failed', err)
       })
   })
