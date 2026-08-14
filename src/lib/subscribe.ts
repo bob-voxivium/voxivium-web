@@ -32,7 +32,7 @@ export const SUBSCRIBE_PLANS: Record<SubscribePlanID, SubscribePlan> = {
     id: 'premium-subscriber-yearly',
     displayName: 'Premium Subscriber Yearly',
     description:
-      'Annual voter premium tier — AI-generated politician reviews, out-of-district report-card access, and shared-beliefs-in-your-community reports as they ship.',
+      'Annual voter premium tier — a personalized monthly analysis of how your elected officials are representing your most important beliefs, out-of-district report-card access, and shared-beliefs-in-your-community reports as they ship.',
     priceUSD: 19.95,
     priceLabel: '$19.95 / year',
     paypalPlanIdEnvKey: 'PUBLIC_PAYPAL_PLAN_ID_PREMIUM_SUBSCRIBER_YEARLY',
