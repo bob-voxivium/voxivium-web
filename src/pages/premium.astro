@@ -1,0 +1,65 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import PremiumTiers from '@components/sections/PremiumTiers.astro'
+
+// Public pricing page for the voter Premium tiers.
+//
+// Until this shipped, the only price anywhere on voxivium-web lived inside
+// /subscribe — a transactional handoff page reached from the app, marked
+// noindex. Anyone evaluating Voxivium from the marketing site could not find
+// out what it costs, and the one price that did exist was the most expensive
+// per year of the three.
+//
+// The free tier leads. Report cards are free forever (see the standing rule
+// that upsell surfaces must open with the free thing, not the paid one), and
+// burying that under three price cards would misrepresent the product.
+---
+
+<BaseLayout
+  title="Voxivium Premium — pricing"
+  description="Voter accounts and report cards are free, forever. Voxivium Premium adds monthly AI analysis of how your elected officials represent your beliefs. Three tiers from $19.95."
+>
+  <section class="free-first">
+    <p class="eyebrow">Pricing</p>
+    <h1 class="title">Voxivium is free for voters.</h1>
+    <p class="lede">
+      Creating an account, answering belief questions, and reading the report
+      card for every official who represents you costs nothing and always will.
+      There are no ads, no political donors, and we never share or sell your
+      personally identifiable information.
+    </p>
+  </section>
+
+  <PremiumTiers />
+</BaseLayout>
+
+<style>
+  .free-first {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: 4rem 1.5rem 0;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .title {
+    color: var(--color-brand-text1);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  .lede {
+    color: var(--color-brand-text2);
+    margin-top: 1rem;
+    max-width: 46rem;
+    line-height: 1.6;
+    font-size: 1.0625rem;
+  }
+</style>

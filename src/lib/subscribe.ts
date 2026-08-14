@@ -41,6 +41,84 @@ export const SUBSCRIBE_PLANS: Record<SubscribePlanID, SubscribePlan> = {
 }
 
 /**
+ * One voter Premium tier as the marketing surfaces present it.
+ *
+ * Deliberately separate from SUBSCRIBE_PLANS above. That map is the
+ * *purchasable* catalog — /subscribe validates ?plan= against it and refuses
+ * anything it can't take money for. Web can only sell the yearly tier
+ * (PayPal's Subscriptions API caps interval_count at 1 YEAR, so the two
+ * one-time tiers have no billing path here), but the site should still
+ * *show* all three. Listing only the most expensive-per-year option is the
+ * worst of both worlds.
+ *
+ * Adding a tier here must never make it purchasable; that requires a
+ * SUBSCRIBE_PLANS entry with a real paypalPlanIdEnvKey.
+ */
+export interface PremiumTier {
+  /** Product identity — matches subscription_plan.name and the store product. */
+  name: string
+  priceLabel: string
+  /** "per year" / "one-time" — the billing shape, spelled out. */
+  termLabel: string
+  /** Comparative value. Null for the baseline tier. */
+  valueLabel: string | null
+  /** Ribbon. Null for tiers that get none. */
+  badge: string | null
+  /** What the duration means in civic terms rather than calendar terms. */
+  cycleLine: string
+  /** Renewal truth — a five-year buyer must not assume it renews. */
+  renewalLine: string
+  /** True when web can actually sell it; false routes to the mobile apps. */
+  purchasableOnWeb: boolean
+}
+
+/**
+ * The three voter tiers, in ladder order.
+ *
+ * Prices mirror subscription_plan and the store products ($19.95 / $49.95 /
+ * $99.00, CEO 2026-07-30). They are duplicated here rather than fetched
+ * because this is a static marketing page — but they are the *list* prices,
+ * and the amount charged always comes from PayPal or the store.
+ *
+ * Election-cycle framing is deliberately conservative: a 5-year entitlement
+ * bought at any point covers a whole 4-year presidential term with a year to
+ * spare, so that claim holds regardless of purchase date. Anything more
+ * specific would be false for some buyers.
+ */
+export const PREMIUM_TIERS: PremiumTier[] = [
+  {
+    name: 'Premium Subscriber Yearly',
+    priceLabel: '$19.95',
+    termLabel: 'per year',
+    valueLabel: null,
+    badge: null,
+    cycleLine: 'Through the next election.',
+    renewalLine: 'Renews automatically. Cancel anytime.',
+    purchasableOnWeb: true,
+  },
+  {
+    name: 'Premium Subscriber 5-Year',
+    priceLabel: '$49.95',
+    termLabel: 'one payment, five years',
+    valueLabel: '$9.99/year equivalent — save 50%',
+    badge: 'Best value',
+    cycleLine: 'Covers a full presidential term.',
+    renewalLine: 'One payment. Does not renew automatically.',
+    purchasableOnWeb: false,
+  },
+  {
+    name: 'Premium Subscriber Lifetime',
+    priceLabel: '$99.00',
+    termLabel: 'one payment, forever',
+    valueLabel: 'One payment. Never pay again.',
+    badge: 'Founding supporter',
+    cycleLine: 'Every election, for good.',
+    renewalLine: 'One payment. Never expires.',
+    purchasableOnWeb: false,
+  },
+]
+
+/**
  * Parse the comma-separated PUBLIC_SUBSCRIBE_ALLOWED_ORIGINS env var into an
  * allowlist of full origin strings (e.g. "https://app.voxivium.com").
  */

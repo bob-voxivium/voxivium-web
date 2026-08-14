@@ -1,0 +1,251 @@
+---
+/**
+ * Voter Premium pricing ladder.
+ *
+ * The job of this component is to stop three prices reading as
+ * cheap → expensive → very expensive. $49.95 for five years is $9.99/year,
+ * half the annual rate, but a reader scanning bare numbers will pick the
+ * smallest one unless the comparison is spelled out. Hence the value line
+ * and the "Best value" ribbon on the middle tier.
+ *
+ * Data comes from PREMIUM_TIERS in src/lib/subscribe.ts — the same file the
+ * checkout page reads its purchasable catalog from, so the two can't drift
+ * into quoting different prices for the same product.
+ */
+import { PREMIUM_TIERS } from '@lib/subscribe'
+
+interface Props {
+  /** Heading level, so the section can sit under an existing h1 or stand alone. */
+  headingLevel?: 'h1' | 'h2'
+}
+
+const { headingLevel = 'h2' } = Astro.props
+const Heading = headingLevel
+---
+
+<section class="tiers-section">
+  <p class="eyebrow">Voxivium Premium</p>
+  <Heading class="tiers-title">Voter accounts are free. Premium goes deeper.</Heading>
+  <p class="tiers-intro">
+    Report cards for the officials who represent you are free, always. Premium
+    adds a monthly AI analysis weighing each official's record against the
+    beliefs you marked most important, plus search across every elected
+    official in the country.
+  </p>
+
+  <ul class="tiers-grid" role="list">
+    {
+      PREMIUM_TIERS.map((tier) => (
+        <li class:list={['tier-card', { featured: tier.badge === 'Best value' }]}>
+          <div class="tier-head">
+            <h3 class="tier-name">{tier.name}</h3>
+            {tier.badge && <span class="tier-badge">{tier.badge}</span>}
+          </div>
+
+          <p class="tier-price">
+            <span class="amount">{tier.priceLabel}</span>
+            <span class="term">{tier.termLabel}</span>
+          </p>
+
+          {tier.valueLabel && <p class="tier-value">{tier.valueLabel}</p>}
+
+          <p class="tier-cycle">{tier.cycleLine}</p>
+          <p class="tier-renewal">{tier.renewalLine}</p>
+
+          {tier.purchasableOnWeb ? (
+            <a class="tier-cta" href="/subscribe?plan=premium-subscriber-yearly&origin=kmp-web">
+              Subscribe
+            </a>
+          ) : (
+            <p class="tier-app-only">Available in the Voxivium app for iPhone and Android.</p>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="tiers-footnote">
+    Prices in USD. Purchases made in the app are billed by Apple or Google at
+    their listed price. Voxivium is a Public Benefit Corporation — subscriptions
+    fund the product and help onboard new verified voters.
+  </p>
+</section>
+
+<style>
+  .tiers-section {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: 4rem 1.5rem;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tiers-title {
+    color: var(--color-brand-text1);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  .tiers-intro {
+    color: var(--color-brand-text2);
+    margin-top: 0.75rem;
+    max-width: 46rem;
+    line-height: 1.6;
+  }
+
+  .tiers-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    margin-top: 2.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .tiers-grid {
+      grid-template-columns: repeat(3, 1fr);
+      align-items: start;
+    }
+  }
+
+  /* Surface matches FeatureCard: 24px corners, ~5% TL→BR gradient, diffuse
+     low-alpha shadow. Per KMP STYLE_GUIDE §1–2, mirrored on the web. */
+  .tier-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 1.75rem;
+    border-radius: 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--color-brand-text1), transparent 88%);
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--color-brand-surface), white 4%) 0%,
+        var(--color-brand-surface) 60%,
+        color-mix(in oklab, var(--color-brand-surface), black 3%) 100%
+      );
+    box-shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.05);
+  }
+
+  :global(html.dark) .tier-card {
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--color-brand-surface), white 5%) 0%,
+        var(--color-brand-surface) 60%,
+        color-mix(in oklab, var(--color-brand-surface), black 8%) 100%
+      );
+    box-shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.5);
+  }
+
+  /* The value tier gets a ring rather than a scale transform — growing one
+     card shifts the row's baseline and makes the other two feel demoted. */
+  .tier-card.featured {
+    border-color: var(--color-brand-primary);
+    box-shadow:
+      0 0 0 1px var(--color-brand-primary),
+      0 24px 48px -32px rgba(0, 0, 0, 0.08);
+  }
+
+  .tier-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .tier-name {
+    color: var(--color-brand-text1);
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  .tier-badge {
+    background: var(--color-brand-primary);
+    color: var(--color-brand-on-primary);
+    border-radius: 999px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .tier-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+
+  .amount {
+    color: var(--color-brand-text1);
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .term {
+    color: var(--color-brand-text3);
+    font-size: 0.9375rem;
+  }
+
+  .tier-value {
+    color: var(--color-brand-primary);
+    font-weight: 600;
+  }
+
+  .tier-cycle {
+    color: var(--color-brand-text2);
+  }
+
+  .tier-renewal {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+  }
+
+  .tier-cta {
+    margin-top: auto;
+    padding-top: 1.25rem;
+  }
+
+  .tier-cta {
+    display: block;
+    text-align: center;
+    background: var(--color-brand-primary);
+    color: var(--color-brand-on-primary);
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .tier-cta:hover {
+    filter: brightness(1.08);
+  }
+
+  .tier-app-only {
+    margin-top: auto;
+    padding-top: 1.25rem;
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+  }
+
+  .tiers-footnote {
+    color: var(--color-brand-text3);
+    font-size: 0.8125rem;
+    margin-top: 2rem;
+    max-width: 46rem;
+    line-height: 1.6;
+  }
+</style>
