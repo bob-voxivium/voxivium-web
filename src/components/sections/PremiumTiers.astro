@@ -21,6 +21,8 @@ interface Props {
 
 const { headingLevel = 'h2' } = Astro.props
 const Heading = headingLevel
+
+const voxiviumAPIBase = import.meta.env.PUBLIC_VOXIVIUM_API_BASE ?? ''
 ---
 
 <section class="tiers-section">
@@ -36,21 +38,30 @@ const Heading = headingLevel
   <ul class="tiers-grid" role="list">
     {
       PREMIUM_TIERS.map((tier) => (
-        <li class:list={['tier-card', { featured: tier.badge === 'Best value' }]}>
+        <li
+          class:list={['tier-card', { featured: tier.badge === 'Best value' }]}
+          data-tier
+          data-tier-name={tier.name}
+        >
           <div class="tier-head">
             <h3 class="tier-name">{tier.name}</h3>
             {tier.badge && <span class="tier-badge">{tier.badge}</span>}
           </div>
 
           <p class="tier-price">
-            <span class="amount">{tier.priceLabel}</span>
-            <span class="term">{tier.termLabel}</span>
+            <span class="amount" data-tier-amount>{tier.priceLabel}</span>
+            <span class="term" data-tier-term>{tier.termLabel}</span>
           </p>
 
-          {tier.valueLabel && <p class="tier-value">{tier.valueLabel}</p>}
+          {/* Rendered even when empty so the live read has a node to fill —
+              the yearly tier is the baseline and carries no value line until
+              the API confirms it is still the baseline. */}
+          <p class="tier-value" data-tier-value hidden={!tier.valueLabel}>
+            {tier.valueLabel}
+          </p>
 
           <p class="tier-cycle">{tier.cycleLine}</p>
-          <p class="tier-renewal">{tier.renewalLine}</p>
+          <p class="tier-renewal" data-tier-renewal>{tier.renewalLine}</p>
 
           {tier.purchasableOnWeb ? (
             <a class="tier-cta" href="/subscribe?plan=premium-subscriber-yearly&origin=kmp-web">
@@ -70,6 +81,101 @@ const Heading = headingLevel
     fund the product and help onboard new verified voters.
   </p>
 </section>
+
+<script is:inline define:vars={{ voxiviumAPIBase }} type="module">
+  // Live price read from voxivium-mvp GET /api/pricing (anonymous, cached).
+  //
+  // The card markup above is server-rendered from PREMIUM_TIERS, so the page
+  // is complete, correct and indexable with JavaScript disabled or the API
+  // down. This only *reconciles* it against subscription_plan, which is what
+  // stops a price change in the database leaving the marketing site quoting
+  // last quarter's number.
+  //
+  // Tiers are matched by plan name — the same string the store product,
+  // subscription_plan.name and the app all key on.
+  if (voxiviumAPIBase) {
+    const cards = document.querySelectorAll('[data-tier]:not([data-tier-bound])')
+    if (cards.length) {
+      cards.forEach((el) => el.setAttribute('data-tier-bound', ''))
+
+      const monthsOf = (t) => {
+        if (t.duration_unit === 'YEAR') return t.duration_value * 12
+        if (t.duration_unit === 'MONTH') return t.duration_value
+        return 0
+      }
+      // Lifetime by either signal, mirroring the app: a term at or beyond the
+      // 100-year horizon must never be annualized, or $99 becomes $0.99/year
+      // and the lifetime tier claims a 95% saving.
+      const isLifetime = (t) => t.lifetime === true || monthsOf(t) >= 1200
+      const annualCents = (t) => {
+        const m = monthsOf(t)
+        if (isLifetime(t) || !m || !t.price_cents) return null
+        return (t.price_cents * 12) / m
+      }
+      const usd = (cents) => {
+        const whole = Math.floor(cents / 100)
+        const rem = Math.round(cents % 100)
+        return `$${whole}.${String(rem).padStart(2, '0')}`
+      }
+      const termOf = (t) => {
+        if (isLifetime(t)) return 'one payment, forever'
+        if (t.renews && monthsOf(t) === 12) return 'per year'
+        if (t.duration_unit === 'YEAR') return `one payment, ${t.duration_value} years`
+        return `one payment, ${t.duration_value} ${t.duration_unit.toLowerCase()}`
+      }
+
+      fetch(`${voxiviumAPIBase}/api/pricing`, { credentials: 'omit' })
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+        .then((data) => {
+          const tiers = Array.isArray(data?.tiers) ? data.tiers : []
+          if (!tiers.length) return
+
+          // Baseline is the most expensive year — in practice the yearly
+          // plan. Savings are quoted against it.
+          const annuals = tiers.map(annualCents).filter((v) => v !== null)
+          const baseline = annuals.length ? Math.max(...annuals) : null
+
+          tiers.forEach((t) => {
+            const card = document.querySelector(`[data-tier][data-tier-name="${CSS.escape(t.name)}"]`)
+            if (!card) return
+
+            const amountEl = card.querySelector('[data-tier-amount]')
+            if (amountEl && t.price_cents) amountEl.textContent = usd(t.price_cents)
+
+            const termEl = card.querySelector('[data-tier-term]')
+            if (termEl) termEl.textContent = termOf(t)
+
+            const renewalEl = card.querySelector('[data-tier-renewal]')
+            if (renewalEl) {
+              renewalEl.textContent = isLifetime(t)
+                ? 'One payment. Never expires.'
+                : t.renews
+                  ? 'Renews automatically. Cancel anytime.'
+                  : 'One payment. Does not renew automatically.'
+            }
+
+            const valueEl = card.querySelector('[data-tier-value]')
+            if (!valueEl) return
+            const annual = annualCents(t)
+            let line = ''
+            if (isLifetime(t)) {
+              line = 'One payment. Never pay again.'
+            } else if (baseline && annual !== null) {
+              const pct = Math.round(((baseline - annual) / baseline) * 100)
+              // Below 5% the discount is not worth a claim.
+              if (pct >= 5) line = `${usd(annual)}/year equivalent — save ${pct}%`
+            }
+            valueEl.textContent = line
+            valueEl.hidden = line === ''
+          })
+        })
+        .catch(() => {
+          // Server-rendered prices stand. A marketing page must never blank
+          // its own price list because a fetch failed.
+        })
+    }
+  }
+</script>
 
 <style>
   .tiers-section {
