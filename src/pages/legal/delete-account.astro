@@ -1,0 +1,336 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+
+const lastUpdated = 'August 17, 2026'
+---
+
+<BaseLayout
+  title="Delete Your Voxivium Account — Voxivium"
+  description="How to request deletion of your Voxivium account and data, what gets deleted, what is kept, and for how long."
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Delete Your Account', path: '/legal/delete-account' },
+  ]}
+>
+  <article class="legal">
+    <header class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Legal</p>
+        <h1>Delete your Voxivium account</h1>
+        <p class="meta">Last updated: {lastUpdated}</p>
+        <p class="lead">
+          This page explains how to request deletion of your <strong>Voxivium</strong> account and
+          the data associated with it. Voxivium is published by <strong>Voxivium, PBC</strong>, a
+          Delaware Public Benefit Corporation.
+        </p>
+      </div>
+    </header>
+
+    <section class="prose">
+      <div class="container">
+        <div class="callout">
+          <h2 id="steps">How to request account deletion</h2>
+          <p>You can delete your account yourself, from inside the app, at any time.</p>
+          <ol>
+            <li>Open the <strong>Voxivium</strong> app and sign in.</li>
+            <li>Tap your <strong>profile icon</strong> in the top bar to open the account menu.</li>
+            <li>
+              Scroll to the <strong>Danger zone</strong> section and tap
+              <strong>"Delete my account."</strong>
+            </li>
+            <li>
+              Read the confirmation steps. They explain what deletion does and offer alternatives
+              such as leaving your account dormant. You can stop at any point.
+            </li>
+            <li>
+              On the final screen, tap <strong>"Delete my account"</strong> to confirm. Your account
+              is deleted immediately and you are signed out on that device.
+            </li>
+          </ol>
+        </div>
+
+        <h3>If you can't sign in</h3>
+        <p>
+          If you have lost access to your account and cannot complete the steps above, email <a
+            href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
+          > from the address associated with your account and ask us to delete it. We will verify that
+          you control the account before acting on the request, and we complete verified requests within
+          30 days.
+        </p>
+
+        <h2 id="what-is-deleted">What is deleted</h2>
+        <p>
+          Deletion happens in two stages: an immediate stage when you confirm, and a permanent
+          purge 30 days later.
+        </p>
+
+        <h3>Immediately, when you confirm</h3>
+        <ul>
+          <li>
+            <strong>Your identity record is anonymized.</strong> Your name, residential address,
+            date of birth, phone number, and email address are erased from your account record and
+            replaced with non-identifying placeholders. Your sign-in credential link is removed, so
+            the account can no longer be accessed.
+          </li>
+          <li>
+            <strong>Your civic input stops counting.</strong> Your belief stances, importance
+            ratings, and stances on legislation, executive orders, and court rulings are removed
+            from all district and national aggregates. Any unsaved draft beliefs are deleted
+            outright.
+          </li>
+          <li>
+            <strong>Your account is marked deleted</strong> and can no longer be signed in to.
+          </li>
+        </ul>
+
+        <h3>Permanently, 30 days after you confirm</h3>
+        <p>
+          A scheduled job removes the remaining records from our production systems. This includes:
+        </p>
+        <ul>
+          <li>Your account record and your voter record.</li>
+          <li>
+            Your profile data: first and last name, residential address, date of birth, political
+            party affiliation, gender, and race or ethnicity if you chose to provide it.
+          </li>
+          <li>Your identity verification result and your voter registration verification result.</li>
+          <li>Your assigned voter districts and voter registration history.</li>
+          <li>
+            All of your civic input: belief stances, importance ratings, poll responses, and stances
+            on legislation, executive orders, and court rulings.
+          </li>
+          <li>Your cached report card and any account role or account-issue records.</li>
+        </ul>
+        <p>
+          The 30-day window exists so that a deletion made by mistake, or by someone who gained
+          access to your device, can be reversed by contacting <a
+            href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
+          >. After 30 days, deletion cannot be undone.
+        </p>
+
+        <h3>Backups</h3>
+        <p>
+          Deleted data is purged from encrypted backups within <strong>90 days</strong> of the
+          deletion request. Backups are not used to restore deleted accounts.
+        </p>
+
+        <h2 id="what-is-kept">What is kept, and for how long</h2>
+        <ul>
+          <li>
+            <strong>A record that a deletion occurred.</strong> We keep a security audit entry
+            noting that an account deletion happened, along with the time, the originating IP
+            address, and a pseudonymous identifier. It does not contain your name, address, or
+            email. We keep it to protect accounts against unauthorized deletion.
+          </li>
+          <li>
+            <strong>Aggregated, anonymized statistics.</strong> Statistics previously derived from
+            civic input and disclosed to customers are not individually identifiable and are not
+            recalled from those customers. Your future contribution to those statistics stops
+            immediately on deletion.
+          </li>
+          <li>
+            <strong>Records we are legally required to keep.</strong> We may retain limited
+            information, such as transaction and billing records, for as long as tax, accounting, or
+            fraud-prevention law requires.
+          </li>
+          <li>
+            <strong>Marketing email signups.</strong> If you joined our email list through
+            voxivium.com, that is a separate record from your app account. To remove it, use the
+            unsubscribe link in any message or email <a href="mailto:privacy@voxivium.com"
+              >privacy@voxivium.com</a
+            >.
+          </li>
+        </ul>
+        <p>
+          Voxivium does not collect or store your government-issued identity documents at any point,
+          so there are none to delete. Identity verification is performed by a third-party provider;
+          we retain only the result.
+        </p>
+
+        <h2 id="deleting-some-data">Deleting some data without deleting your account</h2>
+        <p>
+          You do not have to delete your account to remove or change individual data. From inside
+          the app you can edit or clear the profile fields you provided, and you can change or
+          remove your stance on any belief, bill, executive order, or court ruling at any time. A
+          removed stance stops counting toward district and national aggregates.
+        </p>
+        <p>
+          Some data cannot be removed while your account remains open, because the service depends
+          on it: your email address, your identity verification result, and your voter registration
+          status and districts are required to keep an account eligible. To remove those, delete the
+          account.
+        </p>
+        <p>
+          For any deletion request that the app does not cover, email <a
+            href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
+          >. We honor verified requests within 30 days.
+        </p>
+
+        <h2 id="subscriptions">Subscriptions</h2>
+        <p>
+          Deleting your account does <strong>not</strong> cancel a paid subscription. Subscriptions
+          are billed by the store or processor you purchased through, and must be canceled there:
+        </p>
+        <ul>
+          <li>
+            <strong>Google Play:</strong> Play Store → profile icon → Payments &amp; subscriptions →
+            Subscriptions → Voxivium → Cancel subscription.
+          </li>
+          <li>
+            <strong>Apple App Store:</strong> Settings → your name → Subscriptions → Voxivium →
+            Cancel Subscription.
+          </li>
+          <li>
+            <strong>PayPal:</strong> Settings → Payments → Manage automatic payments → Voxivium →
+            Cancel.
+          </li>
+        </ul>
+        <p>Cancel the subscription before deleting your account, so billing stops.</p>
+
+        <h2 id="contact">Questions</h2>
+        <div class="contact">
+          Voxivium, PBC<br />
+          Privacy: <a href="mailto:privacy@voxivium.com">privacy@voxivium.com</a><br />
+          Support: <a href="mailto:support@voxivium.com">support@voxivium.com</a><br />
+          Full policy: <a href="/legal/privacy">Privacy Policy</a>
+        </div>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    color: var(--color-brand-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.875rem);
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .meta {
+    margin: 1rem 0 0;
+    color: var(--color-brand-text4);
+    font-size: 0.9375rem;
+  }
+
+  .lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-brand-text2);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    max-width: 36rem;
+  }
+
+  .prose {
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .prose h2 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--color-brand-text1);
+    margin: 2.5rem 0 0.75rem;
+    line-height: 1.25;
+  }
+
+  .prose h2:first-child {
+    margin-top: 0;
+  }
+
+  .prose h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-brand-text1);
+    margin: 1.75rem 0 0.625rem;
+    line-height: 1.3;
+  }
+
+  .prose p,
+  .prose li {
+    color: var(--color-brand-text2);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .prose p {
+    margin: 0 0 1rem;
+  }
+
+  .prose ul,
+  .prose ol {
+    margin: 0 0 1.25rem;
+    padding-left: 1.25rem;
+  }
+
+  .prose li {
+    margin-bottom: 0.5rem;
+  }
+
+  .prose li::marker {
+    color: var(--color-brand-text4);
+  }
+
+  .prose a {
+    color: var(--color-brand-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .prose a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .prose strong {
+    color: var(--color-brand-text1);
+    font-weight: 600;
+  }
+
+  /* The deletion steps are what Google's reviewer and a departing user both
+     come here for. Give them a bordered block at the top of the page rather
+     than letting them read as one section among many. */
+  .callout {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el2);
+    border-left: 4px solid var(--color-brand-primary);
+    border-radius: 0.5rem;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .callout h2 {
+    margin-top: 0;
+  }
+
+  .callout ol {
+    margin-bottom: 0;
+  }
+
+  .contact {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-el1);
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    line-height: 1.7;
+  }
+</style>
