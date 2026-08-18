@@ -105,4 +105,27 @@ else
   fi
 fi
 
+# ── Version + changelog ───────────────────────────────────────────────
+# After the deploy, not before: if the sync or the build fails there is no
+# entry, and the next successful deploy measures back from the last
+# successful one, so the commits from the failed attempt are still
+# reported. The --dry-run path exits well above this, so a dry run never
+# advances the version.
+#
+# Nothing in the built site reads VERSION — the marketing site shows no
+# version to visitors. It exists so changelog entries have something to be
+# keyed on, and so "which deploy introduced this?" has an answer.
+# shellcheck source=deploy/lib/changelog.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/changelog.sh"
+
+current_version=$(tr -d '[:space:]' < VERSION 2>/dev/null || echo "0.0")
+if [[ "$current_version" =~ ^0\.([0-9]+)$ ]]; then
+  next_version="0.$(( BASH_REMATCH[1] + 1 ))"
+  printf '%s\n' "$next_version" > VERSION
+  changelog_prepend "site" "$next_version" "$(git rev-parse --short HEAD)"
+  echo "→ Recorded site ${next_version} in CHANGELOG.md (commit VERSION + CHANGELOG.md)."
+else
+  echo "warning: VERSION reads '${current_version}'; expected 0.<build>. Skipped changelog." >&2
+fi
+
 echo "Deployed. https://voxivium.com/"
