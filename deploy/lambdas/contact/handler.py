@@ -91,9 +91,16 @@ _VALID_SUPPORT_TOPICS = {
     "Voter verification",
     "Billing or subscription",
     "Something is broken",
+    "Account deletion or data request",
     "Feedback or a feature request",
     "Something else",
 }
+
+# Deletion and data-rights requests go to the privacy mailbox, not support.
+# The Privacy Policy names privacy@ as the designated contact and commits to
+# a 30-day turnaround; routing those into a general support queue would put a
+# legal clock in the wrong inbox.
+_PRIVACY_TOPICS = {"Account deletion or data request"}
 
 _turnstile_secret_cache = None
 
@@ -332,7 +339,8 @@ def _send_support_email(item: dict) -> None:
     directly. From stays the verified SES sender — sending as the requester
     would fail DMARC.
     """
-    subject = f"[Voxivium support] {item['topic']} — {item['email']}"
+    queue = "privacy" if item["topic"] in _PRIVACY_TOPICS else "support"
+    subject = f"[Voxivium {queue}] {item['topic']} — {item['email']}"
     lines = [
         "New support request",
         f"Submitted at: {item['submitted_at']}",
@@ -343,9 +351,14 @@ def _send_support_email(item: dict) -> None:
             lines.append(f"{field.replace('_', ' ').title()}: {item[field]}")
     body = "\n".join(lines) + "\n"
 
+    recipient = (
+        os.environ["PRIVACY_RECIPIENT"]
+        if item["topic"] in _PRIVACY_TOPICS
+        else os.environ["SUPPORT_RECIPIENT"]
+    )
     _ses().send_email(
         Source=os.environ["SES_FROM_ADDRESS"],
-        Destination={"ToAddresses": [os.environ["SUPPORT_RECIPIENT"]]},
+        Destination={"ToAddresses": [recipient]},
         ReplyToAddresses=[item["email"]],
         Message={
             "Subject": {"Data": subject},

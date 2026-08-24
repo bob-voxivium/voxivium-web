@@ -13,7 +13,9 @@ voxivium.com (Cloudflare DNS + DDoS/WAF, "Full (strict)" SSL)
                                                    (record_type=politician|media|ai
                                                      |partnership|careers|support,
                                                     pending="1" until emailed)
-                                          └→ SES (support only, sent inline)
+                                          └→ SES (support only, sent inline;
+                                              privacy@ for deletion/data
+                                              requests, support@ otherwise)
 
 EventBridge cron (daily) → drain Lambda
     └── Query sparse `pending-index` GSI →
@@ -25,11 +27,18 @@ Admin: aws lambda invoke voxivium-list-subscribers (CLI only)
 
 `support` is the exception to the daily-digest flow: the `/support` page is the
 Support URL registered with App Store Connect and the Play Console, so those
-submissions are emailed by the contact Lambda immediately (to
-`support@voxivium.com`, Reply-To set to the requester) instead of waiting up to
-24 hours for the drain. The row is still written for the record. If the inline
-send fails, `pending` is left set so the drain retries it — the message is
-never lost, only delayed to the digest.
+submissions are emailed by the contact Lambda immediately (Reply-To set to the
+requester) instead of waiting up to 24 hours for the drain. The row is still
+written for the record. If the inline send fails, `pending` is left set so the
+drain retries it — the message is never lost, only delayed to the digest.
+
+Recipient depends on the topic. `Account deletion or data request` goes to
+`privacy@voxivium.com`; every other topic goes to `support@voxivium.com`. The
+split exists because the Privacy Policy designates privacy@ as the contact for
+data-rights requests and commits to a 30-day turnaround — that clock should not
+sit in a general support queue. `/legal/delete-account` routes all of its
+request paths into this form with the topic preselected, so deletion requests
+arrive structured instead of as free-form mail.
 
 All form submissions live in a single DynamoDB table `voxivium-submissions`,
 keyed by a composite `pk` (`voter#<email>` or `contact#<uuid>`). A sparse GSI
@@ -375,7 +384,7 @@ DynamoDB record as `resume_text`, and discards the binary.
 - All form endpoints require Cloudflare Turnstile verification server-side
 - Turnstile and Textbelt secrets stored encrypted in SSM, never in Terraform state, never in env vars
 - SES `SendEmail` permission is conditioned on the From address — even if the drain or contact Lambda were compromised, it can only send as no-reply@voxivium.com
-- The `/support` page publishes no literal address or `mailto:` href in its static HTML, so address harvesters have nothing to scrape; the fallback link is assembled client-side
+- Neither `/support` nor `/legal/delete-account` publishes a literal address or `mailto:` href in its static HTML, so address harvesters have nothing to scrape; fallback links are assembled client-side by `ObfuscatedEmail.astro`, with a spelled-out `<noscript>` so the address stays reachable without JS
 - API Gateway is throttled (10 req/sec sustained, 20 burst) to cap abuse cost
 - DynamoDB has point-in-time recovery and deletion protection
 - Lambda errors trigger CloudWatch alarms via SNS

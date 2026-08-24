@@ -116,6 +116,30 @@ const topics = supportTopicSchema.options
   <p class="form-status" data-form-status hidden></p>
 </form>
 
+<script>
+  // Lets other pages deep-link a preselected topic, e.g.
+  // /support?topic=account-deletion-or-data-request. Matching slugifies the
+  // option values rather than keeping a second lookup table, so the URLs
+  // can't drift out of sync with the enum.
+  const slugify = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+
+  const requested = new URLSearchParams(window.location.search).get('topic')
+  if (requested) {
+    const select = document.querySelector<HTMLSelectElement>('#sup-topic')
+    const wanted = slugify(requested)
+    const match = select
+      ? Array.from(select.options).find(
+          (option) => option.value !== '' && slugify(option.value) === wanted,
+        )
+      : undefined
+    if (select && match) select.value = match.value
+  }
+</script>
+
 <style>
   /* Mirrors CareersForm's .form-help — the class isn't in forms.css yet. */
   .form-help {

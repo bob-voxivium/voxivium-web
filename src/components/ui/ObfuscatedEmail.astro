@@ -1,0 +1,46 @@
+---
+// Renders a mailto: link that isn't present as a literal address in the static
+// HTML. Address harvesters scrape `mailto:` hrefs and anything matching
+// user@domain; this ships the two halves as separate attributes and joins them
+// at runtime. The <noscript> fallback keeps the address readable without JS —
+// spelled out rather than linked, for the same reason.
+//
+// Not airtight against a harvester that executes JS or reads our attributes
+// specifically. It defeats the commodity scrapers, which is the realistic
+// threat for a published support address.
+
+interface Props {
+  /** Local part, before the @. */
+  user: string
+  /** Domain part, after the @. */
+  domain?: string
+  /** Link text. Defaults to the assembled address. */
+  label?: string
+  class?: string
+}
+
+const { user, domain = 'voxivium.com', label, class: className } = Astro.props
+---
+
+<span
+  class:list={['obfuscated-email', className]}
+  data-email-user={user}
+  data-email-domain={domain}
+  data-email-label={label}
+>
+  <noscript>{user} at {domain}</noscript>
+</span>
+
+<script>
+  // Astro hoists and bundles this once per page no matter how many instances
+  // are on it.
+  document.querySelectorAll<HTMLElement>('.obfuscated-email').forEach((slot) => {
+    const { emailUser, emailDomain, emailLabel } = slot.dataset
+    if (!emailUser || !emailDomain) return
+    const address = `${emailUser}@${emailDomain}`
+    const link = document.createElement('a')
+    link.href = `mailto:${address}`
+    link.textContent = emailLabel || address
+    slot.replaceChildren(link)
+  })
+</script>

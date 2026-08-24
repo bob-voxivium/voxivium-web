@@ -44,6 +44,12 @@ variable "support_recipient" {
   default     = "support@voxivium.com"
 }
 
+variable "privacy_recipient" {
+  description = "Where account-deletion and data-rights requests from /support are emailed (kept separate from general support — the Privacy Policy designates this address)"
+  type        = string
+  default     = "privacy@voxivium.com"
+}
+
 variable "sms_recipient_number" {
   description = "Phone number that receives the daily SMS via Textbelt"
   type        = string

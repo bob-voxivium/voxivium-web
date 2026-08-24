@@ -92,6 +92,10 @@ export const supportTopicSchema = z.enum([
   'Voter verification',
   'Billing or subscription',
   'Something is broken',
+  // Routed to the privacy mailbox rather than support — see the recipient
+  // split in the contact Lambda. Deletion and data-rights requests start a
+  // 30-day clock we commit to in the Privacy Policy.
+  'Account deletion or data request',
   'Feedback or a feature request',
   'Something else',
 ])

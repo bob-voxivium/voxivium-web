@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro'
+import ObfuscatedEmail from '@components/ui/ObfuscatedEmail.astro'
 
 const lastUpdated = 'August 17, 2026'
 ---
@@ -19,8 +20,8 @@ const lastUpdated = 'August 17, 2026'
         <h1>Delete your Voxivium account</h1>
         <p class="meta">Last updated: {lastUpdated}</p>
         <p class="lead">
-          This page explains how to request deletion of your <strong>Voxivium</strong> account and
-          the data associated with it. Voxivium is published by <strong>Voxivium, PBC</strong>, a
+          This page explains how to request deletion of your <strong>Voxivium</strong> account and the
+          data associated with it. Voxivium is published by <strong>Voxivium, PBC</strong>, a
           Delaware Public Benefit Corporation.
         </p>
       </div>
@@ -43,40 +44,39 @@ const lastUpdated = 'August 17, 2026'
               such as leaving your account dormant. You can stop at any point.
             </li>
             <li>
-              On the final screen, tap <strong>"Delete my account"</strong> to confirm. Your account
-              is deleted immediately and you are signed out on that device.
+              On the final screen, tap <strong>"Delete my account"</strong> to confirm. Your account is
+              deleted immediately and you are signed out on that device.
             </li>
           </ol>
         </div>
 
         <h3>If you can't sign in</h3>
         <p>
-          If you have lost access to your account and cannot complete the steps above, email <a
-            href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
-          > from the address associated with your account and ask us to delete it. We will verify that
-          you control the account before acting on the request, and we complete verified requests within
-          30 days.
+          If you have lost access to your account and cannot complete the steps above, use our <a
+            href="/support?topic=account-deletion-or-data-request#contact"
+            >account deletion request form</a
+          > and give the email address associated with your account. We will verify that you control the
+          account before acting on the request, and we complete verified requests within 30 days.
         </p>
 
         <h2 id="what-is-deleted">What is deleted</h2>
         <p>
-          Deletion happens in two stages: an immediate stage when you confirm, and a permanent
-          purge 30 days later.
+          Deletion happens in two stages: an immediate stage when you confirm, and a permanent purge
+          30 days later.
         </p>
 
         <h3>Immediately, when you confirm</h3>
         <ul>
           <li>
-            <strong>Your identity record is anonymized.</strong> Your name, residential address,
-            date of birth, phone number, and email address are erased from your account record and
-            replaced with non-identifying placeholders. Your sign-in credential link is removed, so
-            the account can no longer be accessed.
+            <strong>Your identity record is anonymized.</strong> Your name, residential address, date
+            of birth, phone number, and email address are erased from your account record and replaced
+            with non-identifying placeholders. Your sign-in credential link is removed, so the account
+            can no longer be accessed.
           </li>
           <li>
-            <strong>Your civic input stops counting.</strong> Your belief stances, importance
-            ratings, and stances on legislation, executive orders, and court rulings are removed
-            from all district and national aggregates. Any unsaved draft beliefs are deleted
-            outright.
+            <strong>Your civic input stops counting.</strong> Your belief stances, importance ratings,
+            and stances on legislation, executive orders, and court rulings are removed from all district
+            and national aggregates. Any unsaved draft beliefs are deleted outright.
           </li>
           <li>
             <strong>Your account is marked deleted</strong> and can no longer be signed in to.
@@ -93,7 +93,9 @@ const lastUpdated = 'August 17, 2026'
             Your profile data: first and last name, residential address, date of birth, political
             party affiliation, gender, and race or ethnicity if you chose to provide it.
           </li>
-          <li>Your identity verification result and your voter registration verification result.</li>
+          <li>
+            Your identity verification result and your voter registration verification result.
+          </li>
           <li>Your assigned voter districts and voter registration history.</li>
           <li>
             All of your civic input: belief stances, importance ratings, poll responses, and stances
@@ -103,41 +105,41 @@ const lastUpdated = 'August 17, 2026'
         </ul>
         <p>
           The 30-day window exists so that a deletion made by mistake, or by someone who gained
-          access to your device, can be reversed by contacting <a
-            href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
-          >. After 30 days, deletion cannot be undone.
+          access to your device, can be reversed. Use the <a
+            href="/support?topic=account-deletion-or-data-request#contact"
+            >account deletion request form</a
+          > and tell us what happened. After 30 days, deletion cannot be undone.
         </p>
 
         <h3>Backups</h3>
         <p>
-          Deleted data is purged from encrypted backups within <strong>90 days</strong> of the
-          deletion request. Backups are not used to restore deleted accounts.
+          Deleted data is purged from encrypted backups within <strong>90 days</strong> of the deletion
+          request. Backups are not used to restore deleted accounts.
         </p>
 
         <h2 id="what-is-kept">What is kept, and for how long</h2>
         <ul>
           <li>
-            <strong>A record that a deletion occurred.</strong> We keep a security audit entry
-            noting that an account deletion happened, along with the time, the originating IP
-            address, and a pseudonymous identifier. It does not contain your name, address, or
-            email. We keep it to protect accounts against unauthorized deletion.
+            <strong>A record that a deletion occurred.</strong> We keep a security audit entry noting
+            that an account deletion happened, along with the time, the originating IP address, and a
+            pseudonymous identifier. It does not contain your name, address, or email. We keep it to protect
+            accounts against unauthorized deletion.
           </li>
           <li>
-            <strong>Aggregated, anonymized statistics.</strong> Statistics previously derived from
-            civic input and disclosed to customers are not individually identifiable and are not
-            recalled from those customers. Your future contribution to those statistics stops
-            immediately on deletion.
+            <strong>Aggregated, anonymized statistics.</strong> Statistics previously derived from civic
+            input and disclosed to customers are not individually identifiable and are not recalled from
+            those customers. Your future contribution to those statistics stops immediately on deletion.
           </li>
           <li>
-            <strong>Records we are legally required to keep.</strong> We may retain limited
-            information, such as transaction and billing records, for as long as tax, accounting, or
-            fraud-prevention law requires.
+            <strong>Records we are legally required to keep.</strong> We may retain limited information,
+            such as transaction and billing records, for as long as tax, accounting, or fraud-prevention
+            law requires.
           </li>
           <li>
-            <strong>Marketing email signups.</strong> If you joined our email list through
-            voxivium.com, that is a separate record from your app account. To remove it, use the
-            unsubscribe link in any message or email <a href="mailto:privacy@voxivium.com"
-              >privacy@voxivium.com</a
+            <strong>Marketing email signups.</strong> If you joined our email list through voxivium.com,
+            that is a separate record from your app account. To remove it, use the unsubscribe link in
+            any message, or <a href="/support?topic=account-deletion-or-data-request#contact"
+              >send us a request</a
             >.
           </li>
         </ul>
@@ -161,28 +163,28 @@ const lastUpdated = 'August 17, 2026'
           account.
         </p>
         <p>
-          For any deletion request that the app does not cover, email <a
-            href="mailto:privacy@voxivium.com">privacy@voxivium.com</a
+          For any deletion request that the app does not cover, use the <a
+            href="/support?topic=account-deletion-or-data-request#contact"
+            >account deletion request form</a
           >. We honor verified requests within 30 days.
         </p>
 
         <h2 id="subscriptions">Subscriptions</h2>
         <p>
-          Deleting your account does <strong>not</strong> cancel a paid subscription. Subscriptions
-          are billed by the store or processor you purchased through, and must be canceled there:
+          Deleting your account does <strong>not</strong> cancel a paid subscription. Subscriptions are
+          billed by the store or processor you purchased through, and must be canceled there:
         </p>
         <ul>
           <li>
-            <strong>Google Play:</strong> Play Store → profile icon → Payments &amp; subscriptions →
-            Subscriptions → Voxivium → Cancel subscription.
+            <strong>Google Play:</strong> Play Store → profile icon → Payments &amp; subscriptions → Subscriptions
+            → Voxivium → Cancel subscription.
           </li>
           <li>
-            <strong>Apple App Store:</strong> Settings → your name → Subscriptions → Voxivium →
-            Cancel Subscription.
+            <strong>Apple App Store:</strong> Settings → your name → Subscriptions → Voxivium → Cancel
+            Subscription.
           </li>
           <li>
-            <strong>PayPal:</strong> Settings → Payments → Manage automatic payments → Voxivium →
-            Cancel.
+            <strong>PayPal:</strong> Settings → Payments → Manage automatic payments → Voxivium → Cancel.
           </li>
         </ul>
         <p>Cancel the subscription before deleting your account, so billing stops.</p>
@@ -190,8 +192,11 @@ const lastUpdated = 'August 17, 2026'
         <h2 id="contact">Questions</h2>
         <div class="contact">
           Voxivium, PBC<br />
-          Privacy: <a href="mailto:privacy@voxivium.com">privacy@voxivium.com</a><br />
-          Support: <a href="mailto:support@voxivium.com">support@voxivium.com</a><br />
+          Deletion and data requests: <a
+            href="/support?topic=account-deletion-or-data-request#contact">request form</a
+          ><br />
+          Anything else: <a href="/support">Support</a><br />
+          Privacy contact of record: <ObfuscatedEmail user="privacy" /><br />
           Full policy: <a href="/legal/privacy">Privacy Policy</a>
         </div>
       </div>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro'
 import SupportForm from '@components/forms/SupportForm.astro'
+import ObfuscatedEmail from '@components/ui/ObfuscatedEmail.astro'
 import { ORG_ID, absoluteUrl } from '@lib/seo'
 
 // This is the Support URL registered in App Store Connect and Google Play.
@@ -9,11 +10,8 @@ import { ORG_ID, absoluteUrl } from '@lib/seo'
 //
 // The support address is deliberately NOT written as a literal mailto: in the
 // markup — address harvesters scrape those. The form is the primary channel;
-// the fallback link is assembled at runtime in the inline script below.
+// the fallback link is assembled at runtime by <ObfuscatedEmail>.
 const lastUpdated = 'August 24, 2026'
-
-const SUPPORT_USER = 'support'
-const SUPPORT_DOMAIN = 'voxivium.com'
 
 const pageSchema = {
   '@type': 'ContactPage',
@@ -149,12 +147,7 @@ const pageSchema = {
         rather write from your own mail client:
       </p>
       <p class="fallback">
-        <span data-support-email>
-          <noscript>
-            Email <strong>{SUPPORT_USER} at {SUPPORT_DOMAIN}</strong> (written out to keep automated address
-            collectors off it).
-          </noscript>
-        </span>
+        <ObfuscatedEmail user="support" />
       </p>
       <p class="meta">
         Security vulnerability reports go to the address published on our
@@ -173,20 +166,6 @@ const pageSchema = {
 
   <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer
   ></script>
-
-  <!-- Assembles the mailto at runtime. Harvesters that don't execute JS see
-       nothing to scrape; the <noscript> above keeps the address reachable for
-       anyone (or any App Review tester) browsing without JS. -->
-  <script is:inline define:vars={{ SUPPORT_USER, SUPPORT_DOMAIN }}>
-    const slot = document.querySelector('[data-support-email]')
-    if (slot) {
-      const address = SUPPORT_USER + '@' + SUPPORT_DOMAIN
-      const link = document.createElement('a')
-      link.href = 'mailto:' + address
-      link.textContent = address
-      slot.replaceChildren(link)
-    }
-  </script>
 
   <script>
     import '@lib/forms/client'

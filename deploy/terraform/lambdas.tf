@@ -99,6 +99,7 @@ resource "aws_lambda_function" "subscribe" {
       ALLOWED_ORIGIN         = "https://${var.domain_name}"
       SES_FROM_ADDRESS       = var.ses_from_address
       SUPPORT_RECIPIENT      = var.support_recipient
+      PRIVACY_RECIPIENT      = var.privacy_recipient
     }
   }
 }
@@ -303,6 +304,8 @@ resource "aws_lambda_function" "drain_contact_queue" {
       PENDING_INDEX_NAME   = "pending-index"
       SES_FROM_ADDRESS     = var.ses_from_address
       DIGEST_RECIPIENT     = var.digest_recipient
+      SUPPORT_RECIPIENT    = var.support_recipient
+      PRIVACY_RECIPIENT    = var.privacy_recipient
       SMS_RECIPIENT_NUMBER = var.sms_recipient_number
       SMS_ADMIN_EMAIL      = var.sms_admin_email
       TEXTBELT_KEY_PARAM   = aws_ssm_parameter.textbelt_api_key.name

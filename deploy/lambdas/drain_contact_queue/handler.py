@@ -36,6 +36,12 @@ _TABLE = _dynamodb.Table(os.environ["SUBMISSIONS_TABLE"])
 _INDEX = os.environ.get("PENDING_INDEX_NAME", "pending-index")
 _FROM = os.environ["SES_FROM_ADDRESS"]
 _TO = os.environ["DIGEST_RECIPIENT"]
+# Support rows only land here when the contact Lambda's inline send failed.
+# Honor the same topic-based recipient split it uses, so a retried deletion
+# request doesn't quietly end up in the general digest inbox.
+_SUPPORT_TO = os.environ.get("SUPPORT_RECIPIENT", _TO)
+_PRIVACY_TO = os.environ.get("PRIVACY_RECIPIENT", _TO)
+_PRIVACY_TOPICS = {"Account deletion or data request"}
 _SMS_NUMBER = os.environ["SMS_RECIPIENT_NUMBER"]
 _SMS_ADMIN_EMAIL = os.environ["SMS_ADMIN_EMAIL"]
 _TEXTBELT_PARAM = os.environ["TEXTBELT_KEY_PARAM"]
@@ -132,19 +138,30 @@ def _format_body(item: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _recipient_for(item: dict) -> str:
+    """Where this item's email goes. Only support rows deviate from the digest."""
+    if item.get("record_type") != "support":
+        return _TO
+    return _PRIVACY_TO if item.get("topic") in _PRIVACY_TOPICS else _SUPPORT_TO
+
+
 def _send_email(item: dict) -> None:
     """Raises on failure so the item stays pending and gets retried."""
     record_type = item.get("record_type", "unknown")
     email = item.get("email", "unknown")
     subject = f"[Voxivium {record_type}] new submission from {email}"
-    _ses.send_email(
-        Source=_FROM,
-        Destination={"ToAddresses": [_TO]},
-        Message={
+    kwargs = {
+        "Source": _FROM,
+        "Destination": {"ToAddresses": [_recipient_for(item)]},
+        "Message": {
             "Subject": {"Data": subject},
             "Body": {"Text": {"Data": _format_body(item)}},
         },
-    )
+    }
+    # A retried support request should still be replyable in one click.
+    if record_type == "support" and item.get("email"):
+        kwargs["ReplyToAddresses"] = [item["email"]]
+    _ses.send_email(**kwargs)
 
 
 def _clear_pending(pk: str) -> None:
