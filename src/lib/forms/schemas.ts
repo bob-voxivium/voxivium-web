@@ -86,3 +86,29 @@ export const partnershipInquirySchema = z.object({
   message: z.string().trim().max(2000).optional(),
 })
 export type PartnershipInquiry = z.infer<typeof partnershipInquirySchema>
+
+export const supportTopicSchema = z.enum([
+  'Signing in or account access',
+  'Voter verification',
+  'Billing or subscription',
+  'Something is broken',
+  'Feedback or a feature request',
+  'Something else',
+])
+export type SupportTopic = z.infer<typeof supportTopicSchema>
+
+export const supportRequestSchema = z.object({
+  name: z.string().trim().min(1, 'Please tell us your name.').max(96),
+  email: z.string().trim().email('Please enter a valid email address.'),
+  topic: supportTopicSchema,
+  // Free-text rather than an enum: the value comes from the user reading their
+  // own Settings screen, and a stale enum would reject a legitimate build.
+  appVersion: z.string().trim().max(40).optional(),
+  device: z.string().trim().max(120).optional(),
+  message: z
+    .string()
+    .trim()
+    .min(1, 'Please describe what you need help with.')
+    .max(4000, 'Please keep your message under 4000 characters.'),
+})
+export type SupportRequest = z.infer<typeof supportRequestSchema>

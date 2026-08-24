@@ -84,6 +84,17 @@ _FIELD_ORDER = {
         "resume_filename",
         "resume_text",
     ],
+    # Support requests are normally emailed inline by the contact Lambda. They
+    # only reach this digest when that inline send failed, so the row stayed
+    # pending — this entry is the retry path, not the usual one.
+    "support": [
+        "name",
+        "email",
+        "topic",
+        "app_version",
+        "device",
+        "message",
+    ],
 }
 
 

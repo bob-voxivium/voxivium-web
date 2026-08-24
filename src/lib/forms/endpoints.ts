@@ -5,6 +5,7 @@ export type Audience =
   | 'aiLab'
   | 'partnership'
   | 'careers'
+  | 'support'
 
 const map: Record<Audience, string | undefined> = {
   voter: import.meta.env.PUBLIC_VOTER_FORM_ENDPOINT,
@@ -13,6 +14,7 @@ const map: Record<Audience, string | undefined> = {
   aiLab: import.meta.env.PUBLIC_AI_LAB_FORM_ENDPOINT,
   partnership: import.meta.env.PUBLIC_PARTNERSHIP_FORM_ENDPOINT,
   careers: import.meta.env.PUBLIC_CAREERS_FORM_ENDPOINT,
+  support: import.meta.env.PUBLIC_SUPPORT_FORM_ENDPOINT,
 }
 
 const envName: Record<Audience, string> = {
@@ -22,6 +24,7 @@ const envName: Record<Audience, string> = {
   aiLab: 'PUBLIC_AI_LAB_FORM_ENDPOINT',
   partnership: 'PUBLIC_PARTNERSHIP_FORM_ENDPOINT',
   careers: 'PUBLIC_CAREERS_FORM_ENDPOINT',
+  support: 'PUBLIC_SUPPORT_FORM_ENDPOINT',
 }
 
 export function getFormEndpoint(audience: Audience): string {

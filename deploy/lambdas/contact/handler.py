@@ -19,6 +19,13 @@ Expected JSON body (shape varies by form_type):
     { "form_type": "partnership", "name", "email", "organization",
       "role" (optional), "interest", "message" (optional), "turnstile_token" }
 
+  support:
+    { "form_type": "support", "name", "email", "topic", "message",
+      "app_version" (optional), "device" (optional), "turnstile_token" }
+    This is the App Store / Play Store support channel, so it is the one form
+    type that is emailed immediately rather than waiting for the daily digest
+    (see the note on delivery below).
+
   careers:
     { "form_type": "careers", "first_name", "last_name", "email",
       "phone" (optional), "position", "linkedin" (optional),
@@ -32,6 +39,12 @@ Each submission is written to the shared submissions table with a unique pk
 ("contact#<uuid>"), record_type matching the form type, submitted_at, and a
 sparse `pending = "1"` flag that the daily drain Lambda will clear once it
 emails the submission.
+
+Delivery: support submissions are emailed inline here, before the DynamoDB
+write, because a support address published to Apple and Google cannot have a
+24-hour first-response floor. The row is still written for the record. If the
+inline send fails we fall back to writing the row *with* `pending` set, so the
+daily drain picks it up rather than the message being lost.
 
 On success: 202 with { "ok": true }
 On failure: 400 / 403 / 500 with { "ok": false, "error": "..." }
@@ -59,7 +72,7 @@ _table = _dynamodb.Table(os.environ["SUBMISSIONS_TABLE"])
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _URL_RE = re.compile(r"^https?://", re.IGNORECASE)
-_VALID_FORM_TYPES = {"politician", "media", "ai", "partnership", "careers"}
+_VALID_FORM_TYPES = {"politician", "media", "ai", "partnership", "careers", "support"}
 _VALID_CAREERS_POSITIONS = {
     "Support, QA, and Deployment Engineer",
     "Marketing, Pricing, and Sales",
@@ -67,13 +80,34 @@ _VALID_CAREERS_POSITIONS = {
     "Other",
 }
 _MAX_MESSAGE_LEN = 2000
+_MAX_SUPPORT_MESSAGE_LEN = 4000  # mirrors supportRequestSchema on the client
 _MAX_USE_CASE_LEN = 2000
 _MAX_INTEREST_LEN = 2000
 _MAX_RESUME_BYTES = 2 * 1024 * 1024  # mirrors the client-side cap
 _MAX_RESUME_TEXT_LEN = 200_000  # truncate absurdly long extracted text
 _MAX_FILENAME_LEN = 240
+_VALID_SUPPORT_TOPICS = {
+    "Signing in or account access",
+    "Voter verification",
+    "Billing or subscription",
+    "Something is broken",
+    "Feedback or a feature request",
+    "Something else",
+}
 
 _turnstile_secret_cache = None
+
+# Only the support path sends mail, so the SES client is created on first use
+# rather than at import — the other form types shouldn't pay for it on a cold
+# start.
+_ses_client = None
+
+
+def _ses():
+    global _ses_client
+    if _ses_client is None:
+        _ses_client = boto3.client("ses")
+    return _ses_client
 
 
 def _get_turnstile_secret() -> str:
@@ -264,10 +298,60 @@ def _build_item(form_type: str, body: dict) -> dict:
         pdf_bytes = _decode_resume(body.get("resume_base64") or "")
         item["resume_text"] = _extract_pdf_text(pdf_bytes)
 
+    elif form_type == "support":
+        item["name"] = _bounded(body.get("name"), 96)
+
+        topic = (body.get("topic") or "").strip()
+        if topic not in _VALID_SUPPORT_TOPICS:
+            raise ValueError("invalid topic")
+        item["topic"] = topic
+
+        item["message"] = _bounded(body.get("message"), _MAX_SUPPORT_MESSAGE_LEN)
+
+        app_version = _optional_bounded(body.get("app_version"), 40)
+        if app_version:
+            item["app_version"] = app_version
+
+        device = _optional_bounded(body.get("device"), 120)
+        if device:
+            item["device"] = device
+
     else:  # pragma: no cover — guarded by caller
         raise ValueError("invalid form_type")
 
     return item
+
+
+_SUPPORT_FIELD_ORDER = ["name", "email", "topic", "app_version", "device", "message"]
+
+
+def _send_support_email(item: dict) -> None:
+    """Email a support request immediately. Raises on failure.
+
+    Reply-To is the requester so a reply from the support inbox reaches them
+    directly. From stays the verified SES sender — sending as the requester
+    would fail DMARC.
+    """
+    subject = f"[Voxivium support] {item['topic']} — {item['email']}"
+    lines = [
+        "New support request",
+        f"Submitted at: {item['submitted_at']}",
+        "",
+    ]
+    for field in _SUPPORT_FIELD_ORDER:
+        if item.get(field):
+            lines.append(f"{field.replace('_', ' ').title()}: {item[field]}")
+    body = "\n".join(lines) + "\n"
+
+    _ses().send_email(
+        Source=os.environ["SES_FROM_ADDRESS"],
+        Destination={"ToAddresses": [os.environ["SUPPORT_RECIPIENT"]]},
+        ReplyToAddresses=[item["email"]],
+        Message={
+            "Subject": {"Data": subject},
+            "Body": {"Text": {"Data": body}},
+        },
+    )
 
 
 def lambda_handler(event, _context):
@@ -290,6 +374,16 @@ def lambda_handler(event, _context):
     source_ip = event.get("requestContext", {}).get("http", {}).get("sourceIp", "")
     if not _verify_turnstile(token, source_ip):
         return _response(403, {"ok": False, "error": "captcha failed"})
+
+    # Support is emailed inline rather than by the daily drain. On a send
+    # failure we leave `pending` set so the drain retries it; the requester
+    # still gets a success response because their message is durably stored.
+    if form_type == "support":
+        try:
+            _send_support_email(item)
+            item.pop("pending", None)
+        except Exception as e:
+            print(f"Immediate support email failed, leaving pending for drain: {e}")
 
     try:
         _table.put_item(Item=item)

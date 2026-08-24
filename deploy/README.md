@@ -10,8 +10,10 @@ voxivium.com (Cloudflare DNS + DDoS/WAF, "Full (strict)" SSL)
     └── /api/* → API Gateway HTTP API
                     ├── POST /subscribe → Lambda → DynamoDB (record_type=voter)
                     └── POST /contact   → Lambda → DynamoDB
-                                                   (record_type=politician|media|ai,
+                                                   (record_type=politician|media|ai
+                                                     |partnership|careers|support,
                                                     pending="1" until emailed)
+                                          └→ SES (support only, sent inline)
 
 EventBridge cron (daily) → drain Lambda
     └── Query sparse `pending-index` GSI →
@@ -20,6 +22,14 @@ EventBridge cron (daily) → drain Lambda
 
 Admin: aws lambda invoke voxivium-list-subscribers (CLI only)
 ```
+
+`support` is the exception to the daily-digest flow: the `/support` page is the
+Support URL registered with App Store Connect and the Play Console, so those
+submissions are emailed by the contact Lambda immediately (to
+`support@voxivium.com`, Reply-To set to the requester) instead of waiting up to
+24 hours for the drain. The row is still written for the record. If the inline
+send fails, `pending` is left set so the drain retries it — the message is
+never lost, only delayed to the digest.
 
 All form submissions live in a single DynamoDB table `voxivium-submissions`,
 keyed by a composite `pk` (`voter#<email>` or `contact#<uuid>`). A sparse GSI
@@ -364,7 +374,8 @@ DynamoDB record as `resume_text`, and discards the binary.
 - S3 bucket is fully private; only CloudFront (via OAC + SourceArn condition) can read from it. Public traffic reaches the site through Cloudflare → CloudFront only.
 - All form endpoints require Cloudflare Turnstile verification server-side
 - Turnstile and Textbelt secrets stored encrypted in SSM, never in Terraform state, never in env vars
-- SES `SendEmail` permission is conditioned on the From address — even if the drain Lambda were compromised, it can only send as no-reply@voxivium.com
+- SES `SendEmail` permission is conditioned on the From address — even if the drain or contact Lambda were compromised, it can only send as no-reply@voxivium.com
+- The `/support` page publishes no literal address or `mailto:` href in its static HTML, so address harvesters have nothing to scrape; the fallback link is assembled client-side
 - API Gateway is throttled (10 req/sec sustained, 20 burst) to cap abuse cost
 - DynamoDB has point-in-time recovery and deletion protection
 - Lambda errors trigger CloudWatch alarms via SNS

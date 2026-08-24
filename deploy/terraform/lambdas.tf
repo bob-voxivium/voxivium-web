@@ -97,6 +97,8 @@ resource "aws_lambda_function" "subscribe" {
       SUBMISSIONS_TABLE      = aws_dynamodb_table.submissions.name
       TURNSTILE_SECRET_PARAM = aws_ssm_parameter.turnstile_secret_key.name
       ALLOWED_ORIGIN         = "https://${var.domain_name}"
+      SES_FROM_ADDRESS       = var.ses_from_address
+      SUPPORT_RECIPIENT      = var.support_recipient
     }
   }
 }
@@ -182,6 +184,19 @@ data "aws_iam_policy_document" "contact" {
     effect    = "Allow"
     actions   = ["kms:Decrypt"]
     resources = ["arn:aws:kms:${var.aws_region}:*:alias/aws/ssm"]
+  }
+  # Support requests are emailed inline instead of waiting for the daily
+  # drain — the App Store support address can't have a 24h response floor.
+  # Sender is pinned to the verified identity, same condition as the drain.
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendEmail"]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "ses:FromAddress"
+      values   = [var.ses_from_address]
+    }
   }
 }
 

@@ -5,6 +5,7 @@ import {
   aiLabContactSchema,
   partnershipInquirySchema,
   careersApplicationSchema,
+  supportRequestSchema,
 } from './schemas'
 import { submitForm } from './submit'
 import type { Audience } from './endpoints'
@@ -17,6 +18,7 @@ const schemas: Record<Audience, ZodSchema> = {
   aiLab: aiLabContactSchema,
   partnership: partnershipInquirySchema,
   careers: careersApplicationSchema,
+  support: supportRequestSchema,
 }
 
 const endpoints: Record<Audience, string | undefined> = {
@@ -26,6 +28,7 @@ const endpoints: Record<Audience, string | undefined> = {
   aiLab: import.meta.env.PUBLIC_AI_LAB_FORM_ENDPOINT,
   partnership: import.meta.env.PUBLIC_PARTNERSHIP_FORM_ENDPOINT,
   careers: import.meta.env.PUBLIC_CAREERS_FORM_ENDPOINT,
+  support: import.meta.env.PUBLIC_SUPPORT_FORM_ENDPOINT,
 }
 
 // Maps the frontend audience id to the value the contact Lambda expects.
@@ -37,6 +40,7 @@ const formTypeForAudience: Record<Audience, string | undefined> = {
   aiLab: 'ai',
   partnership: 'partnership',
   careers: 'careers',
+  support: 'support',
 }
 
 const VALID_AUDIENCES: readonly Audience[] = [
@@ -46,6 +50,7 @@ const VALID_AUDIENCES: readonly Audience[] = [
   'aiLab',
   'partnership',
   'careers',
+  'support',
 ]
 
 function isAudience(s: string | undefined): s is Audience {
@@ -62,6 +67,12 @@ declare global {
   interface Window {
     turnstile?: TurnstileGlobal
   }
+}
+
+// Signup forms say "you're on the list"; a support request needs to say the
+// ticket was received. A form opts out of the default via data-success-message.
+function successMessage(form: HTMLFormElement): string {
+  return form.dataset.successMessage || "Thanks — you're on the list. We'll be in touch."
 }
 
 function setStatus(form: HTMLFormElement, kind: StatusKind, message: string) {
@@ -182,7 +193,7 @@ function attachForm(form: HTMLFormElement) {
     const honeypot = form.querySelector<HTMLInputElement>('[name="hp"]')
     if (honeypot && honeypot.value.trim() !== '') {
       // Silently "succeed" — bots see what they expect, real users never fill this.
-      setStatus(form, 'success', "Thanks — you're on the list.")
+      setStatus(form, 'success', successMessage(form))
       form.reset()
       return
     }
@@ -246,7 +257,7 @@ function attachForm(form: HTMLFormElement) {
     if (submitButton) submitButton.disabled = false
 
     if (result.ok) {
-      setStatus(form, 'success', "Thanks — you're on the list. We'll be in touch.")
+      setStatus(form, 'success', successMessage(form))
       form.reset()
       resetTurnstile(form)
     } else {

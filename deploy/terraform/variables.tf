@@ -38,6 +38,12 @@ variable "digest_recipient" {
   default     = "contact@voxivium.com"
 }
 
+variable "support_recipient" {
+  description = "Where /support form submissions are emailed immediately (App Store support channel)"
+  type        = string
+  default     = "support@voxivium.com"
+}
+
 variable "sms_recipient_number" {
   description = "Phone number that receives the daily SMS via Textbelt"
   type        = string

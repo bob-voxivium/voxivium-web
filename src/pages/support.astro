@@ -1,0 +1,278 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import SupportForm from '@components/forms/SupportForm.astro'
+import { ORG_ID, absoluteUrl } from '@lib/seo'
+
+// This is the Support URL registered in App Store Connect and Google Play.
+// App Review testers open it, so it must always render a working contact
+// method without an account, a login, or a redirect.
+//
+// The support address is deliberately NOT written as a literal mailto: in the
+// markup — address harvesters scrape those. The form is the primary channel;
+// the fallback link is assembled at runtime in the inline script below.
+const lastUpdated = 'August 24, 2026'
+
+const SUPPORT_USER = 'support'
+const SUPPORT_DOMAIN = 'voxivium.com'
+
+const pageSchema = {
+  '@type': 'ContactPage',
+  '@id': `${absoluteUrl('/support')}#webpage`,
+  name: 'Voxivium Support',
+  description:
+    'Get help with the Voxivium app: account access, voter verification, billing, and bug reports.',
+  url: absoluteUrl('/support'),
+  isPartOf: { '@id': ORG_ID },
+  dateModified: '2026-08-24',
+}
+---
+
+<BaseLayout
+  title="Support — Get help with Voxivium"
+  description="Contact Voxivium support for help with signing in, voter verification, billing, or a bug in the app. We reply within one business day."
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Support', path: '/support' },
+  ]}
+  schema={[pageSchema]}
+>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Support</p>
+      <h1>Get help with Voxivium.</h1>
+      <p class="lead">
+        Send us a message and we'll reply, usually within one business day. There's no ticket number
+        to track and no account required to reach us.
+      </p>
+      <p class="meta">Last updated: {lastUpdated}</p>
+
+      <nav class="toc" aria-label="On this page">
+        <span class="toc-label">On this page</span>
+        <a href="#contact">Contact us</a>
+        <a href="#common">Common questions</a>
+        <a href="#privacy">Privacy and your data</a>
+        <a href="#other">Other ways to reach us</a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="container">
+      <header>
+        <h2>Send us a message.</h2>
+        <p>
+          Everything except the app version and device is required. If you're reporting something
+          that went wrong, telling us what you expected to happen is the single most useful thing
+          you can include.
+        </p>
+      </header>
+
+      <div class="form-card">
+        <SupportForm />
+      </div>
+    </div>
+  </section>
+
+  <section class="common" id="common">
+    <div class="container">
+      <h2>Common questions</h2>
+      <p>
+        A few things come up often enough to answer here. The
+        <a href="/faq">full FAQ</a> covers more.
+      </p>
+
+      <dl class="qa">
+        <dt>I can't sign in.</dt>
+        <dd>
+          Voxivium accounts are tied to the sign-in method you first used — Google, Apple, or email.
+          Signing in with a different method creates a separate account rather than recovering the
+          first one. If you're not sure which you used, message us with the email address you expect
+          to be on the account and we'll look it up.
+        </dd>
+
+        <dt>My voter verification didn't go through.</dt>
+        <dd>
+          Verification confirms you're a registered U.S. voter, and it fails most often because the
+          name or address on your ID doesn't match your current voter registration. Check that
+          first. If they do match and it still fails, send us the date and rough time you tried and
+          we can trace it.
+        </dd>
+
+        <dt>How do I cancel or get a refund?</dt>
+        <dd>
+          Subscriptions purchased in the app are billed by Apple or Google, not by Voxivium, so
+          cancellation and refunds go through them. On iPhone: Settings, your name, Subscriptions.
+          On Android: Play Store, your profile, Payments and subscriptions. Message us if you paid
+          Voxivium directly, or if either store sends you back here.
+        </dd>
+
+        <dt>How do I delete my account?</dt>
+        <dd>
+          You can delete your account from inside the app, and the steps plus what happens to each
+          kind of data are written out at
+          <a href="/legal/delete-account">Delete your account</a>. You don't need to contact us to
+          do it.
+        </dd>
+
+        <dt>Is Voxivium free?</dt>
+        <dd>
+          Yes. Voter accounts are free, and report cards are always free. Paid tiers add features on
+          top of that; they don't gate it.
+        </dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="privacy" id="privacy">
+    <div class="container">
+      <h2>Privacy and your data</h2>
+      <p>
+        Requests about your personal data — access, correction, deletion, or a question about what
+        Voxivium stores — are handled separately from general support. Start at
+        <a href="/legal/delete-account">Delete your account</a>, which explains what each option
+        does. Our <a href="/legal/privacy">Privacy Policy</a> describes what is collected and why, and
+        <a href="/security">Security</a> covers how your identity is kept separate from your political
+        beliefs.
+      </p>
+      <p>
+        Please don't include passwords, government ID numbers, or payment card details in a support
+        message. We will never ask you for them.
+      </p>
+    </div>
+  </section>
+
+  <section class="other" id="other">
+    <div class="container">
+      <h2>Other ways to reach us</h2>
+      <p>
+        The form above is the fastest route, and it reaches the same place email does. If you'd
+        rather write from your own mail client:
+      </p>
+      <p class="fallback">
+        <span data-support-email>
+          <noscript>
+            Email <strong>{SUPPORT_USER} at {SUPPORT_DOMAIN}</strong> (written out to keep automated address
+            collectors off it).
+          </noscript>
+        </span>
+      </p>
+      <p class="meta">
+        Security vulnerability reports go to the address published on our
+        <a href="/security#disclosure">Security page</a>. Press and partnership inquiries go through <a
+          href="/partnerships">Partnerships</a
+        >.
+      </p>
+
+      <p class="postal">
+        Voxivium, PBC<br />
+        921 Pleasant Valley Ave #561<br />
+        Mount Laurel, NJ 08054
+      </p>
+    </div>
+  </section>
+
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer
+  ></script>
+
+  <!-- Assembles the mailto at runtime. Harvesters that don't execute JS see
+       nothing to scrape; the <noscript> above keeps the address reachable for
+       anyone (or any App Review tester) browsing without JS. -->
+  <script is:inline define:vars={{ SUPPORT_USER, SUPPORT_DOMAIN }}>
+    const slot = document.querySelector('[data-support-email]')
+    if (slot) {
+      const address = SUPPORT_USER + '@' + SUPPORT_DOMAIN
+      const link = document.createElement('a')
+      link.href = 'mailto:' + address
+      link.textContent = address
+      slot.replaceChildren(link)
+    }
+  </script>
+
+  <script>
+    import '@lib/forms/client'
+  </script>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: clamp(4rem, 10vh, 6rem) 1.5rem 2rem;
+  }
+
+  .container {
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .page-hero .container {
+    padding: 0;
+  }
+
+  section + section {
+    padding-top: 1rem;
+  }
+
+  section:last-of-type {
+    padding-bottom: 4rem;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-brand-text);
+    margin: 2.5rem 0 0.75rem;
+  }
+
+  p {
+    color: var(--color-brand-text2);
+    line-height: 1.7;
+    margin: 0 0 1rem;
+  }
+
+  a {
+    color: var(--color-brand-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .meta {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+  }
+
+  .form-card {
+    background: var(--color-brand-surface);
+    border: 1px solid var(--color-brand-elev1);
+    border-radius: 0.75rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
+    margin-top: 1.5rem;
+  }
+
+  .qa {
+    margin: 1.5rem 0 0;
+  }
+
+  .qa dt {
+    font-weight: 600;
+    color: var(--color-brand-text);
+    margin-top: 1.5rem;
+  }
+
+  .qa dd {
+    margin: 0.5rem 0 0;
+    color: var(--color-brand-text2);
+    line-height: 1.7;
+  }
+
+  .fallback {
+    font-size: 1.0625rem;
+  }
+
+  .postal {
+    color: var(--color-brand-text3);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-top: 2rem;
+  }
+</style>

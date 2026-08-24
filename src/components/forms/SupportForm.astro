@@ -1,0 +1,127 @@
+---
+import '@styles/forms.css'
+import { supportTopicSchema } from '@lib/forms/schemas'
+
+// Topic list is derived from the zod enum so the select and the validator can
+// never drift apart.
+const topics = supportTopicSchema.options
+---
+
+<form
+  data-voxivium-form="support"
+  data-success-message="Thanks — we've got your message. You'll get a reply at the email address you gave us, usually within one business day."
+  class="vox-form"
+  novalidate
+>
+  <div class="form-field">
+    <label for="sup-name">Name <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="sup-name"
+      name="name"
+      type="text"
+      required
+      autocomplete="name"
+      maxlength="96"
+      aria-describedby="sup-name-error"
+    />
+    <p id="sup-name-error" class="form-error" data-error-for="name" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="sup-email">Email <span class="req" aria-hidden="true">*</span></label>
+    <input
+      id="sup-email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      aria-describedby="sup-email-help sup-email-error"
+    />
+    <p id="sup-email-help" class="form-help">
+      We reply to this address. It doesn't have to match the one on your Voxivium account.
+    </p>
+    <p id="sup-email-error" class="form-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="sup-topic">What's this about? <span class="req" aria-hidden="true">*</span></label>
+    <select id="sup-topic" name="topic" required aria-describedby="sup-topic-error">
+      <option value="">Choose one…</option>
+      {topics.map((topic) => <option value={topic}>{topic}</option>)}
+    </select>
+    <p id="sup-topic-error" class="form-error" data-error-for="topic" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="sup-message">How can we help? <span class="req" aria-hidden="true">*</span></label>
+    <textarea
+      id="sup-message"
+      name="message"
+      required
+      maxlength="4000"
+      rows="6"
+      placeholder="Tell us what happened and what you expected to happen. If something went wrong on a specific screen, naming it helps us find it faster."
+      aria-describedby="sup-message-error"></textarea>
+    <p id="sup-message-error" class="form-error" data-error-for="message" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="sup-app-version">App version (optional)</label>
+    <input
+      id="sup-app-version"
+      name="appVersion"
+      type="text"
+      maxlength="40"
+      placeholder="e.g. 1.2.0"
+      aria-describedby="sup-app-version-help sup-app-version-error"
+    />
+    <p id="sup-app-version-help" class="form-help">
+      In the app: Settings, then About. Optional, but it saves a round trip on bug reports.
+    </p>
+    <p id="sup-app-version-error" class="form-error" data-error-for="appVersion" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="sup-device">Device (optional)</label>
+    <input
+      id="sup-device"
+      name="device"
+      type="text"
+      maxlength="120"
+      placeholder="e.g. iPhone 15, iOS 18.2"
+      aria-describedby="sup-device-error"
+    />
+    <p id="sup-device-error" class="form-error" data-error-for="device" hidden></p>
+  </div>
+
+  <input
+    type="text"
+    name="hp"
+    tabindex="-1"
+    autocomplete="off"
+    class="honeypot"
+    aria-hidden="true"
+  />
+
+  <div
+    class="cf-turnstile"
+    data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+    data-theme="auto"
+  >
+  </div>
+  <p class="form-error" data-error-for="turnstile" hidden></p>
+
+  <button type="submit">Send message</button>
+
+  <p class="form-status" data-form-status hidden></p>
+</form>
+
+<style>
+  /* Mirrors CareersForm's .form-help — the class isn't in forms.css yet. */
+  .form-help {
+    color: var(--color-brand-text3);
+    font-size: 0.8125rem;
+    margin: 0.25rem 0 0;
+    line-height: 1.5;
+  }
+</style>
