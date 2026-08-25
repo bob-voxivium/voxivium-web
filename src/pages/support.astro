@@ -1,16 +1,16 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro'
 import SupportForm from '@components/forms/SupportForm.astro'
-import ObfuscatedEmail from '@components/ui/ObfuscatedEmail.astro'
 import { ORG_ID, absoluteUrl } from '@lib/seo'
 
 // This is the Support URL registered in App Store Connect and Google Play.
 // App Review testers open it, so it must always render a working contact
 // method without an account, a login, or a redirect.
 //
-// The support address is deliberately NOT written as a literal mailto: in the
-// markup — address harvesters scrape those. The form is the primary channel;
-// the fallback link is assembled at runtime by <ObfuscatedEmail>.
+// No email address appears on this page at all — not as a mailto:, and not
+// assembled at runtime. The form is the only contact channel, which is the
+// point: an address published to the App Store gets harvested and spammed.
+// Do not reintroduce one here (CEO decision 2026-08-24).
 const lastUpdated = 'August 24, 2026'
 
 const pageSchema = {
@@ -143,18 +143,24 @@ const pageSchema = {
     <div class="container">
       <h2>Other ways to reach us</h2>
       <p>
-        The form above is the fastest route, and it reaches the same place email does. If you'd
-        rather write from your own mail client:
+        The form above is the way to reach support, and it goes straight to a person. A few things
+        are handled elsewhere:
       </p>
-      <p class="fallback">
-        <ObfuscatedEmail user="support" />
-      </p>
-      <p class="meta">
-        Security vulnerability reports go to the address published on our
-        <a href="/security#disclosure">Security page</a>. Press and partnership inquiries go through <a
-          href="/partnerships">Partnerships</a
-        >.
-      </p>
+      <ul>
+        <li>
+          <strong>Security vulnerabilities</strong> — report them through our
+          <a href="/security#disclosure">Security page</a>.
+        </li>
+        <li>
+          <strong>Press, media, research, and AI labs</strong> — go through
+          <a href="/partnerships">Partnerships</a>.
+        </li>
+        <li>
+          <strong>Account deletion and data requests</strong> — see
+          <a href="/legal/delete-account">Delete your account</a>.
+        </li>
+      </ul>
+      <p class="meta">You can also write to us at:</p>
 
       <p class="postal">
         Voxivium, PBC<br />
@@ -242,10 +248,6 @@ const pageSchema = {
     margin: 0.5rem 0 0;
     color: var(--color-brand-text2);
     line-height: 1.7;
-  }
-
-  .fallback {
-    font-size: 1.0625rem;
   }
 
   .postal {
