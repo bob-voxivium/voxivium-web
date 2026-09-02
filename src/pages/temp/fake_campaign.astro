@@ -1,0 +1,244 @@
+---
+/**
+ * TEMPORARY TEST FIXTURE — /temp/fake_campaign
+ *
+ * Fictional campaign page for a fictional candidacy, used to exercise the
+ * candidate campaign-URL pipeline end to end: portal submission →
+ * campaignscraper → Gemini values scoring → candidate_campaign_details →
+ * the candidate's implied beliefs in the app.
+ *
+ * Delete this file and the `/temp/` sitemap exclusion in astro.config.mjs
+ * when campaign-URL testing is finished.
+ *
+ * ── Why this page does NOT use BaseLayout ────────────────────────────────
+ *
+ * BaseLayout renders the site header, whose nav links to /, /about,
+ * /insights, /faq and /donate. campaignscraper crawls to MaxDepth 2 and
+ * MaxPages 25 within the same eTLD+1, so a single nav would pull the entire
+ * marketing site into the scrape and the candidate's "implied beliefs" would
+ * be extracted partly from Voxivium's own copy. A campaign page must be an
+ * island for the scrape to mean anything.
+ *
+ * That is also why there is not one internal link anywhere below — no nav,
+ * no footer, no cross-links (CEO 2026-09-01). Anything added here that
+ * points at another voxivium.com page silently changes what this test
+ * measures.
+ *
+ * ── Why it is labelled as fictional in visible copy ──────────────────────
+ *
+ * This is a real domain serving what reads as a real congressional campaign.
+ * The banner and the closing note are what keep a visitor who arrives by
+ * accident from mistaking it for one. noindex keeps it out of search; the
+ * banner covers everyone the noindex does not.
+ *
+ * The label costs a little scrape fidelity — the evaluator sees it — but it
+ * states no policy position, so it does not compete with the fifteen that
+ * follow.
+ *
+ * ── Content shape ────────────────────────────────────────────────────────
+ *
+ * Fifteen of the twenty belief domains, one section each, each taking a
+ * position concrete enough to score. The five deliberately omitted are
+ * Foreign Policy, Technology, Agriculture & Rural, Financial Regulation and
+ * Federalism — absent so the run can be checked for correctly reporting NO
+ * coverage rather than inventing it, which is the harder half to verify.
+ *
+ * The persona is a mainstream Democrat with two deliberate crossovers
+ * (border enforcement, defense readiness) so the alignment output is not
+ * uniformly one direction and the "most misaligned" surfaces have something
+ * to show against a Democratic-leaning district.
+ */
+import '@styles/global.css'
+
+const canonical = 'https://voxivium.com/temp/fake_campaign'
+
+/** One section per belief domain covered. Order is presentation order. */
+const positions: { heading: string; body: string[] }[] = [
+  {
+    heading: 'Jobs, Wages and the Cost of Living',
+    body: [
+      'Working families in Burlington and Ocean counties are running harder to stay in the same place. I support raising the federal minimum wage to $17 an hour, indexed to inflation so Congress stops relitigating it every decade, and making the expanded Child Tax Credit permanent.',
+      'I will vote to raise the top marginal rate and to close the carried-interest loophole. A tax code that asks a warehouse supervisor in Willingboro to pay a higher effective rate than a hedge fund partner is not a tax code anyone should defend.',
+    ],
+  },
+  {
+    heading: 'Health Care',
+    body: [
+      'Health care is a right, not a product. I support a public option available on every exchange in the country, permanent expansion of ACA premium subsidies, and a $35 monthly cap on insulin for everyone — not only for seniors on Medicare.',
+      'Medicare should negotiate the price of every drug it buys, not a short list. I will oppose any budget that reaches savings by narrowing eligibility.',
+    ],
+  },
+  {
+    heading: 'Social Security and the Safety Net',
+    body: [
+      "I will not vote to raise the retirement age or to means-test benefits people already paid for. Social Security's shortfall is a revenue problem, and I support lifting the payroll tax cap on income above $400,000 to close it.",
+      'I support permanent paid family and medical leave at the federal level, and protecting SNAP from work-requirement expansions that cut people off for paperwork rather than for need.',
+    ],
+  },
+  {
+    heading: 'Veterans and National Defense',
+    body: [
+      'This district is home to Joint Base McGuire-Dix-Lakehurst, and readiness is not an abstraction here. I support sustaining force readiness and a pay raise for junior enlisted servicemembers, and I will not vote for a budget that hollows out the base.',
+      'Supporting the military and auditing it are the same commitment. The Pentagon has never passed a clean audit. I will vote to keep defense spending strong and to make passing that audit a condition of future increases.',
+    ],
+  },
+  {
+    heading: 'Immigration and the Border',
+    body: [
+      'Border security and immigrant dignity are not opposites, and I am tired of being told to choose. I support more immigration judges to clear the asylum backlog, modern screening technology at ports of entry, and the additional enforcement personnel the bipartisan border bill funded.',
+      'In the same bill I will vote for a path to citizenship for Dreamers and for farm and hospitality workers who have been here for years, paying taxes, raising children who are citizens. A system that can neither remove nor legalize anyone is the actual crisis.',
+    ],
+  },
+  {
+    heading: 'Criminal Justice',
+    body: [
+      "Our system should be measured by whether people come out less likely to reoffend. I support ending cash bail for non-violent offenses, expanding federal reentry and job-training programs, and repealing mandatory minimums that tie a judge's hands.",
+      'I support funding police departments properly and pairing that with real accountability: a national misconduct registry so an officer fired in one state cannot be quietly rehired in another.',
+    ],
+  },
+  {
+    heading: 'Civil Rights',
+    body: [
+      'I support passing the Equality Act to extend federal anti-discrimination protection in housing, employment and public accommodation to LGBTQ Americans, and restoring the preclearance requirements the Supreme Court struck from the Voting Rights Act.',
+      'Federal enforcement exists because leaving these questions to the states produced exactly the outcomes it was created to correct.',
+    ],
+  },
+  {
+    heading: 'Privacy and Civil Liberties',
+    body: [
+      "I will vote against reauthorizing warrantless surveillance of Americans' communications, and I support closing the data-broker loophole that lets federal agencies purchase location data they would need a warrant to collect directly.",
+      'A warrant requirement is not an obstacle to law enforcement. It is the price of doing it in a free country.',
+    ],
+  },
+  {
+    heading: 'Environment and Energy',
+    body: [
+      'I support the clean energy tax credits, a binding federal target of net-zero electricity by 2035, and stronger EPA authority over PFAS contamination — which is not theoretical in this district.',
+      'The transition has to bring refinery and utility workers with it. I will not support a climate bill that has no wage-replacement and retraining guarantee for the workers whose jobs it ends.',
+    ],
+  },
+  {
+    heading: 'Education',
+    body: [
+      'I support doubling Title I funding, universal pre-K, and raising the federal share of special-education costs to the 40% Congress promised in 1975 and has never once delivered.',
+      'I oppose diverting public money to private-school vouchers. Federal dollars belong in the public schools that are required to accept every child who walks through the door.',
+    ],
+  },
+  {
+    heading: 'Gun Safety',
+    body: [
+      'I support universal background checks, federal red-flag legislation with due-process protections, and restoring the assault weapons ban. Ninety percent of Americans support background checks and Congress has not acted.',
+      'None of this touches lawful hunting or home defense, and I will say so to anyone who claims otherwise.',
+    ],
+  },
+  {
+    heading: 'Personal Freedom',
+    body: [
+      'I will vote to codify Roe v. Wade into federal law. The decision belongs to a woman and her doctor, not to a congressman.',
+      "I support protecting access to contraception and IVF by statute, and I will oppose any federal effort to write one religious tradition's conclusions into everyone's law.",
+    ],
+  },
+  {
+    heading: 'Workers and Unions',
+    body: [
+      'I support the PRO Act, banning captive-audience meetings, and real penalties for employers who fire workers for organizing — penalties large enough to stop being a line item.',
+      'I support extending overtime protection to salaried workers up to $75,000 and ending the misclassification of full-time employees as independent contractors.',
+    ],
+  },
+  {
+    heading: 'Housing',
+    body: [
+      'The shortage is a supply problem and it will not fix itself locally. I support a federal housing production fund tied to zoning reform, expanding the Low-Income Housing Tax Credit, and full funding for Section 8 vouchers so the program stops turning away eligible families.',
+      'I support down-payment assistance for first-time buyers and limits on large investment firms buying single-family homes in bulk.',
+    ],
+  },
+  {
+    heading: 'Democracy and Government Reform',
+    body: [
+      'I support the Freedom to Vote Act, automatic voter registration, an end to partisan gerrymandering through independent commissions, and overturning Citizens United by constitutional amendment.',
+      'I support a total ban on individual stock trading by members of Congress and their spouses. If you cannot serve without trading on what you learn in a briefing, do not serve.',
+    ],
+  },
+]
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bob Seamon for Congress — New Jersey's 3rd District</title>
+    <meta
+      name="description"
+      content="Fictional test campaign page. Bob Seamon for U.S. House of Representatives, New Jersey's 3rd Congressional District — where the candidate stands."
+    />
+    <link rel="canonical" href={canonical} />
+    <!-- Not a real campaign, and not to be indexed or followed. -->
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+
+  <body class="bg-white text-slate-900 antialiased">
+    <div role="note" class="border-b-4 border-amber-500 bg-amber-100 px-6 py-4 text-amber-950">
+      <p class="mx-auto max-w-3xl text-sm leading-relaxed font-semibold">
+        TEST PAGE — FICTIONAL CONTENT. This page was created by Voxivium to test its
+        campaign-analysis software. Bob Seamon is not a candidate for any office, is not running for
+        Congress, and none of the statements below is a real campaign position. Nothing here should
+        be relied on by voters.
+      </p>
+    </div>
+
+    <header class="border-b border-slate-200 bg-slate-900 px-6 py-14 text-white">
+      <div class="mx-auto max-w-3xl">
+        <p class="text-sm font-semibold tracking-[0.2em] text-sky-300 uppercase">
+          Seamon for Congress
+        </p>
+        <h1 class="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">Bob Seamon</h1>
+        <p class="mt-3 text-xl text-slate-300">Candidate for the U.S. House of Representatives</p>
+        <p class="text-lg text-slate-400">New Jersey's 3rd Congressional District</p>
+        <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate-200">
+          I am running because this district deserves a representative who will tell you exactly
+          where he stands before you vote, not after. Every position I hold is on this page. Read
+          them, and hold me to them.
+        </p>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-6 py-14">
+      <h2 class="text-3xl font-bold tracking-tight">Where I Stand</h2>
+      <p class="mt-3 text-lg text-slate-600">
+        Fifteen issues, stated plainly. Where I break with my own party, I have said so.
+      </p>
+
+      <div class="mt-12 space-y-12">
+        {
+          positions.map((position) => (
+            <section>
+              <h3 class="text-2xl font-semibold tracking-tight text-slate-900">
+                {position.heading}
+              </h3>
+              {position.body.map((paragraph) => (
+                <p class="mt-4 text-lg leading-relaxed text-slate-700">{paragraph}</p>
+              ))}
+            </section>
+          ))
+        }
+      </div>
+
+      <section class="mt-16 border-t border-slate-200 pt-10">
+        <h3 class="text-2xl font-semibold tracking-tight">About Bob</h3>
+        <p class="mt-4 text-lg leading-relaxed text-slate-700">
+          Bob Seamon is a fictional candidate. In this fiction he has lived in Burlington County for
+          twenty-two years, spent his career in software, served two terms on a local school board,
+          and is married with three children.
+        </p>
+      </section>
+
+      <p class="mt-16 rounded-lg bg-slate-100 p-6 text-sm leading-relaxed text-slate-600">
+        <strong class="font-semibold text-slate-800">Reminder:</strong> this is a fictional page published
+        by Voxivium solely to test automated analysis of candidate campaign websites. It is not a campaign
+        communication, it is not authorized by any candidate or committee, and no donations are solicited
+        or accepted.
+      </p>
+    </main>
+  </body>
+</html>

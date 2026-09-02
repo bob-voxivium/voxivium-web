@@ -9,9 +9,16 @@ export default defineConfig({
       // Keep transactional and dormant routes out. /subscribe and
       // /subscribe/complete are noindexed in the page head; listing them here
       // would ask Google to crawl pages we've told it not to index.
+      //
+      // /temp/ holds throwaway test fixtures — currently a fictional campaign
+      // page used to exercise the candidate campaign-URL pipeline. It is
+      // noindexed for the same reason, and it must not appear in the sitemap:
+      // the campaign scraper reads sitemap.xml as a freshness probe, and a
+      // fixture listed there is a fixture that looks like site content.
       filter: (page) =>
         !page.includes('/kickstarter') &&
         !page.includes('/subscribe') &&
+        !page.includes('/temp/') &&
         !page.includes('/404'),
       // A single build timestamp. Honest at the granularity we have: this is a
       // static site rebuilt on deploy, and per-page mtimes would be lost
