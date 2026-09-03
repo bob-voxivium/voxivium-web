@@ -12,6 +12,20 @@ which commits are new — leave it in place when editing an entry by hand.
 
 <!-- releases below -->
 
+## site 0.4 — 2026-09-02 (17b1426)
+
+- feat: add temporary fictional campaign page for scraper testing
+- Rebrand the report card as the Accountability Scorecard
+
+<sub>since 79bf142</sub>
+
+## site 0.3 — 2026-08-25 (79bf142)
+
+- fix: remove the support email address from the support page
+- chore: record site 0.2 deploy
+
+<sub>since 723cbd6</sub>
+
 ## site 0.2 — 2026-08-25 (723cbd6)
 
 - feat: route account deletion requests through the support form
